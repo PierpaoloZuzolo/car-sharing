@@ -1,6 +1,12 @@
 #ifndef PRENOTAZIONE_H
 #define PRENOTAZIONE_H
 
+#include <time.h>
+#define MASSIMO 50
+#define MASSIMO_NOME 50
+#define MASSIMO_COGNOME 50
+#define MASSIMO_EMAIL 80
+
 /*SPECIFICA SINTATTICA
 
 TIPI: PRENOTAZIONE,TIME_T
@@ -107,7 +113,16 @@ controllo_prenotazione(PRENOTAZIONE) = void
 
 typedef struct prenotazione* PRENOTAZIONE;
 
-float costo_noleggio(int ora_utilizzo, time_t inizio);
+struct prenotazione{
+    char nome[MASSIMO_NOME + 1];
+    char cognome[MASSIMO_COGNOME +1];
+    char email[MASSIMO_EMAIL + 1];
+    time_t inizio;
+    time_t fine;
+    float costo;
+};
+
+float costo_noleggio(double ora_utilizzo, time_t inizio);
 time_t creazione_data();
 int giorni_festivi(struct tm* tm_attuale);
 int orario_sconto(struct tm* tm_attuale);
