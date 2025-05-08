@@ -2,21 +2,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-#include "prenotazione.h"
-#include "utente.h" 
 #include "utile.h"
-
-
-typedef struct prenotazione{
-    char nome[MAX_NOME + 1];
-    char cognome[MAX_COGNOME +1];
-    char mail[MAIL + 1];
-    time_t inizio;
-    time_t fine;
-    float costo;
-    struct prenotazione* prossimo;
-
-} prenotazione;
+#include "prenotazione.h"
+#include "priorita_prenotazione.h" 
 
 time_t creazione_data() {
 
@@ -74,7 +62,7 @@ int orario_sconto(struct tm* tm_attuale){
     return 0;
 }
 
-float costo_noleggio(int ora_utilizzo, time_t inizio) {
+float costo_noleggio(double ora_utilizzo, time_t inizio) {
     
     time_t tempo_corrente = inizio;
 
@@ -97,7 +85,7 @@ float costo_noleggio(int ora_utilizzo, time_t inizio) {
 
         tempo_corrente += 3600;
     }
-    printf("[TOTALE] - prezzo noleggio = %.01f€", prezzo_noleggio);
+    printf("[TOTALE] - prezzo noleggio = %.02f€", prezzo_noleggio);
     return prezzo_noleggio;
 }
 
@@ -105,7 +93,7 @@ void informazioni_costo_noleggio(int ora_utilizzo, time_t inizio){
 
     printf("\n");
     printf("NOTA BENE: i prezzi possono variare nel corso del tempo!\n");
-    printf("In caso di mancato utilizzo del veicolo da parte dell’utente, nonostante il pagamento già effettuato, non è previsto alcun rimborso!\n");
+    printf("In caso di mancato utilizzo del veicolo da parte dell'utente, nonostante il pagamento già effettuato, non è previsto alcun rimborso!\n");
     printf("\n");
     printf("=================== DESCRIZIONE PREZZI NOLEGGIO ===================\n");
     printf("\n");
@@ -155,7 +143,7 @@ void informazioni_costo_noleggio(int ora_utilizzo, time_t inizio){
         scanf("%s, scelta");
 
         if(strcmp(scelta,"SI") == 0 || strcmp(scelta,"Si") == 0 || strcmp(scelta,"si") == 0){
-
+            PRENOTAZIONE creazione_prenotazione( );
         }
 
         else{
@@ -194,7 +182,7 @@ void controllo_prenotazione(PRENOTAZIONE richiesta){
     printf("=======================================\n");
     printf("-Nome:       %s\n", richiesta->nome);
     printf("-Cognome:    %s\n", richiesta->cognome);
-    printf("-Mail:       %s\n", richiesta->mail);
+    printf("-Mail:       %s\n", richiesta->email);
     printf("                  INIZIO               \n");
     stampa_data(richiesta->inizio);
     printf("                   FINE                \n");
@@ -213,4 +201,42 @@ void controllo_prenotazione(PRENOTAZIONE richiesta){
     if(strcmp(accettazione, "CONTINUA") == 0 || strcmp(accettazione, "Continua") == 0 || strcmp(accettazione, "continua") == 0){
         printf("Prenotazione andata a buon fine.\n");
     }
+}
+
+// Funzione per creare una nuova prenotazione e riempire tutti i campi della struttura
+PRENOTAZIONE creazione_prenotazione( ){
+    PRENOTAZIONE nuova = malloc(sizeof(struct prenotazione));
+    if(nuova == NULL){
+        printf("Errore di allocazione di memoria!");
+        EXIT_FAILURE;
+    }
+
+    char nome[MASSIMO_NOME];
+    printf("\nCompila la tua prenotazione!\n");
+    printf("Inserisci il nome:\n");
+    scanf("%s", nome);
+    strncpy(nuova->nome, nome, MASSIMO_NOME);
+
+    char cognome[MASSIMO_COGNOME];
+    printf("Inserisci il cognome:\n");
+    scanf("%s", cognome);
+    strncpy(nuova->cognome, cognome, MASSIMO_COGNOME);
+    
+    char email[MASSIMO_EMAIL];
+    printf("Inserisci l'email:\n");
+    scanf("%s", email);
+    strncpy(nuova->email, email, MASSIMO_EMAIL);
+
+    printf("Inserisci la data di inizio:\n");
+    time_t inizio = creazione_data();
+
+    printf("Inserisci la data di fine:\n");
+    time_t fine = creazione_data();
+
+    // Calcolo della durata in ore (differenza tra fine e inizio in secondi, convertita in ore)
+    double ore = (double)(nuova->fine - nuova->inizio) / 3600.0;   
+    // Calcola il prezzo del noleggio, in base alla durata e secondo gli sconti
+    nuova->costo = costo_noleggio(ore, inizio);   
+
+    return nuova;
 }
