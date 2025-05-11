@@ -23,7 +23,7 @@ Tipi: prenotazione
   - nome       -> una stringa contenente il nome dell'utente.
   - cognome    -> una stringa contente il cognome dell'utente.
   - email      -> una stringa contente l'email dell'utente.
-  - data_inizi -> il timestamp che rappresenta l'inizio del noleggio.
+  - data_inizio-> il timestamp che rappresenta l'inizio del noleggio.
   - data_fine  -> il timestamp che rappresenta la fine del noleggio.
   - costo      -> il costo associato alla prenotazione.
 
@@ -71,7 +71,7 @@ Operatori:
 SPECIFICA SEMANTICA
 
 -------------------------------------------------------------
-Tipi: time_t, int, float, PRENOTAZIONE
+Tipi: TIME_T, INT, FLOAT, PRENOTAZIONE
 -------------------------------------------------------------
 
 Per ogni operazione si definiscono precondizioni, postcondizioni ed effetti:
