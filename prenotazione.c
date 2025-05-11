@@ -2,11 +2,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-#include "utile.h"
-#include "prenotazione.h"
-#include "priorita_prenotazione.h" 
+#include "prenotazione.h" 
 
-time_t creazione_data() {
+// Funzione che chiede all'utente di inserire una data (mese, giorno, anno, ora e minuto)
+time_t creazione_data( ) {
 
     struct tm tm_inizio = {0};
     int mese, giorno, anno, ora, minuto;
@@ -31,141 +30,78 @@ time_t creazione_data() {
     scanf("%d", &minuto);
     tm_inizio.tm_min = minuto;
 
-    return mktime(&tm_inizio);
+    //trasforma i secondi in data
+    return mktime(&tm_inizio);  
 }
 
-int giorni_festivi(struct tm* tm_attuale){
-    int mese = tm_attuale->tm_mon, giorno = tm_attuale->tm_mday;
-
-    if(((giorno == 1 || giorno == 6) && mese == 0) ||    //01/01 06/01
-        (giorno == 25 && mese == 3) ||  //25/04
-        (giorno == 1 && mese == 4) ||   //01/05
-        (giorno == 2 && mese == 5) ||   //02/06
-        (giorno == 15 && mese == 7) ||  //15/08
-        (giorno == 1 && mese == 10) ||  //01/10
-        ((giorno == 8 || giorno == 25 || giorno == 26 ) && mese == 11)) { //08-25-26/12
-        return 1;
-    }
-
-    return 0;
-}
-
-int orario_sconto(struct tm* tm_attuale){   
-
-    int ora= tm_attuale->tm_hour;
-    
-    if((ora >= 3 && ora <= 6) || 
-       (ora >= 13 && ora <= 15) ){
-        return 1;
-    }
-
-    return 0;
-}
-
-float costo_noleggio(double ora_utilizzo, time_t inizio) {
+// Funzione che calcola il costo del noleggio secondo le ore di 
+float costo_noleggio(int minuti, time_t inizio) {
     
     time_t tempo_corrente = inizio;
 
     float prezzo_noleggio = 0.0;
 
-    for(int i = 0; i < ora_utilizzo; i++){
+// Un ciclo che verifica il costo, ora per ora e giorno per giorno, tenendo conto degli sconti e delle festività italiane 
+    for(int i = 0; i < minuti; i++){
         struct tm* tm_corrente= localtime(&tempo_corrente);
 
-        if(giorni_festivi(tm_corrente)){
-            prezzo_noleggio+=25;
+        int mese = tm_corrente->tm_mon, giorno = tm_corrente->tm_mday;
+
+        // Prezzo secondo i giorni festivi
+        if(((giorno == 1 || giorno == 6) && mese == 0) ||    //01/01 06/01
+            (giorno == 25 && mese == 3) ||  //25/04
+            (giorno == 1 && mese == 4) ||   //01/05
+            (giorno == 2 && mese == 5) ||   //02/06
+            (giorno == 15 && mese == 7) ||  //15/08
+            (giorno == 1 && mese == 10) ||  //01/10
+            ((giorno == 8 || giorno == 25 || giorno == 26 ) && mese == 11)){ //08/12 25/12 26/12
+                prezzo_noleggio+=2;
+            }
+
+        int ora= tm_corrente->tm_hour;
+
+        // Sconto orario
+        if((ora >= 3 && ora <= 6) || 
+           (ora >= 13 && ora <= 15) ){
+            prezzo_noleggio+=0.19;
         }
 
-        else if(orario_sconto(tm_corrente)){
-            prezzo_noleggio+=7.5;
-        }
-
+        // Prezzo normale
         else{
-            prezzo_noleggio+=15;
+            prezzo_noleggio+=0.98;
         }
 
-        tempo_corrente += 3600;
+        tempo_corrente += 60;
     }
     printf("[TOTALE] - prezzo noleggio = %.02f€", prezzo_noleggio);
     return prezzo_noleggio;
 }
 
-void informazioni_costo_noleggio(int ora_utilizzo, time_t inizio){
+// Funzione che crea un preventivo del costo secondo le ore di utilizzo inserite da utente, tenendo conto degli sconti
+void preventivo( ){
 
-    printf("\n");
-    printf("NOTA BENE: i prezzi possono variare nel corso del tempo!\n");
-    printf("In caso di mancato utilizzo del veicolo da parte dell'utente, nonostante il pagamento già effettuato, non è previsto alcun rimborso!\n");
-    printf("\n");
-    printf("=================== DESCRIZIONE PREZZI NOLEGGIO ===================\n");
-    printf("\n");
-    printf("1. Prezzo standard (15€/h):\n");
-    printf("-In fasce di orari senza sconti e non festivi\n");
+   printf("Inserisci la data di inizio: \n");
+   time_t inizio=creazione_data();
 
-    printf("\n");
-    printf("2. Prezzo scontato (7.5€/h):\n");
-    printf("-tra le 3.00 e le 6.00 (fascia mattutina)\n");
-    printf("-tra le 13.00 e le 15.00 (fascia pomeridiana)\n");
-
-    printf("\n");
-    printf("3. Prezzo festivo (25€/h):\n");
-    printf("- 01 Gennaio (Capodanno)\n");
-    printf("- 06 Gennaio (Epifania)\n");
-    printf("- 25 Aprile (Festa della Liberazione)\n");
-    printf("- 01 Maggio (Festa del Lavoro)\n");
-    printf("- 02 Giugno (Festa della Repubblica)\n");
-    printf("- 15 Agosto (Ferragosto)\n");
-    printf("- 01 Novembre (Tutti i Santi)\n");
-    printf("- 08 Dicembre (Immacolata Concezione)\n");
-    printf("- 25 Dicembre (Natale)\n");
-    printf("- 26 Dicembre (Santo Stefano)\n");
-    printf("\n");
-    printf("========================================================================\n");
-    printf("\n");
-
-    char scelta[10];
-
-    printf("Vuoi fare un preventivo? (SI/NO)\n");
-    scanf("%s, scelta");
-
-    if(strcmp(scelta,"SI") == 0 || strcmp(scelta,"Si") == 0 || strcmp(scelta,"si") == 0){
-        time_t inzio;
-        int ora_utilizzo;
-
-        printf("Inserisci la data di inizio: \n");
-        inzio=creazione_data();
-
-        printf("Inserisci le ore di utilizzo: \n");
-        scanf("%d", &ora_utilizzo);
+   printf("Inserisci la data di fine:\n");
+   time_t fine = creazione_data();
         
-        float prezzo_noleggio=costo_noleggio(ora_utilizzo, inizio);
-        
-        printf("\n");
-        printf("Vuoi proseguire con la prenotazione?\n");
-        scanf("%s, scelta");
+   int minuti = (int)((fine - inizio) % 3600) / 60;
 
-        if(strcmp(scelta,"SI") == 0 || strcmp(scelta,"Si") == 0 || strcmp(scelta,"si") == 0){
-            PRENOTAZIONE creazione_prenotazione( );
-        }
-
-        else{
-            printf("Hai deciso di non continuare!\n");
-        }
-    }
-
-    else{
-        printf("Hai deciso di non continuare!\n");
-    }
-
+   costo_noleggio(minuti, inizio);
 }
 
-void stampa_data (time_t inizio_fine){
-    struct tm* tm_inizio = localtime(&inizio_fine);  
+// Funzione che stampa la data passata per input
+void stampa_data (time_t data){
+    struct tm* tm_inizio = localtime(&data);  
     
     printf("Data e ora: %02d/%02d/%04d %02d:%02d\n", tm_inizio->tm_mday, tm_inizio->tm_mon + 1, tm_inizio->tm_year + 1900, 
                                                      tm_inizio->tm_hour, tm_inizio->tm_min);
 
 }
 
-void controllo_prenotazione(PRENOTAZIONE richiesta){
+// Funzione che mostra i dati all'utente a schermo per controllare se inseriti correttamente
+void controllo_prenotazione(prenotazione* richiesta){
     if(richiesta==NULL){
         printf("Non è stata inserita nessuna prenotazione!");
         exit(-1);
@@ -193,22 +129,25 @@ void controllo_prenotazione(PRENOTAZIONE richiesta){
     printf("PREGO, CONFERMARE I DATI (scrivi CONTINUA o INDIETRO)\n");
 
     scanf("%s", &accettazione);
-    if(strcmp(accettazione, "INDIETRO") == 0 || strcmp(accettazione, "Indietro") == 0 || strcmp(accettazione, "indietro") == 0){
-        free (richiesta);
-        printf("Prenotazione annullata.\n");
-    }
 
     if(strcmp(accettazione, "CONTINUA") == 0 || strcmp(accettazione, "Continua") == 0 || strcmp(accettazione, "continua") == 0){
         printf("Prenotazione andata a buon fine.\n");
+        printf("Prenda il veicolo nella seguente data:\t");
+        stampa_data(richiesta->inizio);
+    }
+
+    else{
+        free (richiesta);
+        printf("Prenotazione annullata.\n");
     }
 }
 
-// Funzione per creare una nuova prenotazione e riempire tutti i campi della struttura
-PRENOTAZIONE creazione_prenotazione( ){
-    PRENOTAZIONE nuova = malloc(sizeof(struct prenotazione));
+// Funzione per creare una nuova prenotazione e riempire tutti i campi attraverso l'inserimento da utente
+prenotazione* creazione_prenotazione( ){
+    prenotazione* nuova = malloc(sizeof(prenotazione));
     if(nuova == NULL){
         printf("Errore di allocazione di memoria!");
-        EXIT_FAILURE;
+        exit(EXIT_FAILURE);
     }
 
     char nome[MASSIMO_NOME];
@@ -228,15 +167,78 @@ PRENOTAZIONE creazione_prenotazione( ){
     strncpy(nuova->email, email, MASSIMO_EMAIL);
 
     printf("Inserisci la data di inizio:\n");
-    time_t inizio = creazione_data();
+    nuova->inizio = creazione_data();
 
     printf("Inserisci la data di fine:\n");
-    time_t fine = creazione_data();
+    nuova->fine = creazione_data();
 
-    // Calcolo della durata in ore (differenza tra fine e inizio in secondi, convertita in ore)
-    double ore = (double)(nuova->fine - nuova->inizio) / 3600.0;   
+    // Calcolo della durata in minuti (differenza tra fine e inizio in secondi, convertita in minuti)
+    int minuti = (int)((nuova->fine - nuova->inizio) / 60);     
     // Calcola il prezzo del noleggio, in base alla durata e secondo gli sconti
-    nuova->costo = costo_noleggio(ore, inizio);   
+    nuova->costo = costo_noleggio(minuti, nuova->inizio);   
 
     return nuova;
+}
+
+// Funzione che mostra le informazioni riguardo il costo del noleggio, permettendo di creare un preventivo e una prenotazione
+void informazioni_costo_noleggio( ){
+
+    printf("\n");
+    printf("NOTA BENE: i prezzi possono variare nel corso del tempo!\n");
+    printf("In caso di mancato utilizzo del veicolo da parte dell'utente non è previsto alcun rimborso!\n");
+    printf("\n");
+    printf("=================== DESCRIZIONE PREZZI NOLEGGIO ===================\n");
+    printf("\n");
+    printf("1. Prezzo standard (0.98€/min):\n");
+    printf("-In fasce di orari senza sconti e non festivi\n");
+
+    printf("\n");
+    printf("2. Prezzo scontato (0.19€/min):\n");
+    printf("-tra le 3.00 e le 6.00 (fascia mattutina)\n");
+    printf("-tra le 13.00 e le 15.00 (fascia pomeridiana)\n");
+
+    printf("\n");
+    printf("3. Prezzo festivo (2€/min):\n");
+    printf("- 01 Gennaio (Capodanno)\n");
+    printf("- 06 Gennaio (Epifania)\n");
+    printf("- 25 Aprile (Festa della Liberazione)\n");
+    printf("- 01 Maggio (Festa del Lavoro)\n");
+    printf("- 02 Giugno (Festa della Repubblica)\n");
+    printf("- 15 Agosto (Ferragosto)\n");
+    printf("- 01 Novembre (Tutti i Santi)\n");
+    printf("- 08 Dicembre (Immacolata Concezione)\n");
+    printf("- 25 Dicembre (Natale)\n");
+    printf("- 26 Dicembre (Santo Stefano)\n");
+    printf("\n");
+    printf("========================================================================\n");
+    printf("\n");
+
+    char scelta[3];
+
+    printf("Vuoi fare un preventivo? (SI/NO)\n");
+    scanf("%s, scelta");
+
+    if(strcmp(scelta,"SI") == 0 || strcmp(scelta,"Si") == 0 || strcmp(scelta,"si") == 0){
+
+        //Crea il preventivo secondo i minuti di utilizzo.
+        void preventivo( ); 
+    
+        printf("\n");
+        printf("Vuoi proseguire con la prenotazione(SI/NO)?\n");
+        scanf("%s, scelta");
+
+        if(strcmp(scelta,"SI") == 0 || strcmp(scelta,"Si") == 0 || strcmp(scelta,"si") == 0){
+            //crea la prenotazione con i dati inseriti dall'utente
+            prenotazione* creazione_prenotazione( );
+        }
+
+        else{
+            printf("Hai deciso di non continuare!\n");
+        }
+    }
+
+    else{
+        printf("Hai deciso di non continuare!\n");
+    }
+
 }

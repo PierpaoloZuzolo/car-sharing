@@ -1,133 +1,127 @@
 #ifndef PRENOTAZIONE_H
 #define PRENOTAZIONE_H
 
-#include <time.h>
-#define MASSIMO 50
 #define MASSIMO_NOME 50
 #define MASSIMO_COGNOME 50
-#define MASSIMO_EMAIL 80
+#define MASSIMO_EMAIL 254
 
-/*SPECIFICA SINTATTICA
+/*
+========================================================================
+SPECIFICA SINTATTICA E SEMANTICA - ADT PRENOTAZIONE
+========================================================================
 
-TIPI: PRENOTAZIONE,TIME_T
+Specifica Sintattica
 
-OPERATORI:
+L’ADT PRENOTAZIONE è definito come un tipo che rappresenta i dati della prenotazioni,
+Vengono definiti i seguenti tipi ed operatori:
 
-- creazione_data              : ( ) → time_t
-- giorni_festivi              : (struct tm*) → int
-- orario_sconto               : (struct tm*) → int
-- costo_noleggio              : (int, time_t) → float
-- informazioni_costo_noleggio : (int, time_t) → void
-- stampa_data                 : (time_t) → void
-- controllo_prenotazione      : (PRENOTAZIONE) → void
+-------------------------------------------------------------
+Tipi: prenotazione
+-------------------------------------------------------------
+- prenotazione:
+  Un record che rappresenta una prenotazione ed è definito come:
+  - nome       -> una stringa contenente il nome dell'utente.
+  - cognome    -> una stringa contente il cognome dell'utente.
+  - email      -> una stringa contente l'email dell'utente.
+  - data_inizi -> il timestamp che rappresenta l'inizio del noleggio.
+  - data_fine  -> il timestamp che rappresenta la fine del noleggio.
+  - costo      -> il costo associato alla prenotazione.
 
-creazione_data:
-• Sintassi: creazione_data : ( ) → time_t
-• Descrizione: Chiede la data da inserire all'utente. Se l'utente non inserisce una data valida, il comportamento può generare un errore
+-------------------------------------------------------------
+Operatori:
+-------------------------------------------------------------
+- creazione_data              : ( ) → TIME_T
+- costo_noleggio              : (INT, TIME_T) → FLOAT
+- preventivo                  : ( ) →  VOID
+- stampa_data                 : (TIME_T) → VOID
+- controllo_prenotazione      : (PRENOTAZIONE) → VOID
+- creazione_prenotazione      : (   ) → PRENOTAZIONE
+- informazioni_costo_noleggio : (INT, TIME_T) → VOID
 
-giorni_festivi:
-• Sintassi: giorni_festivi : (struct tm*) → int
-• Descrizione: Confornta la data data in input con un elenco di giorni festivi italiani prestabilito
+1. time_t creazione_data( )
+   • Descrizione: Fa inserire all'utente la data, segnando giorno, mese, anno, ora e minuti.
+   • Specifica: Restituisce la data che il cliente ha inserito, questa viene calcolata prima in secondi
+   dal 1970, poi la trasforma nella corrispettiva data.
 
-orario_sconto:
-• Sintassi: orario_sconto : (struct tm*) → int
-• Descrizione: Confronta l' orario dato in input con un elenco di orari in cui c'è lo sconto
+2.  float costo_noleggio(int minuti, time_t inizio)
+    • Descrizione: Calcola il costo del noleggio secondo le ore utilizzo tenendo conto delle tariffe variabili.
+    • Specifica: Restituisce il costo, tenendo conto degli sconti.
 
-costo_noleggio:
-• Sintassi: costo_noleggio : (int, time_t) → float
-• Descrizione: Restituisce il costo del noleggio, calcolato in base alle ore di utilizzo e considerando eventuali sconti per festività 
-o orari particolari. 
-Il prezzo può variare a seconda dell'auto, avendo così dei moltiplicatore a seconda della fascia attribuita dall'admin.
+3.  void preventivo ( )
+    • Descrizione: Mostra all'utente il costo del servizio.
+    • Specifica: Restituisce a video il costo calcolato secondo le ore di utilizzo.
 
-informazioni_costo_noleggio:
-• Sintassi: informazioni_costo_noleggio : (int, time_t) → void
-• Descrizione: Illustra i costi che possono variare a seconda di giorni festivi e orari particolari. Il cliente può decidere 
-se procedere con la prenotazione in base a queste informazioni.
+4.  void stampa_data (time_t data)
+    • Descrizione: Mostra a schermo la data passata in input, seguendo il formato (gg/mese/anno h:min).
+    • Specifica: Restituisce a schermo la data.
 
-stampa_data :
-• Sintassi: stampa_data : (time_t) → void
-• Descrizione: Stampa la data passata in input 
+5.  void controllo_prenotazione (prenotazione* richiesta) 
+    • Descrizione: Mostra a schermo i dati inseriti per compilare la prenotazione.
+    • Specifica: Restituisce a schermo i dati della prenotazione, affichè l'utente possa visionarli.
 
-controllo_prenotazione:
-• Sintassi: controllo_prenotazione : (PRENOTAZIONE) → void
-• Descrizione: Stampa i dettagli della prenotazione, consentendo all'utente di verificare se i dati sono stati correttamente inseriti. 
-Se la prenotazione è corretta, può proseguire con la prenotazione del veicolo.
+6.  prenotazione* creazione_prenotazione ( ) 
+    • Descrizione: Chiede all'utente i dati da inserire per completare la prenotazione.
+    • Specifica: Restituisce una prenotazione con i campi compilati dall'utente.
 
+7.  void informazioni_costo_noleggio( ) 
+    • Descrizione: Permette di visualizzare le varie tariffe e permette di proseguire con la prenotazione.
+    • Specifica: Restituisce a schermo i diversi costi.
 
-
+========================================================================
 SPECIFICA SEMANTICA
 
-TIPI:
+-------------------------------------------------------------
+Tipi: time_t, int, float, PRENOTAZIONE
+-------------------------------------------------------------
 
-PRENOTAZIONE = {prenotazione}
-prenotazione è una struttura con i seguenti campi:
-    - nome: una stringa contenente il nome dell'utente
-    - cognome: una stringa contente il cognome dell'utente
-    - email: una stringa contente l'email dell'utente
-    - data_inizio: il timestamp che rappresenta l'inizio del noleggio
-    - data_fine: il timestamp che rappresenta la fine del noleggio
-    - costo: il costo associato alla prenotazione
+Per ogni operazione si definiscono precondizioni, postcondizioni ed effetti:
 
+1.  creazione_data(void) = data
+            pre: Nessuna.
+            post: Data deve essere valida.
 
-time_t = tipo per rappresentare il tempo
+2.  costo_noleggio(minuti, inizio) = prezzo
+            pre: 
+                -Minuti deve essere maggiore o uguale a 3600 (1 ora).
+                -Inizio deve essere una data valida.
+            post: Nessuna.
 
-OPERATORI:
+3.  preventivo (void) = void
+            pre: Nessuna.
+            post: Nessuna.
 
-creazione_data( ) = time_t
-    pre: nessuna
-    post: restituisce un valore di tipo time_t che rappresenta la data di inizio e fine del noleggio.
+4.  stampa_data (data) = void
+            pre: Data deve essere valida.
+            post: Nessuna.
 
+5.  controllo_prenotazione (richiesta) = void
+            pre: Richiesta deve essere valida.
+            post: Nessuna.
 
-giorni_festivi(tm_attuale) = R
-    pre: tm_attuale deve essere una struttura tm valida
-    post: se la data fornita coincide con un giorno festivo italiano, il valore restituito R è 1 (vero), altrimenti 0 (falso).
+6.  creazione_prenotazione ( ) = nuova_prenotazione
+            pre: Nessuna.
+            post: Nuova_prenotazione deve essere valida.
 
-
-orario_sconto(tm_attuale) = R
-    -pre: tm_attuale deve essere una struttura tm valida
-    -post: se la data e l'orario forniti rientrano in un intervallo di orario sconto predefinito, restituito R è 1 (vero), altrimenti 0 (falso).
-
-costo_noleggio(ora_utilizzo, inizio) = float
-    -pre:
-    -ora_utilizzo: l'ora inserita deve essere maggiore o uguale a 1 e deve essere un numero intero.
-    -inizio: è il timestamp che rappresenta l'inizio del noleggio.
-    -post: nessuna
-
-
-informazioni_costo_noleggio(ora_utilizzo, inizio) = void
-    -pre:
-    -ora_utilizzo: l'ora inserita deve essere maggiore o uguale a 1 e deve essere un numero intero.
-    -inizio: è il timestamp che rappresenta l'inizio del noleggio.
-    -post: nessuna
-
-    -stampa_data(inizio_fine) = void
-    pre: inizio_fine deve essere una data valida
-    post: nessuna
-
-controllo_prenotazione(PRENOTAZIONE) = void
-    -pre: La prenotazione deve essere valida e non vuota
-    -post: nessuna
-
-
+7.    informazioni_costo_noleggio(void) = void
+            pre: Nessuna.
+            post: Nessuna.
 */
 
-typedef struct prenotazione* PRENOTAZIONE;
-
-struct prenotazione{
+typedef struct{
     char nome[MASSIMO_NOME + 1];
     char cognome[MASSIMO_COGNOME +1];
     char email[MASSIMO_EMAIL + 1];
     time_t inizio;
     time_t fine;
     float costo;
-};
+} prenotazione;
 
-float costo_noleggio(double ora_utilizzo, time_t inizio);
-time_t creazione_data();
-int giorni_festivi(struct tm* tm_attuale);
-int orario_sconto(struct tm* tm_attuale);
-void informazioni_costo_noleggio(int ora_utilizzo, time_t inizio);
-void stampa_data (time_t inizio_fine);
-void controllo_prenotazione(PRENOTAZIONE richiesta);
+time_t creazione_data( );
+float costo_noleggio(int minuti, time_t inizio);
+void preventivo( );
+void stampa_data (time_t data);
+void controllo_prenotazione(prenotazione* richiesta);
+prenotazione* creazione_prenotazione( );
+void informazioni_costo_noleggio( );
 
 #endif
