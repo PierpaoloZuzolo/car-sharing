@@ -5,6 +5,8 @@
 #define MASSIMO_COGNOME 50
 #define MASSIMO_EMAIL 254
 
+typedef struct prenotazione* ptrprenotazione;
+
 /*
 ========================================================================
 SPECIFICA SINTATTICA E SEMANTICA - ADT PRENOTAZIONE
@@ -12,19 +14,19 @@ SPECIFICA SINTATTICA E SEMANTICA - ADT PRENOTAZIONE
 
 Specifica Sintattica
 
-L’ADT PRENOTAZIONE è definito come un tipo che rappresenta i dati della prenotazioni,
+L’ADT PRENOTAZIONE è definito come un tipo opaco che rappresenta i dati della prenotazioni,
 Vengono definiti i seguenti tipi ed operatori:
 
 -------------------------------------------------------------
-Tipi: prenotazione
+Tipi: prenotazione, ptrprenotazione
 -------------------------------------------------------------
 - prenotazione:
   Un record che rappresenta una prenotazione ed è definito come:
   - nome       -> una stringa contenente il nome dell'utente.
   - cognome    -> una stringa contente il cognome dell'utente.
   - email      -> una stringa contente l'email dell'utente.
-  - data_inizio-> il timestamp che rappresenta l'inizio del noleggio.
-  - data_fine  -> il timestamp che rappresenta la fine del noleggio.
+  - inizio     -> il marcatore temporale che rappresenta l'inizio del noleggio.
+  - fine       -> il marcatore temporale che rappresenta la fine del noleggio.
   - costo      -> il costo associato alla prenotazione.
 
 -------------------------------------------------------------
@@ -38,18 +40,18 @@ Operatori:
 - creazione_prenotazione      : (   ) → PRENOTAZIONE
 - informazioni_costo_noleggio : (INT, TIME_T) → VOID
 
-1. time_t creazione_data( )
-   • Descrizione: Fa inserire all'utente la data, segnando giorno, mese, anno, ora e minuti.
+1. time_t creazione_data ( )
+   • Descrizione: Fa inserire all'utente la data, segnando giorno, mese e anno.
    • Specifica: Restituisce la data che il cliente ha inserito, questa viene calcolata prima in secondi
-   dal 1970, poi la trasforma nella corrispettiva data.
+    dal 1900, poi la trasforma nella corrispettiva data.
 
-2.  float costo_noleggio(int minuti, time_t inizio)
-    • Descrizione: Calcola il costo del noleggio secondo le ore utilizzo tenendo conto delle tariffe variabili.
-    • Specifica: Restituisce il costo, tenendo conto degli sconti.
+2.  float costo_noleggio (int giorno, time_t inizio)
+    • Descrizione: Calcola il costo del noleggio secondo i giorni tenendo conto delle tariffe variabili.
+    • Specifica: Restituisce il costo, tenendo conto dei prezzi.
 
 3.  void preventivo ( )
     • Descrizione: Mostra all'utente il costo del servizio.
-    • Specifica: Restituisce a video il costo calcolato secondo le ore di utilizzo.
+    • Specifica: Restituisce a video il costo calcolato secondo i giorni di utilizzo.
 
 4.  void stampa_data (time_t data)
     • Descrizione: Mostra a schermo la data passata in input, seguendo il formato (gg/mese/anno h:min).
@@ -64,7 +66,7 @@ Operatori:
     • Specifica: Restituisce una prenotazione con i campi compilati dall'utente.
 
 7.  void informazioni_costo_noleggio( ) 
-    • Descrizione: Permette di visualizzare le varie tariffe e permette di proseguire con la prenotazione.
+    • Descrizione: Permette di visualizzare le varie tariffe.
     • Specifica: Restituisce a schermo i diversi costi.
 
 ========================================================================
@@ -80,9 +82,9 @@ Per ogni operazione si definiscono precondizioni, postcondizioni ed effetti:
             pre: Nessuna.
             post: Data deve essere valida.
 
-2.  costo_noleggio(minuti, inizio) = prezzo
+2.  costo_noleggio(giorno, inizio) = prezzo
             pre: 
-                -Minuti deve essere maggiore o uguale a 3600 (1 ora).
+                -Giorno deve essere maggiore o uguale a 86400 secondi (1 giorno).
                 -Inizio deve essere una data valida.
             post: Nessuna.
 
@@ -102,26 +104,18 @@ Per ogni operazione si definiscono precondizioni, postcondizioni ed effetti:
             pre: Nessuna.
             post: Nuova_prenotazione deve essere valida.
 
-7.    informazioni_costo_noleggio(void) = void
+7.  informazioni_costo_noleggio(void) = void
             pre: Nessuna.
             post: Nessuna.
 */
 
-typedef struct{
-    char nome[MASSIMO_NOME + 1];
-    char cognome[MASSIMO_COGNOME +1];
-    char email[MASSIMO_EMAIL + 1];
-    time_t inizio;
-    time_t fine;
-    float costo;
-} prenotazione;
-
 time_t creazione_data( );
 float costo_noleggio(int minuti, time_t inizio);
-void preventivo( );
-void stampa_data (time_t data);
-void controllo_prenotazione(prenotazione* richiesta);
-prenotazione* creazione_prenotazione( );
+void stampa_data(time_t data);
+void controllo_prenotazione(ptrprenotazione richiesta);
 void informazioni_costo_noleggio( );
+void preventivo( );
+ptrprenotazione creazione_prenotazione( );
+time_t prendi_data_inizio(ptrprenotazione richiesta);
 
 #endif
