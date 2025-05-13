@@ -25,12 +25,12 @@ Tipi:
 -------------------------------------------------------------
 Operatori:
 -------------------------------------------------------------
-- IniziaUtente     : (const char *nome, const char *email) → PtrUtente
-- PrendiNome   : (PtrUtente) → char*
-- PrendiEmail    : (PtrUtente) → char*
-- StampaUtente : (PtrUtente) → void
+- IniziaUtente     : (const char *nome, const char *email) -> PtrUtente
+- PrendiNome   : (PtrUtente) -> char*
+- PrendiEmail    : (PtrUtente) -> char*
+- StampaUtente : (PtrUtente) -> void
 - SalvaUtentiSuFile: (char *nome_file, PtrUtente) -> void
-- CaricaUtentiDaFile  : (const char *nome_file, TABELLAHASH) → void
+- CaricaUtentiDaFile  : (const char *nome_file, TABELLAHASH) -> void
 - LiberaUtente: (PtrUtente) -> void
 
 1. PtrUtente IniziaUtente (const char *nome, const char *email)

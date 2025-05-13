@@ -20,17 +20,19 @@ Tipi:
 - PtrHash  
     Puntatore opaco a una struttura dati che rappresenta una tabella hash.
     Ogni cella contiene una lista collegata di nodi con:
-    - PtrUtente utente → utente memorizzato
-    - nodo* prossimo → puntatore al nodo successivo
+    - PtrUtente utente -> utente memorizzato
+    - nodo* prossimo -> puntatore al nodo successivo
 
 -------------------------------------------------------------
 Operatori:
 -------------------------------------------------------------
-- hash                  : (char nome[], char email[], int dimensione) → unsigned int  
-- NuovaTabellaHash      : (int dimensione) → PtrHash  
-- InserisciHash         : (PtrHash h, PtrUtente utente) → bool  
-- CercaUtente           : (PtrHash h, PtrUtente utente) → PtrUtente  
-- DistruggiHash         : (PtrHash h) → void  
+- hash                      : (char nome[], char email[], int dimensione) -> unsigned int  
+- NuovaTabellaHash          : (int dimensione) -> PtrHash  
+- InserisciHash             : (PtrHash h, PtrUtente utente) -> bool  
+- CercaUtente               : (PtrHash h, PtrUtente utente) -> PtrUtente  
+- DistruggiHash             : (PtrHash h) -> void  
+- dimensione_hash           : (PtrHash h) -> int
+- verifica_duplicati_utenti : (PtrHash h, consta char *nome, const char *email) -> bool
 
 -------------------------------------------------------------
 Operatori con descrizione e specifica:
@@ -57,6 +59,13 @@ Operatori con descrizione e specifica:
    • Descrizione: Libera tutta la memoria associata alla tabella hash.  
    • Specifica: Libera ogni nodo presente nelle liste collegate e tutti gli utenti associati, poi libera la tabella e la struttura `h`.
 
+6. int dimensione_hash(PtrHash h)
+   • Descrizione: Restituisce la dimensione della tabella hash.
+   • Specifica: Se h != NULL, restituisce h->dimensione, altrimenti 0.
+
+7. bool verifica_duplicati_utenti((PtrHash h, const char *nome, const char *email)
+   • Descrizione: Cerca nella tabella hash se il nome o il cognome sono già inseriti.
+   • Specifica: Se il nome inserito o la email inserita sono già presenti nella tabella hash, la funzione restituisce true, false altrimenti.
 ===============================
 Specifica Semantica
 ===============================
@@ -73,26 +82,33 @@ BOOLEANO: {vero, falso}
 Per ogni operazione si definiscono precondizioni, postcondizioni ed effetti:
 -------------------------------------------------------------
 
-1. hash(nome, email, dimensione)  
+1. hash(nome, email, dimensione) =  valore_hash
    • pre: nome ed email sono stringhe valide, dimensione > 0  
    • post: restituisce un valore compreso tra 0 e dimensione-1, derivato dai caratteri di nome ed email
 
-2. NuovaTabellaHash(dimensione)  
+2. NuovaTabellaHash(dimensione)  = h
    • pre: dimensione > 0  
    • post: alloca una nuova tabella hash con `dimensione` celle inizializzate a NULL
 
-3. InserisciHash(h, utente)  
+3. InserisciHash(h, utente)  = true\false
    • pre: h != NULL, utente != NULL  
    • post: se un utente con la stessa email non è presente, viene aggiunto e restituisce true; altrimenti restituisce false e libera `utente` duplicato
 
-4. CercaUtente(h, utente)  
+4. CercaUtente(h, utente)  = attuale->utente
    • pre: h != NULL, utente != NULL  
    • post: restituisce un PtrUtente con stessa email se presente, altrimenti NULL
 
-5. DistruggiHash(h)  
+5. DistruggiHash(h) 
    • pre: h != NULL  
    • post: libera tutta la memoria associata a `h`, incluse le liste e i dati utente
 
+6. dimensione_hash(h) = h->dimensione
+   • pre: h != NULL
+   • post: restituisce un int che ha come valore la dimensione della tabella hash
+
+7. verifica_duplicati_utenti(h, nome, email) = true\false
+   • pre: nome e email sono stringhe valide e h != NULL
+   • post: restituisce true se trova nome o email già esistenti, altrimenti false
 */
 
 
@@ -107,6 +123,10 @@ bool InserisciHash(PtrHash h, PtrUtente utente);
 PtrUtente CercaUtente(PtrHash h, PtrUtente utente);
 
 void DistruggiHash(PtrHash h);
+
+int dimensione_hash(PtrHash h);
+
+bool verifica_duplicati_utenti(PtrHash h, const char *nome, const char *email);
 
 
 

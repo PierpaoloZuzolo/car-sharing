@@ -121,3 +121,34 @@ void DistruggiHash(PtrHash h)
     free(h->tabella);
     free(h);
 }
+
+int dimensione_hash(PtrHash h)
+{
+    return h ? h->dimensione : 0; // restituisce 0 se h punta a NULL
+}
+
+
+// funzione per vedere se il nome o l'email inseriti per la registrazione di un utente esistono già
+bool verifica_duplicati_utenti(PtrHash h, const char *nome, const char *email)
+{
+    if(!h){
+        printf("Errore tabella hash.");
+        exit(1);
+    }
+    int dimensione = dimensione_hash(h);
+    if (0 == dimensione){
+        printf("Errore tabella hash.");
+        exit(1);
+    }
+    for(int i = 0; i < dimensione; i++){
+        nodo *attuale = h->tabella[i];
+        while(attuale){
+            PtrUtente ut = attuale->utente;
+            if(strcmp(PrendiNome(ut), nome) == 0 || strcmp(PrendiEmail(ut), email) == 0){
+                return true;
+            }
+            attuale = attuale->prossimo;
+        }
+    }
+    return false;
+}
