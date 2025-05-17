@@ -1,127 +1,192 @@
-#ifndef PRENOTAZIONE_H
-#define PRENOTAZIONE_H
+#ifndef PRENOTAZIONI_H
+#define PRENOTAZIONI_H
 
-#define MASSIMO_NOME 50
-#define MASSIMO_COGNOME 50
-#define MASSIMO_EMAIL 254
+#include <stdbool.h>
 
 /*
-========================================================================
-SPECIFICA SINTATTICA E SEMANTICA - ADT PRENOTAZIONE
-========================================================================
-
-Specifica Sintattica
-
-L’ADT PRENOTAZIONE è definito come un tipo che rappresenta i dati della prenotazioni,
-Vengono definiti i seguenti tipi ed operatori:
-
--------------------------------------------------------------
-Tipi: prenotazione
--------------------------------------------------------------
-- prenotazione:
-  Un record che rappresenta una prenotazione ed è definito come:
-  - nome       -> una stringa contenente il nome dell'utente.
-  - cognome    -> una stringa contente il cognome dell'utente.
-  - email      -> una stringa contente l'email dell'utente.
-  - data_inizi -> il timestamp che rappresenta l'inizio del noleggio.
-  - data_fine  -> il timestamp che rappresenta la fine del noleggio.
-  - costo      -> il costo associato alla prenotazione.
-
--------------------------------------------------------------
-Operatori:
--------------------------------------------------------------
-- creazione_data              : ( ) → TIME_T
-- costo_noleggio              : (INT, TIME_T) → FLOAT
-- preventivo                  : ( ) →  VOID
-- stampa_data                 : (TIME_T) → VOID
-- controllo_prenotazione      : (PRENOTAZIONE) → VOID
-- creazione_prenotazione      : (   ) → PRENOTAZIONE
-- informazioni_costo_noleggio : (INT, TIME_T) → VOID
-
-1. time_t creazione_data( )
-   • Descrizione: Fa inserire all'utente la data, segnando giorno, mese, anno, ora e minuti.
-   • Specifica: Restituisce la data che il cliente ha inserito, questa viene calcolata prima in secondi
-   dal 1970, poi la trasforma nella corrispettiva data.
-
-2.  float costo_noleggio(int minuti, time_t inizio)
-    • Descrizione: Calcola il costo del noleggio secondo le ore utilizzo tenendo conto delle tariffe variabili.
-    • Specifica: Restituisce il costo, tenendo conto degli sconti.
-
-3.  void preventivo ( )
-    • Descrizione: Mostra all'utente il costo del servizio.
-    • Specifica: Restituisce a video il costo calcolato secondo le ore di utilizzo.
-
-4.  void stampa_data (time_t data)
-    • Descrizione: Mostra a schermo la data passata in input, seguendo il formato (gg/mese/anno h:min).
-    • Specifica: Restituisce a schermo la data.
-
-5.  void controllo_prenotazione (prenotazione* richiesta) 
-    • Descrizione: Mostra a schermo i dati inseriti per compilare la prenotazione.
-    • Specifica: Restituisce a schermo i dati della prenotazione, affichè l'utente possa visionarli.
-
-6.  prenotazione* creazione_prenotazione ( ) 
-    • Descrizione: Chiede all'utente i dati da inserire per completare la prenotazione.
-    • Specifica: Restituisce una prenotazione con i campi compilati dall'utente.
-
-7.  void informazioni_costo_noleggio( ) 
-    • Descrizione: Permette di visualizzare le varie tariffe e permette di proseguire con la prenotazione.
-    • Specifica: Restituisce a schermo i diversi costi.
-
-========================================================================
-SPECIFICA SEMANTICA
-
--------------------------------------------------------------
-Tipi: time_t, int, float, PRENOTAZIONE
--------------------------------------------------------------
-
-Per ogni operazione si definiscono precondizioni, postcondizioni ed effetti:
-
-1.  creazione_data(void) = data
-            pre: Nessuna.
-            post: Data deve essere valida.
-
-2.  costo_noleggio(minuti, inizio) = prezzo
-            pre: 
-                -Minuti deve essere maggiore o uguale a 3600 (1 ora).
-                -Inizio deve essere una data valida.
-            post: Nessuna.
-
-3.  preventivo (void) = void
-            pre: Nessuna.
-            post: Nessuna.
-
-4.  stampa_data (data) = void
-            pre: Data deve essere valida.
-            post: Nessuna.
-
-5.  controllo_prenotazione (richiesta) = void
-            pre: Richiesta deve essere valida.
-            post: Nessuna.
-
-6.  creazione_prenotazione ( ) = nuova_prenotazione
-            pre: Nessuna.
-            post: Nuova_prenotazione deve essere valida.
-
-7.    informazioni_costo_noleggio(void) = void
-            pre: Nessuna.
-            post: Nessuna.
+ Tipo astratto di dato: prenotazioni
+ ----------------------------------
+ Struttura che rappresenta le prenotazioni di un veicolo
+ suddivise in slot giornalieri (es. 48 slot per 24 ore a intervalli di 30 min)
+ per un periodo di 6 giorni (lunedì-sabato).
 */
+typedef struct prenotazioni *ptr_prenotazione;
 
-typedef struct{
-    char nome[MASSIMO_NOME + 1];
-    char cognome[MASSIMO_COGNOME +1];
-    char email[MASSIMO_EMAIL + 1];
-    time_t inizio;
-    time_t fine;
-    float costo;
-} prenotazione;
 
-time_t creazione_data( );
-float costo_noleggio(int minuti, time_t inizio);
-void preventivo( );
-void stampa_data (time_t data);
-void controllo_prenotazione(prenotazione* richiesta);
-prenotazione* creazione_prenotazione( );
-void informazioni_costo_noleggio( );
+/*
+ Funzione: inizializza_prenotazioni
+ ----------------------------------
+ Alloca e inizializza una struttura prenotazioni con tutti gli slot liberi.
+
+ Parametri:
+   Nessuno.
+
+ Pre-condizione:
+   Nessuna.
+
+ Post-condizione:
+   La struttura prenotazioni è allocata e tutti gli slot sono azzerati (liberi).
+
+ Ritorna:
+   Puntatore alla nuova struttura prenotazioni,
+   oppure NULL se l’allocazione fallisce.
+*/
+ptr_prenotazione inizializza_prenotazioni();
+
+
+/*
+ Funzione: carica_prenotazioni_da_file
+ ------------------------------------
+ Legge da file il contenuto delle prenotazioni per un veicolo,
+ gestendo il reset automatico degli slot se è cambiato il giorno.
+
+ Parametri:
+   p: puntatore alla struttura prenotazioni da aggiornare.
+   targa: stringa contenente la targa del veicolo, usata per costruire il nome file.
+
+ Pre-condizione:
+   p deve essere un puntatore valido.
+   targa deve essere una stringa valida.
+
+ Post-condizione:
+   La struttura prenotazioni è aggiornata con i dati letti dal file,
+   oppure azzerata se il file non esiste o il giorno è cambiato.
+   Gli slot passati vengono bloccati.
+
+ Ritorna:
+   1 se la lettura da file è avvenuta con successo,
+   0 se il file non esiste o il giorno è cambiato (prenotazioni resettate).
+*/
+int carica_prenotazioni_da_file(ptr_prenotazione p, const char *targa);
+
+
+/*
+ Funzione: leggi_cella_da_orario
+ -------------------------------
+ Richiede all’utente di inserire un orario (HH MM),
+ verifica la correttezza e lo converte in indice di slot.
+
+ Parametri:
+   messaggio: stringa da visualizzare come prompt per l’inserimento.
+
+ Pre-condizione:
+   Nessuna.
+
+ Post-condizione:
+   Nessuna modifica.
+
+ Ritorna:
+   Indice dello slot corrispondente all’orario,
+   oppure -1 se l’orario inserito è non valido.
+*/
+int leggi_cella_da_orario(const char *messaggio);
+
+
+/*
+ Funzione: veicolo_disponibile_oggi
+ ----------------------------------
+ Verifica se esiste almeno uno slot libero oggi.
+
+ Parametri:
+   p: puntatore alla struttura prenotazioni da controllare.
+
+ Pre-condizione:
+   p deve essere un puntatore valido.
+
+ Post-condizione:
+   Nessuna modifica.
+
+ Ritorna:
+   true se almeno uno slot è libero,
+   false altrimenti.
+*/
+bool veicolo_disponibile_oggi(ptr_prenotazione p);
+
+
+/*
+ Funzione: salva_prenotazioni_su_file
+ -----------------------------------
+ Salva su file le prenotazioni aggiornate di un veicolo.
+
+ Parametri:
+   p: puntatore alla struttura prenotazioni da salvare.
+   targa: stringa contenente la targa del veicolo, usata per costruire il nome file.
+
+ Pre-condizione:
+   p deve essere un puntatore valido.
+   targa deve essere una stringa valida.
+
+ Post-condizione:
+   Il file con le prenotazioni viene aggiornato.
+
+ Ritorna:
+   Nessun valore.
+*/
+void salva_prenotazioni_su_file(ptr_prenotazione p, const char *targa);
+
+
+/*
+ Funzione: prenota_intervallo
+ ----------------------------
+ Tenta di prenotare un intervallo di slot consecutivi.
+
+ Parametri:
+   p: puntatore alla struttura prenotazioni.
+   inizio_slot: indice dello slot di inizio (incluso).
+   fine_slot: indice dello slot di fine (escluso).
+
+ Pre-condizione:
+   p deve essere un puntatore valido.
+   inizio_slot e fine_slot devono essere indici validi e inizio_slot < fine_slot.
+
+ Post-condizione:
+   Se possibile, gli slot nell’intervallo sono marcati come prenotati.
+
+ Ritorna:
+   1 se la prenotazione ha successo,
+   0 se uno o più slot nell’intervallo sono già occupati o intervallo non valido.
+*/
+int prenota_intervallo(ptr_prenotazione p, int inizio_slot, int fine_slot);
+
+
+/*
+ Funzione: libera_prenotazioni
+ -----------------------------
+ Libera la memoria allocata per la struttura prenotazioni.
+
+ Parametri:
+   p: puntatore alla struttura prenotazioni da liberare.
+
+ Pre-condizione:
+   p deve essere un puntatore valido.
+
+ Post-condizione:
+   La memoria della struttura è liberata.
+
+ Ritorna:
+   Nessun valore.
+*/
+void libera_prenotazioni(ptr_prenotazione p);
+
+
+/*
+ Funzione: blocca_celle_passate
+ -----------------------------
+ Blocca gli slot di prenotazione che sono già passati
+ in base all’orario corrente.
+
+ Parametri:
+   p: puntatore alla struttura prenotazioni da aggiornare.
+
+ Pre-condizione:
+   p deve essere un puntatore valido.
+
+ Post-condizione:
+   Tutti gli slot antecedenti all’orario corrente sono marcati come occupati.
+   
+ Ritorna:
+   Nessun valore.
+*/
+void blocca_celle_passate(ptr_prenotazione p);
 
 #endif
