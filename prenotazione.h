@@ -7,7 +7,7 @@
  Tipo astratto di dato: prenotazioni
  ----------------------------------
  Struttura che rappresenta le prenotazioni di un veicolo
- suddivise in slot giornalieri (es. 48 slot per 24 ore a intervalli di 30 min)
+ suddivise in celle giornaliere (es. 48 slot per 24 ore a intervalli di 30 min)
  per un periodo di 6 giorni (lunedì-sabato).
 */
 typedef struct prenotazioni *ptr_prenotazione;
@@ -16,7 +16,7 @@ typedef struct prenotazioni *ptr_prenotazione;
 /*
  Funzione: inizializza_prenotazioni
  ----------------------------------
- Alloca e inizializza una struttura prenotazioni con tutti gli slot liberi.
+ Alloca e inizializza una struttura prenotazioni con tutte le celle libere.
 
  Parametri:
    Nessuno.
@@ -25,7 +25,7 @@ typedef struct prenotazioni *ptr_prenotazione;
    Nessuna.
 
  Post-condizione:
-   La struttura prenotazioni è allocata e tutti gli slot sono azzerati (liberi).
+   La struttura prenotazioni è allocata e tutte le celle sono azzerate (libere).
 
  Ritorna:
    Puntatore alla nuova struttura prenotazioni,
@@ -38,7 +38,7 @@ ptr_prenotazione inizializza_prenotazioni();
  Funzione: carica_prenotazioni_da_file
  ------------------------------------
  Legge da file il contenuto delle prenotazioni per un veicolo,
- gestendo il reset automatico degli slot se è cambiato il giorno.
+ gestendo il reset automatico delle celle se è cambiato il giorno.
 
  Parametri:
    p: puntatore alla struttura prenotazioni da aggiornare.
@@ -51,11 +51,11 @@ ptr_prenotazione inizializza_prenotazioni();
  Post-condizione:
    La struttura prenotazioni è aggiornata con i dati letti dal file,
    oppure azzerata se il file non esiste o il giorno è cambiato.
-   Gli slot passati vengono bloccati.
+   Le celle passate vengono bloccate.
 
  Ritorna:
    1 se la lettura da file è avvenuta con successo,
-   0 se il file non esiste o il giorno è cambiato (prenotazioni resettate).
+   0 se il file non esiste o il giorno è cambiato (prenotazioni ripristinate).
 */
 int carica_prenotazioni_da_file(ptr_prenotazione p, const char *targa);
 
@@ -76,7 +76,7 @@ int carica_prenotazioni_da_file(ptr_prenotazione p, const char *targa);
    Nessuna modifica.
 
  Ritorna:
-   Indice dello slot corrispondente all’orario,
+   Indice della cella corrispondente all’orario,
    oppure -1 se l’orario inserito è non valido.
 */
 int leggi_cella_da_orario(const char *messaggio);
@@ -85,7 +85,7 @@ int leggi_cella_da_orario(const char *messaggio);
 /*
  Funzione: veicolo_disponibile_oggi
  ----------------------------------
- Verifica se esiste almeno uno slot libero oggi.
+ Verifica se esiste almeno una cella libera oggi.
 
  Parametri:
    p: puntatore alla struttura prenotazioni da controllare.
@@ -97,7 +97,7 @@ int leggi_cella_da_orario(const char *messaggio);
    Nessuna modifica.
 
  Ritorna:
-   true se almeno uno slot è libero,
+   true se almeno una cella è libera,
    false altrimenti.
 */
 bool veicolo_disponibile_oggi(ptr_prenotazione p);
@@ -128,25 +128,25 @@ void salva_prenotazioni_su_file(ptr_prenotazione p, const char *targa);
 /*
  Funzione: prenota_intervallo
  ----------------------------
- Tenta di prenotare un intervallo di slot consecutivi.
+ Tenta di prenotare un intervallo di celle consecutive.
 
  Parametri:
    p: puntatore alla struttura prenotazioni.
-   inizio_slot: indice dello slot di inizio (incluso).
-   fine_slot: indice dello slot di fine (escluso).
+   inizio_cella: indice dello celle di inizio (incluso).
+   fine_cella: indice dello slot di fine (escluso).
 
  Pre-condizione:
    p deve essere un puntatore valido.
-   inizio_slot e fine_slot devono essere indici validi e inizio_slot < fine_slot.
+   inizio_cella e fine_cella devono essere indici validi e inizio_cella < fine_cella.
 
  Post-condizione:
-   Se possibile, gli slot nell’intervallo sono marcati come prenotati.
+   Se possibile, le celle nell’intervallo sono marcate come prenotate.
 
  Ritorna:
    1 se la prenotazione ha successo,
-   0 se uno o più slot nell’intervallo sono già occupati o intervallo non valido.
+   0 se uno o più celle nell’intervallo sono già occupate o intervallo non valido.
 */
-int prenota_intervallo(ptr_prenotazione p, int inizio_slot, int fine_slot);
+int prenota_intervallo(ptr_prenotazione p, int inizio_cella, int fine_cella);
 
 
 /*
@@ -172,7 +172,7 @@ void libera_prenotazioni(ptr_prenotazione p);
 /*
  Funzione: blocca_celle_passate
  -----------------------------
- Blocca gli slot di prenotazione che sono già passati
+ Blocca le celle di prenotazione che sono già passate
  in base all’orario corrente.
 
  Parametri:
@@ -182,7 +182,7 @@ void libera_prenotazioni(ptr_prenotazione p);
    p deve essere un puntatore valido.
 
  Post-condizione:
-   Tutti gli slot antecedenti all’orario corrente sono marcati come occupati.
+   Tutti le celle antecedenti all’orario corrente sono marcate come occupate.
    
  Ritorna:
    Nessun valore.
