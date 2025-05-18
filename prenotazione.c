@@ -2,243 +2,231 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-#include "prenotazione.h" 
+#include <stdbool.h>
+#include "prenotazione.h"
+#include "utile.h"
 
-// Funzione che chiede all'utente di inserire una data (mese, giorno, anno, ora e minuto)
-time_t creazione_data( ) {
 
-    struct tm tm_inizio = {0};
-    int mese, giorno, anno, ora, minuto;
+#define CELLE_GIORNALIERE 48  // 48 mezz'ore in un giorno
 
-    printf("Inserisci il mese (1-12): \n");
-    scanf("%d", &mese);
-    tm_inizio.tm_mon = mese - 1;
-    
-    printf("Inserisci il giorno (1-31): \n");
-    scanf("%d", &giorno);
-    tm_inizio.tm_mday = giorno;
-    
-    printf("Inserisci l'anno (es. 2025): \n");
-    scanf("%d", &anno);
-    tm_inizio.tm_year = anno - 1900; 
-    
-    printf("Inserisci l'ora (0-23): \n");
-    scanf("%d", &ora);
-    tm_inizio.tm_hour = ora;
-    
-    printf("Inserisci i minuti (0-59): \n");
-    scanf("%d", &minuto);
-    tm_inizio.tm_min = minuto;
+struct prenotazioni {
+    int cella[CELLE_GIORNALIERE];  // ogni cella vale 30 minuti
+};
 
-    //trasforma i secondi in data
-    return mktime(&tm_inizio);  
+
+/*
+ Inizializza una nuova struttura per la gestione delle prenotazioni.
+
+ Ritorna:
+   Un puntatore a una nuova struttura prenotazioni con tutte le celle impostate a NULL.
+   Restituisce NULL in caso di fallimento nell'allocazione.
+*/
+ptr_prenotazione inizializza_prenotazioni() 
+{
+    ptr_prenotazione p = malloc(sizeof(struct prenotazioni));
+
+    if (p) memset(p->cella, 0, sizeof(p->cella));
+    return p;
 }
 
-// Funzione che calcola il costo del noleggio secondo le ore di 
-float costo_noleggio(int minuti, time_t inizio) {
-    
-    time_t tempo_corrente = inizio;
 
-    float prezzo_noleggio = 0.0;
+/*
+ Carica le prenotazioni associate a una targa da file, oppure inizializza una nuova giornata.
 
-// Un ciclo che verifica il costo, ora per ora e giorno per giorno, tenendo conto degli sconti e delle festività italiane 
-    for(int i = 0; i < minuti; i++){
-        struct tm* tm_corrente= localtime(&tempo_corrente);
+ Parametri:
+   p: puntatore alla struttura delle prenotazioni da aggiornare.
+   targa: targa del veicolo, usata per determinare il nome del file.
 
-        int mese = tm_corrente->tm_mon, giorno = tm_corrente->tm_mday;
+ Ritorna:
+   1 se il caricamento da file è avvenuto con successo, 0 se è stata inizializzata una nuova giornata.
+*/
+int carica_prenotazioni_da_file(ptr_prenotazione p, const char *targa) 
+{
+    char nome_file[32];
+    snprintf(nome_file, sizeof(nome_file), "%s.txt", targa);
 
-        // Prezzo secondo i giorni festivi
-        if(((giorno == 1 || giorno == 6) && mese == 0) ||    //01/01 06/01
-            (giorno == 25 && mese == 3) ||  //25/04
-            (giorno == 1 && mese == 4) ||   //01/05
-            (giorno == 2 && mese == 5) ||   //02/06
-            (giorno == 15 && mese == 7) ||  //15/08
-            (giorno == 1 && mese == 10) ||  //01/10
-            ((giorno == 8 || giorno == 25 || giorno == 26 ) && mese == 11)){ //08/12 25/12 26/12
-                prezzo_noleggio+=2;
-            }
+    // Se è un nuovo giorno, azzera la struttura, blocca le celle passate e salva su file
+    if(vedi_se_giorno_nuovo()){
+        memset(p->cella, 0, sizeof(p->cella));  
+        blocca_slot_passati(p);
+        salva_prenotazioni_su_file(p, targa);
 
-        int ora= tm_corrente->tm_hour;
-
-        // Sconto orario
-        if((ora >= 3 && ora <= 6) || 
-           (ora >= 13 && ora <= 15) ){
-            prezzo_noleggio+=0.19;
-        }
-
-        // Prezzo normale
-        else{
-            prezzo_noleggio+=0.98;
-        }
-
-        tempo_corrente += 60;
-    }
-    printf("[TOTALE] - prezzo noleggio = %.02f€", prezzo_noleggio);
-    return prezzo_noleggio;
-}
-
-// Funzione che crea un preventivo del costo secondo le ore di utilizzo inserite da utente, tenendo conto degli sconti
-void preventivo( ){
-
-   printf("Inserisci la data di inizio: \n");
-   time_t inizio=creazione_data();
-
-   printf("Inserisci la data di fine:\n");
-   time_t fine = creazione_data();
-        
-   int minuti = (int)((fine - inizio) % 3600) / 60;
-
-   costo_noleggio(minuti, inizio);
-}
-
-// Funzione che stampa la data passata per input
-void stampa_data (time_t data){
-    struct tm* tm_inizio = localtime(&data);  
-    
-    printf("Data e ora: %02d/%02d/%04d %02d:%02d\n", tm_inizio->tm_mday, tm_inizio->tm_mon + 1, tm_inizio->tm_year + 1900, 
-                                                     tm_inizio->tm_hour, tm_inizio->tm_min);
-
-}
-
-// Funzione che mostra i dati all'utente a schermo per controllare se inseriti correttamente
-void controllo_prenotazione(prenotazione* richiesta){
-    if(richiesta==NULL){
-        printf("Non è stata inserita nessuna prenotazione!");
-        exit(-1);
+        return 0;
     }
 
-    time_t adesso = time(NULL);
-    struct tm* tm_inizio = localtime(&adesso);
+    FILE *f = fopen(nome_file, "r");
 
-    char accettazione[9];
+    // Se il file non esiste, inizializza la struttura e salva
+    if (!f) {
+        memset(p->cella, 0, sizeof(p->cella)); 
+        blocca_celle_passate(p);
+        salva_prenotazioni_su_file(p, targa);
 
-    printf("\n");
-    printf("=======================================\n");
-    printf("           DETTAGLI PRENOTAZIONE       \n");
-    printf("=======================================\n");
-    printf("-Nome:       %s\n", richiesta->nome);
-    printf("-Cognome:    %s\n", richiesta->cognome);
-    printf("-Mail:       %s\n", richiesta->email);
-    printf("                  INIZIO               \n");
-    stampa_data(richiesta->inizio);
-    printf("                   FINE                \n");
-    stampa_data(richiesta->fine);
-    printf("---------------PREZZO------------------\n");
-    printf("-Costo:      %.2f€\n", richiesta->costo);
-    printf("=======================================\n");
-    printf("PREGO, CONFERMARE I DATI (scrivi CONTINUA o INDIETRO)\n");
-
-    scanf("%s", &accettazione);
-
-    if(strcmp(accettazione, "CONTINUA") == 0 || strcmp(accettazione, "Continua") == 0 || strcmp(accettazione, "continua") == 0){
-        printf("Prenotazione andata a buon fine.\n");
-        printf("Prenda il veicolo nella seguente data:\t");
-        stampa_data(richiesta->inizio);
+        return 0;
     }
 
-    else{
-        free (richiesta);
-        printf("Prenotazione annullata.\n");
-    }
+    for (int i = 0; i < CELLE_GIORNALIERE; i++)
+        fscanf(f, "%d", &p->cella[i]);
+
+    fclose(f);
+
+    // Blocca le celle del tempo passato e salva lo stato aggiornato
+    blocca_celle_passate(p);
+    salva_prenotazioni_su_file(p, targa);
+
+    return 1;
 }
 
-// Funzione per creare una nuova prenotazione e riempire tutti i campi attraverso l'inserimento da utente
-prenotazione* creazione_prenotazione( ){
-    prenotazione* nuova = malloc(sizeof(prenotazione));
-    if(nuova == NULL){
-        printf("Errore di allocazione di memoria!");
-        exit(EXIT_FAILURE);
-    }
 
-    char nome[MASSIMO_NOME];
-    printf("\nCompila la tua prenotazione!\n");
-    printf("Inserisci il nome:\n");
-    scanf("%s", nome);
-    strncpy(nuova->nome, nome, MASSIMO_NOME);
+/*
+ Salva su file lo stato attuale delle prenotazioni di un veicolo.
 
-    char cognome[MASSIMO_COGNOME];
-    printf("Inserisci il cognome:\n");
-    scanf("%s", cognome);
-    strncpy(nuova->cognome, cognome, MASSIMO_COGNOME);
-    
-    char email[MASSIMO_EMAIL];
-    printf("Inserisci l'email:\n");
-    scanf("%s", email);
-    strncpy(nuova->email, email, MASSIMO_EMAIL);
+ Parametri:
+   p: puntatore alla struttura delle prenotazioni da salvare.
+   targa: targa del veicolo, usata per costruire il nome del file.
 
-    printf("Inserisci la data di inizio:\n");
-    nuova->inizio = creazione_data();
+ Effetti:
+   Scrive il contenuto delle celle in un file chiamato "<targa>.txt".
+*/
+void salva_prenotazioni_su_file(ptr_prenotazione p, const char *targa) 
+{
+    char nome_file[32];
+    snprintf(nome_file, sizeof(nome_file), "%s.txt", targa);
 
-    printf("Inserisci la data di fine:\n");
-    nuova->fine = creazione_data();
+    FILE *f = fopen(nome_file, "w");
+    if (!f) return;
 
-    // Calcolo della durata in minuti (differenza tra fine e inizio in secondi, convertita in minuti)
-    int minuti = (int)((nuova->fine - nuova->inizio) / 60);     
-    // Calcola il prezzo del noleggio, in base alla durata e secondo gli sconti
-    nuova->costo = costo_noleggio(minuti, nuova->inizio);   
+    for (int i = 0; i < CELLE_GIORNALIERE; i++)
+        fprintf(f, "%d\n", p->cella[i]);
 
-    return nuova;
+    fclose(f);
 }
 
-// Funzione che mostra le informazioni riguardo il costo del noleggio, permettendo di creare un preventivo e una prenotazione
-void informazioni_costo_noleggio( ){
 
-    printf("\n");
-    printf("NOTA BENE: i prezzi possono variare nel corso del tempo!\n");
-    printf("In caso di mancato utilizzo del veicolo da parte dell'utente non è previsto alcun rimborso!\n");
-    printf("\n");
-    printf("=================== DESCRIZIONE PREZZI NOLEGGIO ===================\n");
-    printf("\n");
-    printf("1. Prezzo standard (0.98€/min):\n");
-    printf("-In fasce di orari senza sconti e non festivi\n");
+/*
+ Legge un orario in formato HH MM e lo converte nella corrispondente cella oraria.
 
-    printf("\n");
-    printf("2. Prezzo scontato (0.19€/min):\n");
-    printf("-tra le 3.00 e le 6.00 (fascia mattutina)\n");
-    printf("-tra le 13.00 e le 15.00 (fascia pomeridiana)\n");
+ Parametri:
+   messaggio: messaggio da mostrare all’utente per l’inserimento dell’orario.
 
-    printf("\n");
-    printf("3. Prezzo festivo (2€/min):\n");
-    printf("- 01 Gennaio (Capodanno)\n");
-    printf("- 06 Gennaio (Epifania)\n");
-    printf("- 25 Aprile (Festa della Liberazione)\n");
-    printf("- 01 Maggio (Festa del Lavoro)\n");
-    printf("- 02 Giugno (Festa della Repubblica)\n");
-    printf("- 15 Agosto (Ferragosto)\n");
-    printf("- 01 Novembre (Tutti i Santi)\n");
-    printf("- 08 Dicembre (Immacolata Concezione)\n");
-    printf("- 25 Dicembre (Natale)\n");
-    printf("- 26 Dicembre (Santo Stefano)\n");
-    printf("\n");
-    printf("========================================================================\n");
-    printf("\n");
+ Valore di ritorno:
+   Restituisce l’indice della cella (0–47) corrispondente all’orario,
+   oppure -1 in caso di input non valido.
+*/
+int leggi_cella_da_orario(const char *messaggio)
+{
+    int ora, minuto;
 
-    char scelta[3];
+    printf("%s formato HH MM (ore - minuti): ", messaggio);
+    if (scanf("%d %d", &ora, &minuto) != 2 || ora < 0 || ora > 24 || (minuto != 0 && minuto != 30)) {
+        printf("Orario non valido. Usa solo :00 o :30.\n");
+        return -1;
+    }
 
-    printf("Vuoi fare un preventivo? (SI/NO)\n");
-    scanf("%s, scelta");
+    // Calcola l’indice della cella (es. 9:30 → 19)
+    return ora * 2 + (minuto == 30 ? 1 : 0);
+}
 
-    if(strcmp(scelta,"SI") == 0 || strcmp(scelta,"Si") == 0 || strcmp(scelta,"si") == 0){
 
-        //Crea il preventivo secondo i minuti di utilizzo.
-        void preventivo( ); 
-    
-        printf("\n");
-        printf("Vuoi proseguire con la prenotazione(SI/NO)?\n");
-        scanf("%s, scelta");
+/*
+ Tenta di prenotare un intervallo di celle orarie consecutive.
 
-        if(strcmp(scelta,"SI") == 0 || strcmp(scelta,"Si") == 0 || strcmp(scelta,"si") == 0){
-            //crea la prenotazione con i dati inseriti dall'utente
-            prenotazione* creazione_prenotazione( );
-        }
+ Parametri:
+   p: puntatore alla struttura delle prenotazioni.
+   inizio_cella: indice della cella iniziale dell’intervallo.
+   fine_cella: indice della cella finale (esclusiva) dell’intervallo.
 
-        else{
-            printf("Hai deciso di non continuare!\n");
+ Valore di ritorno:
+   Restituisce 1 se l’intervallo è stato prenotato con successo, 0 altrimenti.
+   Fallisce se l’intervallo è invalido o se una cella dell’intervallo è già occupata.
+*/
+int prenota_intervallo(ptr_prenotazione p, int inizio_cella, int fine_cella) 
+{
+    if (!p) return 0;
+
+    if (inizio_cella < 0 || fine_cella > CELLE_GIORNALIERE  || inizio_cella >= fine_cella) {
+        printf(" Intervallo non valido: inizio=%d, fine=%d\n", inizio_cella, fine_cella);
+        return 0;
+    }
+
+    // Verifica disponibilità in quell'orario
+    for (int i = inizio_cella; i < fine_cella; i++) {
+        if (p->cella[i]) {
+            printf(" Intervallo occupato (slot %d gia prenotato).\n", i);
+            return 0;
         }
     }
 
-    else{
-        printf("Hai deciso di non continuare!\n");
+    // Prenota se è libero quell'orario
+    for (int i = inizio_cella; i < fine_cella; i++) {
+        p->cella[i] = 1;
     }
 
+    return 1;
+}
+
+
+/*
+ Verifica se il veicolo ha almeno una cella disponibile per oggi.
+
+ Parametri:
+   p: puntatore alla struttura delle prenotazioni del veicolo.
+
+ Valore di ritorno:
+   Restituisce true se almeno una cella è libera, false altrimenti.
+   Termina il programma se il puntatore è NULL.
+*/
+bool veicolo_disponibile_oggi(ptr_prenotazione p) 
+{
+    if (!p) exit(1);
+
+    for (int i = 0; i < CELLE_GIORNALIERE; i++) {
+        if (p->cella[i] == 0) return true;
+    }
+
+    return false;
+}
+
+
+/*
+ Libera la memoria associata alla struttura delle prenotazioni.
+
+ Parametri:
+   p: puntatore alla struttura di prenotazioni da deallocare.
+
+ Effetti:
+   Dealloca la memoria solo se il puntatore è valido.
+*/
+void libera_prenotazioni(ptr_prenotazione p) 
+{
+    if (p) free(p);
+}
+
+
+/*
+ Blocca le celle temporali già trascorsi nella giornata corrente.
+
+ Parametri:
+   p: puntatore alla struttura delle prenotazioni da aggiornare.
+
+ Effetti:
+   Segna come occupate le celle corrispondenti a orari già passati rispetto all'orario attuale.
+   L'approssimazione considera lo slot successivo anche se si è oltre :00 o :30.
+*/
+void blocca_celle_passate(ptr_prenotazione p) 
+{
+    if (!p) return;
+
+    int ora, minuto;
+    ottieni_orario_corrente(&ora, &minuto);
+
+    // Calcola la prima cella prenotabile: approssimiamo sempre in avanti
+    int prossima_cella = ora * 2 + (minuto > 0 ? (minuto <= 30 ? 1 : 2) : 0);
+
+    if (prossima_cella > CELLE_GIORNALIERE) prossima_cella = CELLE_GIORNALIERE;
+
+    // Blocca celle non più disponibili
+    for (int i = 0; i < prossima_cella; i++) {
+        p->cella[i] = 1; 
+    }
 }
