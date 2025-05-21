@@ -189,4 +189,30 @@ void libera_prenotazioni(ptr_prenotazione p);
 */
 void blocca_celle_passate(ptr_prenotazione p);
 
+
+/*
+ Funzione: costo_noleggio
+ -------------------------
+ Calcola il costo totale del noleggio di un veicolo in base 
+ all’intervallo orario specificato e ad un eventuale sconto.
+
+ Parametri:
+   inizio_cella: indice della cella iniziale del noleggio (inclusivo).
+   fine_cella: indice della cella finale del noleggio (esclusivo).
+   sconto: valore intero. Se multiplo di 5, applica una tariffa scontata.
+
+ Pre-condizione:
+   inizio_cella e fine_cella devono essere compresi tra 0 e 48,
+   con inizio_cella < fine_cella.
+   Il valore di sconto deve essere >= 0.
+
+ Post-condizione:
+   Viene stampato il costo totale del noleggio.
+   Il valore di ritorno rappresenta il costo calcolato.
+
+ Ritorna:
+   Il costo del noleggio come valore float.
+*/
+float costo_noleggio(int inizio_cella, int fine_cella, int sconto);
+
 #endif
