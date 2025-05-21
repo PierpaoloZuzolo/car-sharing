@@ -48,7 +48,7 @@ int carica_prenotazioni_da_file(ptr_prenotazione p, const char *targa)
     // Se è un nuovo giorno, azzera la struttura, blocca le celle passate e salva su file
     if(vedi_se_giorno_nuovo()){
         memset(p->cella, 0, sizeof(p->cella));  
-        blocca_slot_passati(p);
+        blocca_celle_passate(p);
         salva_prenotazioni_su_file(p, targa);
 
         return 0;
@@ -229,4 +229,47 @@ void blocca_celle_passate(ptr_prenotazione p)
     for (int i = 0; i < prossima_cella; i++) {
         p->cella[i] = 1; 
     }
+}
+
+
+/*
+ Calcola il costo del noleggio di un veicolo in base all'intervallo orario 
+ richiesto e ad un eventuale sconto.
+
+ Parametri:
+   inizio_cella: indice della cella di inizio noleggio (inclusiva, da 0 a 47)
+   fine_cella: indice della cella di fine noleggio (esclusiva)
+   sconto: valore numerico usato per determinare se applicare una tariffa scontata fissa
+
+ Valore di ritorno:
+   Restituisce il costo totale del noleggio come valore float.
+
+ Comportamento:
+   - Calcola il costo sommando:
+       • €3.50 per ogni cella tra le 01:00 e le 06:00 (celle 2–11 incluse)
+       • €5.00 per ogni altra cella
+   - Se il parametro 'sconto' è un multiplo di 5, ignora il calcolo precedente
+     e applica una tariffa scontata di €2.25 per ogni cella utilizzata.
+   - Il costo finale viene stampato a video e restituito.
+*/
+float costo_noleggio(int inizio_cella, int fine_cella, int sconto)
+{
+    float costo = 0.0;
+    
+    for (int i = inizio_cella; i < fine_cella; i++) {
+        // Fascia oraria 01:00–06:00 (celle 2–11)
+        if (i >= 2 && i < 12) {
+            costo += 3.5;
+        } else {
+            costo += 5.0;
+        }
+    }
+
+    // Se sconto è multiplo di 5, applica una tariffa scontata fissa per ogni cella
+    if (sconto % 5 == 0) {
+        costo = (fine_cella - inizio_cella) * 2.25;
+    }
+
+    printf("Il costo del veicolo: %.2f\n", costo);
+    return costo;
 }
