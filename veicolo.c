@@ -4,6 +4,7 @@
 #include <stdbool.h>
 #include "veicolo.h"
 #include "lista_veicoli.h"
+#include "prenotazione.h"
 
 struct veicolo{
     char marca[30];
@@ -12,7 +13,8 @@ struct veicolo{
     char posizione[60];
     char stato[20];
 
-   // DAFARE inserire variabile puntatore per prenotazioni
+  
+   ptr_prenotazione prenotazione_veicolo;
 };
 
 /*
@@ -44,10 +46,16 @@ ptr_veicolo inizia_veicolo(const char *marca_veicolo, const char *modello_veicol
         strncpy(nuovo_veicolo->posizione, posizione_veicolo, sizeof(nuovo_veicolo->posizione) - 1);
         nuovo_veicolo->posizione[sizeof(nuovo_veicolo->posizione) - 1] = '\0';
 
-        /*
-            Per il parametro 'stato' che indica se un veicolo è disponibile o meno serve una funzione che va a vedere se 
-            il veicolo è prenotato, in tempo reale
-        */
+       
+       nuovo_veicolo->prenotazione_veicolo = inizializza_prenotazioni();
+        carica_prenotazioni_da_file(nuovo_veicolo->prenotazione_veicolo, nuovo_veicolo->targa);
+
+       
+        if(veicolo_disponibile_oggi(nuovo_veicolo->prenotazione_veicolo))
+
+            strcpy(nuovo_veicolo->stato, "disponibile");
+        else
+            strcpy(nuovo_veicolo->stato, "non disponibile");
     } 
     return nuovo_veicolo;
 }
@@ -130,6 +138,21 @@ char *prendi_stato(ptr_veicolo ve)
     return ve ? ve->stato : NULL;
 }
 
+/*
+ Restituisce il puntatore alla lista di prenotazioni del veicolo.
+
+ Parametri:
+   ve: puntatore al veicolo
+
+ Ritorna:
+   Un puntatore alla lista delle prenotazioni associate, oppure NULL.
+*/
+
+ptr_prenotazione prendi_prenotazioni(ptr_veicolo ve)
+{
+    return ve ? ve->prenotazione_veicolo : NULL;
+}
+
 
 /*
  Stampa a video le informazioni del veicolo in formato leggibile.
@@ -173,6 +196,30 @@ void carica_veicoli_da_file(const char *nome_file, ptr_lista l)
     }
 }
 
+/*
+ Aggiorna lo stato di disponibilità di un veicolo in base alle prenotazioni.
+
+ Parametri:
+   ve: puntatore al veicolo di cui aggiornare lo stato
+
+ Effetti:
+   Aggiorna il campo 'stato' del veicolo a "disponibile" o "non disponibile"
+   in base alla disponibilità odierna. Restituisce true se il veicolo
+   non è disponibile, false altrimenti.
+*/
+
+bool aggiorna_stato_veicolo(ptr_veicolo ve) 
+{
+    if (!ve) return false;
+
+    if (veicolo_disponibile_oggi(ve->prenotazione_veicolo)) {
+        strcpy(ve->stato, "disponibile");
+        return false;
+    } else {
+        strcpy(ve->stato, "non disponibile");
+        return true;
+    }
+}
 
 /*
  Libera la memoria occupata da un veicolo, comprese le sue prenotazioni.
@@ -181,11 +228,12 @@ void carica_veicoli_da_file(const char *nome_file, ptr_lista l)
    ve: puntatore al veicolo da liberare
 
  Effetti:
-   Dealloca la memoria associata al veicolo.
+   Dealloca la memoria associata al veicolo e alle sue prenotazioni.
 */
 void libera_veicolo(ptr_veicolo ve)
 {
     if(ve){
+        libera_prenotazioni(ve->prenotazione_veicolo);
         free(ve);
     }
 }
