@@ -1,7 +1,7 @@
 #ifndef LISTA_VEICOLI_H
 #define LISTA_VEICOLI_H
 
-#include "veicolo.h"
+
 
 /*
  Tipo astratto di dato: lista_veicoli
@@ -10,6 +10,7 @@
 */
 typedef struct lista_veicoli *ptr_lista;
 
+#include "veicolo.h"
 
 /*
  Funzione: nuova_lista

@@ -3,12 +3,19 @@
 #include <string.h>
 #include "utente.h"
 #include "hash.h"
+#include "lista_veicoli.h"
+#include "veicolo.h"
+#include "prenotazione.h"
+#include "utile.h"
 
 #define DIM_HASH 200
 
 
 
 ptr_utente gestione_utente(ptr_hash h);
+
+ptr_veicolo menu_prenotazione(ptr_lista lista);
+
 
 
 
@@ -22,8 +29,20 @@ int main (){
 
     distruggi_hash(hash);
 
+    ptr_lista lista = nuova_lista();
+       if(!lista){
+           printf("Errore risorse sistema.");
+           exit(1);
+       }
+
+    ptr_veicolo ve = menu_prenotazione(lista);
+    if(ve){
+
+    }
 
     return 0;
+
+
 }
 
 
@@ -77,13 +96,16 @@ ptr_utente gestione_utente(ptr_hash h)
            if(inserisci_hash(h, nuovo)){
             salva_utente_su_file("utenti.txt", nuovo);
             printf("\nRegistrazione effettuata");
+            printf("Benvenut* ");
+                stampa_utente(nuovo);
+                printf("\n");
             return nuovo;
            } 
            
            
         }
 
-
+        //DA FARE: per il login deve essere richiesto solo il nome
         if(2 == scelta){ //Login
             printf("\nInserisci nome: ");
            scanf("%49s", nome);
@@ -99,8 +121,9 @@ ptr_utente gestione_utente(ptr_hash h)
             libera_utente(temp);
 
             if(trovato){
-                printf("Login effettuato! Benvenuto ");
+                printf("Login effettuato! Benvenut* ");
                 stampa_utente(trovato);
+                printf("\n");
                 return trovato;
             } else{
                 printf("\nCredenziali non valide.");
@@ -115,4 +138,61 @@ ptr_utente gestione_utente(ptr_hash h)
     }
 
 }
+
+
+
+ptr_veicolo menu_prenotazione(ptr_lista lista)
+{
+
+    
+
+    carica_veicoli_da_file("veicoli.txt", lista);
+
+    if(vedi_se_giorno_nuovo()){
+         int giorno, mese, anno;
+
+        data_attuale(&giorno, &mese, &anno);
+    
+        FILE *f = fopen("ultimo_avvio.txt", "w");
+        if (f) {
+         fprintf(f, "%d %d %d", giorno, mese, anno);
+         fclose(f);
+         
+        }
+    }
+
+
+
+
+    stampa_lista_veicoli(lista);
+
+    printf("Seleziona l'indice del veicolo da prenotare ( es. 1): ");
+    int scelta_veicolo;
+    scanf("%d", &scelta_veicolo);
+
+    ptr_veicolo ve = trova_veicolo_lista(scelta_veicolo, lista);
+    if(!ve){
+        printf("veicolo non trovato.");
+        return NULL;
+    }
+
+    int inizio = leggi_cella_da_orario("Inserisci orario di inizio");
+    int fine = leggi_cella_da_orario("Inserisci orario di fine");
+
+    if(prenota_intervallo(prendi_prenotazioni(ve), inizio, fine)){
+        salva_prenotazioni_su_file(prendi_prenotazioni(ve), prendi_targa(ve));
+        if(aggiorna_stato_veicolo(ve)){
+            rimuovi_veicolo_non_disponibile(lista);
+        }
+
+        printf("Prenotazione per veicolo [%s] completata.\n", prendi_targa(ve));
+        return ve;
+    } else {
+        printf("Impossibile effettuare la prenotazione.\n");
+        return NULL;
+    }
+
+
+}
+
 
