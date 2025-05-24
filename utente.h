@@ -10,6 +10,8 @@
 */
 typedef struct utente *ptr_utente;
 
+#include "hash.h"
+
 
 /*
  Funzione: inizia_utente

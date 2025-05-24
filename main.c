@@ -8,19 +8,19 @@
 
 
 
-PtrUtente gestione_utente(PtrHash h);
+ptr_utente gestione_utente(ptr_hash h);
 
 
 
 int main (){
-    PtrHash hash = NuovaTabellaHash(DIM_HASH);
+    ptr_hash hash = nuova_tabella_hash(DIM_HASH);
        if (!hash){
            printf("Errore risorse sistema.");
            exit(1);
        }
-    PtrUtente ut = gestione_utente(hash);
+    ptr_utente ut = gestione_utente(hash);
 
-    DistruggiHash(hash);
+    distruggi_hash(hash);
 
 
     return 0;
@@ -35,13 +35,13 @@ int main (){
 
 
 
-PtrUtente gestione_utente(PtrHash h)
+ptr_utente gestione_utente(ptr_hash h)
 {
     char nome[50], email[100];
 
    
 
-    CaricaUtentiDaFile("utenti.txt", h);
+    carica_utente_da_file("utenti.txt", h);
 
     int scelta;
 
@@ -62,25 +62,23 @@ PtrUtente gestione_utente(PtrHash h)
            scanf("%49s", nome);
            printf("\nInserisci email: ");
            scanf("%99s", email);
-
+        /*
            if(verifica_duplicati_utenti(h, nome, email)){
             printf("Nome utente o mail non validi, utente già inserito. \n");
             continue;  
            }
-
-           PtrUtente nuovo = IniziaUtente(nome, email); //inizializzazione variabile utente
+           */
+           ptr_utente nuovo = inizia_utente(nome, email); //inizializzazione variabile utente
            if (!nuovo){
             printf("\nErrore risorse sistema.");
             exit(1);
            }
 
-           if(InserisciHash(h, nuovo)){
-            SalvaUtentiSuFile("utenti.txt", nuovo);
+           if(inserisci_hash(h, nuovo)){
+            salva_utente_su_file("utenti.txt", nuovo);
             printf("\nRegistrazione effettuata");
             return nuovo;
-           } else {
-            printf("\nErrore salvataggio...");
-           }
+           } 
            
            
         }
@@ -92,17 +90,17 @@ PtrUtente gestione_utente(PtrHash h)
            printf("\nInserisci email: ");
            scanf("%99s", email);
 
-           PtrUtente temp = IniziaUtente(nome, email);
+           ptr_utente temp = inizia_utente(nome, email);
            if(!temp){
             printf("\nErrore risorse sistema.");
             exit(1);
            }
-            PtrUtente trovato = CercaUtente(h, temp);
-            LiberaUtente(temp);
+            ptr_utente trovato = cerca_utente(h, temp);
+            libera_utente(temp);
 
             if(trovato){
                 printf("Login effettuato! Benvenuto ");
-                StampaUtente(trovato);
+                stampa_utente(trovato);
                 return trovato;
             } else{
                 printf("\nCredenziali non valide.");

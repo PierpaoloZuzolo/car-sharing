@@ -4,6 +4,7 @@
 typedef struct veicolo *ptr_veicolo;
 
 #include "lista_veicoli.h"
+#include "prenotazione.h"
 
 
 /*

@@ -2,6 +2,7 @@
 #define HASH_H
 
 #include "utente.h"
+#include <stdbool.h>
 
 typedef struct tabella_hash *ptr_hash;
 
@@ -114,7 +115,7 @@ Per ogni operazione si definiscono precondizioni, postcondizioni ed effetti:
 */
 
 
-unsigned int hash(char nome[], char email[], int dimensione);
+unsigned int hash(char *chiave, int dimensione);
 
 ptr_hash nuova_tabella_hash(int dimensione);
 
@@ -125,6 +126,8 @@ ptr_utente cerca_utente(ptr_hash h, ptr_utente utente);
 void distruggi_hash(ptr_hash h);
 
 int dimensione_hash(ptr_hash h);
+
+//!!! FUNZIONE OBSOLETA, DA ELIMINARE!!!
 
 bool verifica_duplicati_utenti(ptr_hash h, const char *nome, const char *email);
 

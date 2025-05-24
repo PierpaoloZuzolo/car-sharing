@@ -20,32 +20,23 @@ struct tabella_hash{
 
 
 /*
- Calcola un valore hash a partire da nome ed email.
+ Calcola un valore hash a partire da nome.
  Utilizzato per indicizzare un utente all'interno di una tabella hash.
 
  Parametri:
-   nome: stringa contenente il nome dell'utente (massimo 50 caratteri considerati).
-   email: stringa contenente l'email dell'utente (massimo 100 caratteri considerati).
-   dimensione: dimensione della tabella hash.
+   chiave: stringa contenente il nome dell'utente (massimo 50 caratteri considerati).
+   
 
  Ritorna:
-   Un valore hash (unsigned int) calcolato in base ai caratteri di nome ed email,
+   Un valore hash (unsigned int) calcolato in base ai caratteri di chiave,
    compreso tra 0 e dimensione - 1.
 */
-unsigned int hash(char nome[], char email[], int dimensione)
+unsigned int hash(char *chiave, int dimensione)
 {
-    unsigned int lunghezza_nome = strnlen(nome, 50);
-    unsigned int lunghezza_cognome = strnlen(email, 100);
-
-    unsigned int valore_hash = 0;
-
-    for (int i = 0; i < lunghezza_nome; i++){
-        valore_hash += nome[i];
-    }
-
-    for (int i = 0; i < lunghezza_cognome; i++){
-        valore_hash += email[i];
-        valore_hash = (valore_hash * email[i]) % dimensione;
+    int valore_hash = 0;
+    while (*chiave) {
+        valore_hash = (valore_hash * 31 + *chiave) % dimensione;
+        chiave++;
     }
 
     return valore_hash;
@@ -99,12 +90,13 @@ bool inserisci_hash(ptr_hash h, ptr_utente ut)
     if(!ut) return false;
 
     // Calcola l’indice della tabella hash in cui inserire l’utente.
-    int indice = hash(prendi_nome(ut), prendi_email(ut), h->dimensione); 
+    int indice = hash(prendi_nome(ut), h->dimensione); 
 
-    // Scorre la lista collegate per verificare duplicati in base all'email e libera l'utente duplicato
+    // Scorre la lista collegate per verificare duplicati in base al nome e libera l'utente duplicato
     nodo *attuale = h->tabella[indice];
     while(attuale){
-        if(strcmp(prendi_email(attuale->utente), prendi_email(ut)) == 0){
+        if(strcmp(prendi_nome(attuale->utente), prendi_nome(ut)) == 0){
+          printf("\nNome inserito non valido!\n");
             free(ut);
              return false;
         }
@@ -123,7 +115,7 @@ bool inserisci_hash(ptr_hash h, ptr_utente ut)
 
 
 /*
- Cerca un utente nella tabella hash in base a nome ed email.
+ Cerca un utente nella tabella hash in base a nome.
 
  Parametri:
    h: puntatore alla tabella hash in cui cercare.
@@ -134,12 +126,12 @@ bool inserisci_hash(ptr_hash h, ptr_utente ut)
 */
 ptr_utente cerca_utente(ptr_hash h, ptr_utente ut)
 {
-    int indice = hash(prendi_nome(ut), prendi_email(ut), h->dimensione); 
+    int indice = hash(prendi_nome(ut), h->dimensione); 
 
-    //Scorre la lista per trovare un utente con la stessa email
+    //Scorre la lista per trovare un utente con la stesso nome
     nodo *attuale = h->tabella[indice];
     while(attuale){
-        if(strcmp(prendi_email(attuale->utente), prendi_email(ut)) == 0){
+        if(strcmp(prendi_nome(attuale->utente), prendi_nome(ut)) == 0){
             return attuale->utente;
         }
         attuale = attuale->prossimo;
@@ -168,7 +160,7 @@ void distruggi_hash(ptr_hash h)
             nodo *temp = attuale;
             attuale = attuale->prossimo;
 
-            LiberaUtente(temp->utente);
+            libera_utente(temp->utente);
             free(temp);
         }
     }
@@ -193,6 +185,11 @@ int dimensione_hash(ptr_hash h)
   // Restituisce 0 se h punta a NULL.
     return h ? h->dimensione : 0;
 }
+
+
+
+
+ //!!! QUESTA FUNZIONE NON SERVE, E' OBSOLETA, DA ELIMINARE!!!
 
 
 /*
