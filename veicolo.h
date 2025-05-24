@@ -111,6 +111,27 @@ char *prendi_targa(ptr_veicolo ve);
 char *prendi_stato(ptr_veicolo ve);
 
 
+/*
+ Funzione: prendi_prenotazioni
+ -----------------------------
+ Restituisce il puntatore alla struttura delle prenotazioni associate a un veicolo.
+
+ Parametri:
+   ve: puntatore alla struttura veicolo da cui prelevare le prenotazioni
+
+ Pre-condizione:
+   Il puntatore ve deve essere valido (non NULL)
+
+ Post-condizione:
+   Nessuna modifica ai dati del veicolo o delle prenotazioni
+
+ Ritorna:
+   Un puntatore alla lista delle prenotazioni associate al veicolo,
+   oppure NULL se il puntatore ve è NULL
+*/
+ptr_prenotazione prendi_prenotazioni(ptr_veicolo ve);
+
+
 
 /*
  Funzione: stampa_veicolo
@@ -153,11 +174,33 @@ void stampa_veicolo(ptr_veicolo ve);
 */
 void carica_veicoli_da_file(const char *nome_file, ptr_lista l);
 
+/*
+ Funzione: aggiorna_stato_veicolo
+ --------------------------------
+ Aggiorna lo stato del veicolo in base alla sua disponibilità odierna.
+
+ Parametri:
+   ve: puntatore al veicolo di cui aggiornare lo stato
+
+ Pre-condizione:
+   ve deve essere un puntatore valido a una struttura veicolo
+
+ Post-condizione:
+   Il campo 'stato' del veicolo viene aggiornato a "disponibile" se il veicolo è disponibile oggi,
+   altrimenti a "non disponibile".
+
+ Ritorna:
+   true se il veicolo non è disponibile oggi,
+   false se il veicolo è disponibile o se il puntatore è nullo
+*/
+
+bool aggiorna_stato_veicolo(ptr_veicolo ve);
+
 
 /*
  Funzione: libera_veicolo
  ------------------------
- Libera la memoria associata a un veicolo.
+ Libera la memoria associata a un veicolo, inclusa la memoria delle sue prenotazioni.
 
  Parametri:
    ve: puntatore al veicolo da liberare
@@ -166,7 +209,7 @@ void carica_veicoli_da_file(const char *nome_file, ptr_lista l);
    ve deve essere un puntatore valido a una struttura veicolo allocata dinamicamente
 
  Post-condizione:
-   La memoria occupata dal veicolo viene liberata
+   La memoria occupata dal veicolo e dalle sue prenotazioni viene liberata
 
  Ritorna:
    Nessun valore
