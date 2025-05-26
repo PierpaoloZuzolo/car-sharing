@@ -14,11 +14,19 @@ struct utente{
 
 
 /*
+ Funzione: inizia_utente
+ -----------------------
  Crea e inizializza un nuovo utente con nome ed email forniti.
 
  Parametri:
    nome: stringa contenente il nome dell'utente.
    email: stringa contenente l'email dell'utente.
+
+  Pre-condizione:
+   nome ed email devono essere puntatori validi (non NULL).
+
+ Post-condizione:
+   Un nuovo utente viene creato con i dati forniti.
 
  Ritorna:
    Un puntatore al nuovo utente allocato e inizializzato,
@@ -41,10 +49,18 @@ ptr_utente inizia_utente(const char *nome, const char *email)
 
 
 /*
+ Funzione: prendi_nome
+ ---------------------
  Restituisce il nome dell'utente.
 
  Parametri:
    ut: puntatore all'utente.
+
+ Pre-condizione:
+   ut deve essere un puntatore valido.
+
+ Post-condizione:
+   Nessuna modifica all'utente.
 
  Ritorna:
    La stringa nome se ut è valido,
@@ -58,11 +74,19 @@ char *prendi_nome(ptr_utente ut)
 
 
 /*
+ Funzione: prendi_email
+ ----------------------
  Restituisce l'email dell'utente.
 
  Parametri:
    ut: puntatore all'utente.
 
+  Pre-condizione:
+   ut deve essere un puntatore valido.
+
+ Post-condizione:
+   Nessuna modifica all'utente.
+   
  Ritorna:
    La stringa email se ut è valido,
    altrimenti NULLITEM.
@@ -75,10 +99,18 @@ char *prendi_email(ptr_utente ut)
 
 
 /*
+ Funzione: stampa_utente
+ -----------------------
  Stampa il nome dell'utente su standard output.
 
  Parametri:
    ut: puntatore all'utente da stampare.
+
+  Pre-condizione:
+   ut deve essere un puntatore valido.
+
+ Post-condizione:
+   Nessuna modifica all'utente.
 
  Effetti:
    Se ut è valido, stampa il nome dell'utente con printf.
@@ -92,11 +124,19 @@ void stampa_utente(ptr_utente ut)
 
 
 /*
+ Funzione: salva_utente_su_file
+ ------------------------------
  Salva le informazioni di un utente su file in modalità append.
 
  Parametri:
    nome_file: nome del file dove salvare i dati.
    ut: puntatore all'utente da salvare.
+
+  Pre-condizione:
+   nome_file e ut devono essere puntatori validi.
+
+ Post-condizione:
+   Le informazioni dell'utente vengono scritte nel file.
 
  Effetti:
    Se il file si apre correttamente e ut non è NULL,
@@ -117,11 +157,19 @@ void salva_utente_su_file(char *nome_file, ptr_utente ut)
 
 
 /*
+ Funzione: carica_utente_da_file
+ -------------------------------
  Carica gli utenti da un file e li inserisce nella tabella hash.
 
  Parametri:
    nome_file: nome del file da cui leggere gli utenti.
    h: puntatore alla tabella hash dove inserire gli utenti caricati.
+
+  Pre-condizione:
+   nome_file e h devono essere puntatori validi.
+
+ Post-condizione:
+   Un utente viene caricato dal file e inserito nella tabella hash.
 
  Effetti:
    Per ogni coppia nome-email letta dal file, crea un nuovo utente
@@ -147,10 +195,18 @@ void carica_utente_da_file(const char *nome_file, ptr_hash h)
 
 
 /*
+ Funzione: libera_utente
+ -----------------------
  Libera la memoria allocata per un utente.
 
  Parametri:
    ut: puntatore all'utente da liberare.
+
+  Pre-condizione:
+   ut deve essere un puntatore valido.
+
+ Post-condizione:
+   La memoria occupata dall'utente è liberata.
 
  Effetti:
    Se ut è diverso da NULL, ne libera la memoria.

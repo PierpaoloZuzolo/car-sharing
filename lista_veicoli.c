@@ -16,7 +16,15 @@ struct lista_veicoli{
 
 
 /*
+ Funzione: nuova_lista
+ ---------------------
  Crea una nuova lista di veicoli vuota.
+
+  Parametri:
+   Nessuno.
+
+ Pre-condizione:
+   Nessuna.
 
  Ritorna:
    Un puntatore a una nuova lista inizializzata (testa NULL), 
@@ -34,12 +42,21 @@ ptr_lista nuova_lista()
     return li;
 }
 
+
 /*
+ Funzione: inserisci_veicolo_lista
+ ---------------------------------
  Inserisce un veicolo nella lista, se disponibile.
 
  Parametri:
    li: puntatore alla lista in cui inserire il veicolo.
    ve: puntatore al veicolo da inserire.
+
+    Pre-condizione:
+   li e ve devono essere puntatori validi (non NULL).
+
+ Post-condizione:
+   Il veicolo viene inserito nella lista.
 
  Effetti:
    Inserisce il veicolo in testa alla lista solo se il suo stato è "disponibile".
@@ -72,10 +89,18 @@ void inserisci_veicolo_lista(ptr_lista li, ptr_veicolo ve)
 
 
 /*
+ Funzione: rimuovi_veicolo_non_disponibile
+ -----------------------------------------
  Rimuove dalla lista tutti i veicoli non disponibili.
 
  Parametri:
    li: puntatore alla lista da modificare.
+
+    Pre-condizione:
+   li deve essere un puntatore valido.
+
+ Post-condizione:
+   I veicoli non disponibili vengono rimossi e la loro memoria liberata.
 
  Effetti:
    Scorre la lista e rimuove tutti i nodi il cui veicolo ha stato "non disponibile".
@@ -114,10 +139,18 @@ void rimuovi_veicolo_non_disponibile(ptr_lista li)
 
 
 /*
+ Funzione: stampa_lista_veicoli
+ ------------------------------
  Stampa a video l'intera lista dei veicoli.
 
  Parametri:
    li: puntatore alla lista da stampare.
+
+    Pre-condizione:
+   li deve essere un puntatore valido.
+
+ Post-condizione:
+   Nessuna modifica alla lista.
 
  Effetti:
    Per ogni veicolo nella lista, stampa le sue informazioni con indice progressivo.
@@ -141,10 +174,18 @@ void stampa_lista_veicoli(ptr_lista li)
 
 
 /*
+ Funzione: libera_lista_veicoli
+ ------------------------------
  Libera tutta la memoria associata alla lista di veicoli.
 
  Parametri:
    li: puntatore alla lista da deallocare.
+
+    Pre-condizione:
+   li deve essere un puntatore valido.
+
+ Post-condizione:
+   Tutta la memoria occupata dalla lista e dai veicoli è liberata.
 
  Effetti:
    Libera tutti i nodi e i veicoli contenuti, poi libera la lista stessa.
@@ -168,11 +209,20 @@ void libera_lista_veicoli(ptr_lista li)
 
 
 /*
+ Funzione: trova_veicolo_lista
+ -----------------------------
  Restituisce il veicolo nella posizione specificata della lista.
 
  Parametri:
    posizione: posizione (1-based) del veicolo da cercare.
    li: puntatore alla lista da cui estrarre il veicolo.
+
+  Pre-condizione:
+   li deve essere un puntatore valido.
+   posizione deve essere compresa tra 0 e (dimensione della lista - 1).
+
+ Post-condizione:
+   Nessuna modifica alla lista.
 
  Ritorna:
    Il puntatore al veicolo nella posizione indicata, oppure NULL se non valido.

@@ -6,7 +6,24 @@
 #include "utile.h"
 
 
+/*
+ Funzione: ottieni_orario_corrente
+ ---------------------------------
+ Recupera l'orario corrente del sistema.
 
+ Parametri:
+   ora: puntatore a intero dove viene salvata l'ora corrente (0-23).
+   minuto: puntatore a intero dove viene salvato il minuto corrente (0-59).
+
+ Pre-condizione:
+   I puntatori ora e minuto devono essere validi (non NULL).
+
+ Post-condizione:
+   I valori puntati vengono aggiornati con l'orario corrente.
+
+ Effetti:
+   Nessun effetto collaterale oltre all'aggiornamento dei valori.
+*/
 void ottieni_orario_corrente(int *ora, int *minuto) 
 {
     time_t adesso = time(NULL);
@@ -16,6 +33,25 @@ void ottieni_orario_corrente(int *ora, int *minuto)
 }
 
 
+/*
+ Funzione: data_attuale
+ ----------------------
+ Recupera la data corrente del sistema.
+
+ Parametri:
+   giorno: puntatore a intero dove salvare il giorno corrente.
+   mese: puntatore a intero dove salvare il mese corrente.
+   anno: puntatore a intero dove salvare l'anno corrente.
+
+ Pre-condizione:
+   I puntatori devono essere validi (non NULL).
+
+ Post-condizione:
+   I valori vengono aggiornati con la data attuale (gg/mm/aaaa).
+
+ Effetti:
+   Nessun effetto collaterale oltre all'aggiornamento dei parametri.
+*/
 void data_attuale(int *giorno, int *mese, int *anno)
 {
     time_t adesso = time(NULL);
@@ -26,6 +62,30 @@ void data_attuale(int *giorno, int *mese, int *anno)
     *anno = oggi->tm_year + 1900;
 }
 
+
+/*
+ Funzione: vedi_se_giorno_nuovo
+ ------------------------------
+ Verifica se è iniziato un nuovo giorno rispetto all'ultimo avvio.
+
+ Parametri:
+   Nessuno.
+
+ Pre-condizione:
+   Deve esistere (o essere creato) un file "ultimo_avvio.txt" per il salvataggio persistente.
+
+ Post-condizione:
+   Confronta la data attuale con quella salvata precedentemente.
+   Se è un giorno nuovo, restituisce true. Altrimenti false.
+
+ Ritorna:
+   true se la data è diversa da quella precedentemente salvata,
+   false se è la stessa.
+
+ Effetti:
+   Nessun salvataggio automatico. Solo lettura da file.
+   Il salvataggio della nuova data dovrebbe essere gestito separatamente.
+*/
 bool vedi_se_giorno_nuovo() 
 {
     int giorno, mese, anno;

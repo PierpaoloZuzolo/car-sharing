@@ -20,12 +20,20 @@ struct tabella_hash{
 
 
 /*
+ Funzione: hash
+ --------------
  Calcola un valore hash a partire da nome.
  Utilizzato per indicizzare un utente all'interno di una tabella hash.
 
  Parametri:
    chiave: stringa contenente il nome dell'utente (massimo 50 caratteri considerati).
    
+  Pre-condizione:
+   chiave deve essere un puntatore valido.
+   dimensione > 0.
+
+ Post-condizione:
+   Nessuna modifica ai parametri.
 
  Ritorna:
    Un valore hash (unsigned int) calcolato in base ai caratteri di chiave,
@@ -44,10 +52,18 @@ unsigned int hash(char *chiave, int dimensione)
 
 
 /*
+ Funzione: nuova_tabella_hash
+ ----------------------------
  Alloca e inizializza una nuova tabella hash con la dimensione specificata.
 
  Parametri:
    dimensione: numero di posizioni della tabella hash (numero di bucket).
+
+  Pre-condizione:
+   dimensione > 0.
+
+ Post-condizione:
+   Alloca e restituisce un puntatore a una nuova tabella hash vuota.
 
  Ritorna:
    Un puntatore alla nuova tabella hash (ptr_hash), oppure NULL in caso di errore di allocazione.
@@ -73,11 +89,19 @@ ptr_hash nuova_tabella_hash(int dimensione)
 
 
 /*
+ Funzione: inserisci_hash
+ ------------------------
  Inserisce un nuovo utente nella tabella hash, evitando duplicati per email.
 
  Parametri:
    h: puntatore alla tabella hash in cui inserire l'utente.
    ut: puntatore alla struttura utente da inserire.
+
+  Pre-condizione:
+   h e utente devono essere puntatori validi.
+
+ Post-condizione:
+   L'utente è inserito nella tabella se non già presente.
 
  Ritorna:
    true se l'inserimento è andato a buon fine,
@@ -115,11 +139,19 @@ bool inserisci_hash(ptr_hash h, ptr_utente ut)
 
 
 /*
+ Funzione: cerca_utente
+ ----------------------
  Cerca un utente nella tabella hash in base a nome.
 
  Parametri:
    h: puntatore alla tabella hash in cui cercare.
    ut: puntatore a una struttura utente con nome ed email da confrontare.
+
+  Pre-condizione:
+   h e ut devono essere puntatori validi.
+
+ Post-condizione:
+   Nessuna modifica alla tabella.
 
  Ritorna:
    Un puntatore all'utente trovato, oppure NULL se non è presente nella tabella.
@@ -142,10 +174,18 @@ ptr_utente cerca_utente(ptr_hash h, ptr_utente ut)
 
 
 /*
+ Funzione: distruggi_hash
+ ------------------------
  Libera tutta la memoria allocata per la tabella hash, inclusi gli utenti e i nodi.
 
  Parametri:
    h: puntatore alla tabella hash da distruggere.
+
+  Pre-condizione:
+   h deve essere un puntatore valido.
+
+ Post-condizione:
+   Tutta la memoria occupata dalla tabella e dagli utenti viene liberata.
 
  Effetti:
    Dealloca tutti i nodi delle liste collegate, libera la memoria degli utenti tramite LiberaUtente,
@@ -171,10 +211,18 @@ void distruggi_hash(ptr_hash h)
 
 
 /*
+ Funzione: dimensione_hash
+ -------------------------
  Restituisce la dimensione della tabella hash.
 
  Parametri:
    h: puntatore alla tabella hash.
+
+  Pre-condizione:
+   h deve essere un puntatore valido.
+
+ Post-condizione:
+   Nessuna modifica alla tabella.
 
  Ritorna:
    La dimensione della tabella se h è valido,
@@ -184,54 +232,4 @@ int dimensione_hash(ptr_hash h)
 {
   // Restituisce 0 se h punta a NULL.
     return h ? h->dimensione : 0;
-}
-
-
-
-
- //!!! QUESTA FUNZIONE NON SERVE, E' OBSOLETA, DA ELIMINARE!!!
-
-
-/*
- Verifica se esiste un utente con lo stesso nome o email nella tabella hash.
-
- Parametri:
-   h: puntatore alla tabella hash.
-   nome: stringa del nome da verificare.
-   email: stringa dell'email da verificare.
-
- Ritorna:
-   true se trova un utente con nome o email già presenti,
-   false altrimenti.
-
- Nota:
-   In caso di tabella hash non valida, stampa un errore e termina il programma.
-*/
-bool verifica_duplicati_utenti(ptr_hash h, const char *nome, const char *email)
-{
-    if(!h){
-        printf("Errore tabella hash.");
-        exit(1);
-    }
-
-    int dimensione = dimensione_hash(h);
-    if (0 == dimensione){
-        printf("Errore tabella hash.");
-        exit(1);
-    }
-
-    for(int i = 0; i < dimensione; i++){
-        nodo *attuale = h->tabella[i];
-        while(attuale){
-            ptr_utente ut = attuale->utente;
-
-            if(strcmp(prendi_nome(ut), nome) == 0 || strcmp(prendi_email(ut), email) == 0){
-                return true;
-            }
-
-            attuale = attuale->prossimo;
-        }
-    }
-    
-    return false;
 }
