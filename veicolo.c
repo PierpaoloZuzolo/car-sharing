@@ -18,6 +18,8 @@ struct veicolo{
 };
 
 /*
+ Funzione: inizia_veicolo
+ ------------------------
  Crea e inizializza un nuovo veicolo con i dati forniti.
  Utilizzata per costruire un oggetto veicolo e aggiungerlo alla lista.
 
@@ -26,6 +28,12 @@ struct veicolo{
    modello_veicolo: stringa con il modello del veicolo
    targa_veicolo: stringa con la targa del veicolo
    posizione_veicolo: stringa con la posizione attuale del veicolo
+
+  Pre-condizione:
+   Tutti i parametri devono essere stringhe valide terminate da '\0'.
+
+ Post-condizione:
+   Alloca dinamicamente una struttura veicolo e copia i dati ricevuti nei rispettivi campi.
 
  Ritorna:
    Un puntatore al nuovo veicolo allocato, oppure NULL in caso di errore.
@@ -60,11 +68,20 @@ ptr_veicolo inizia_veicolo(const char *marca_veicolo, const char *modello_veicol
     return nuovo_veicolo;
 }
 
+
 /*
+ Funzione: prendi_marca
+ ----------------------
  Restituisce la marca del veicolo.
 
  Parametri:
    ve: puntatore al veicolo
+
+  Pre-condizione:
+   Il puntatore ve deve essere valido (non NULL)
+
+ Post-condizione:
+   Nessuna modifica allo stato del veicolo
 
  Ritorna:
    Una stringa con la marca, oppure NULL se il puntatore è invalido.
@@ -77,10 +94,18 @@ char *prendi_marca(ptr_veicolo ve)
 
 
 /*
+  Funzione: prendi_modello
+ ------------------------
  Restituisce il modello del veicolo.
 
  Parametri:
    ve: puntatore al veicolo
+
+  Pre-condizione:
+   Il puntatore ve deve essere valido (non NULL)
+
+ Post-condizione:
+   Nessuna modifica allo stato del veicolo
 
  Ritorna:
    Una stringa con il modello, oppure NULL se il puntatore è invalido.
@@ -91,11 +116,20 @@ char *prendi_modello(ptr_veicolo ve)
     return ve ? ve->modello : NULL;
 }
 
+
 /*
+ Funzione: prendi_targa
+ ----------------------
  Restituisce la targa del veicolo.
 
  Parametri:
    ve: puntatore al veicolo
+
+  Pre-condizione:
+   Il puntatore ve deve essere valido (non NULL)
+
+ Post-condizione:
+   Nessuna modifica allo stato del veicolo
 
  Ritorna:
    Una stringa con la targa, oppure NULL se il puntatore è invalido.
@@ -108,11 +142,19 @@ char *prendi_targa(ptr_veicolo ve)
 
 
 /*
+ Funzione: prendi_posizione
+ ----------------------
  Restituisce la posizione del veicolo.
 
  Parametri:
    ve: puntatore al veicolo
 
+ Pre-condizione:
+   Il puntatore ve deve essere valido (non NULL)
+
+ Post-condizione:
+   Nessuna modifica allo stato del veicolo
+   
  Ritorna:
    Una stringa con la posizione, oppure NULL se il puntatore è invalido.
 */
@@ -124,10 +166,18 @@ char *prendi_posizione(ptr_veicolo ve)
 
 
 /*
+ Funzione: prendi_stato
+ ----------------------
  Restituisce lo stato del veicolo (es. disponibile, occupato).
 
  Parametri:
    ve: puntatore al veicolo
+
+   Pre-condizione:
+   Il puntatore ve deve essere valido (non NULL)
+
+ Post-condizione:
+   Nessuna modifica allo stato del veicolo
 
  Ritorna:
    Una stringa con lo stato, oppure NULL se il puntatore è invalido.
@@ -138,16 +188,24 @@ char *prendi_stato(ptr_veicolo ve)
     return ve ? ve->stato : NULL;
 }
 
+
 /*
+ Funzione: prendi_prenotazioni
+ -----------------------------
  Restituisce il puntatore alla lista di prenotazioni del veicolo.
 
  Parametri:
    ve: puntatore al veicolo
 
+  Pre-condizione:
+   Il puntatore ve deve essere valido (non NULL)
+
+ Post-condizione:
+   Nessuna modifica ai dati del veicolo o delle prenotazioni
+
  Ritorna:
    Un puntatore alla lista delle prenotazioni associate, oppure NULL.
 */
-
 ptr_prenotazione prendi_prenotazioni(ptr_veicolo ve)
 {
     return ve ? ve->prenotazione_veicolo : NULL;
@@ -155,10 +213,18 @@ ptr_prenotazione prendi_prenotazioni(ptr_veicolo ve)
 
 
 /*
+ Funzione: stampa_veicolo
+ ------------------------
  Stampa a video le informazioni del veicolo in formato leggibile.
 
  Parametri:
    ve: puntatore al veicolo da stampare
+
+  Pre-condizione:
+   Il puntatore ve deve essere valido (non NULL)
+
+ Post-condizione:
+   Nessuna modifica alla struttura veicolo
 
  Effetti:
    Stampa le principali informazioni del veicolo su standard output.
@@ -172,11 +238,19 @@ void stampa_veicolo(ptr_veicolo ve)
 
 
 /*
+Funzione: carica_veicoli_da_file
+ -------------------------------
  Carica i veicoli da un file e li inserisce in una lista.
 
  Parametri:
    nome_file: stringa con il nome del file da leggere
    l: puntatore alla lista di veicoli dove inserire i dati
+
+  Pre-condizione:
+   Il file deve essere formattato correttamente con righe contenenti marca, modello, targa e posizione
+
+ Post-condizione:
+   Tutti i veicoli letti dal file vengono inseriti nella lista l
 
  Effetti:
    Legge i dati da file e li aggiunge alla lista.
@@ -196,18 +270,27 @@ void carica_veicoli_da_file(const char *nome_file, ptr_lista l)
     }
 }
 
+
 /*
+ Funzione: aggiorna_stato_veicolo
+ --------------------------------
  Aggiorna lo stato di disponibilità di un veicolo in base alle prenotazioni.
 
  Parametri:
    ve: puntatore al veicolo di cui aggiornare lo stato
+
+  Pre-condizione:
+   ve deve essere un puntatore valido a una struttura veicolo
+
+ Post-condizione:
+   Il campo 'stato' del veicolo viene aggiornato a "disponibile" se il veicolo è disponibile oggi,
+   altrimenti a "non disponibile".
 
  Effetti:
    Aggiorna il campo 'stato' del veicolo a "disponibile" o "non disponibile"
    in base alla disponibilità odierna. Restituisce true se il veicolo
    non è disponibile, false altrimenti.
 */
-
 bool aggiorna_stato_veicolo(ptr_veicolo ve) 
 {
     if (!ve) return false;
@@ -221,11 +304,20 @@ bool aggiorna_stato_veicolo(ptr_veicolo ve)
     }
 }
 
+
 /*
+ Funzione: libera_veicolo
+ ------------------------
  Libera la memoria occupata da un veicolo, comprese le sue prenotazioni.
 
  Parametri:
    ve: puntatore al veicolo da liberare
+
+ Pre-condizione:
+   ve deve essere un puntatore valido a una struttura veicolo allocata dinamicamente
+
+ Post-condizione:
+   La memoria occupata dal veicolo e dalle sue prenotazioni viene liberata
 
  Effetti:
    Dealloca la memoria associata al veicolo e alle sue prenotazioni.

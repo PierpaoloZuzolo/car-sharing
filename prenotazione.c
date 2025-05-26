@@ -15,7 +15,15 @@ struct prenotazioni {
 
 
 /*
+ Funzione: inizializza_prenotazioni
+ ----------------------------------
  Inizializza una nuova struttura per la gestione delle prenotazioni.
+
+  Pre-condizione:
+   Nessuna.
+
+ Post-condizione:
+   La struttura prenotazioni è allocata e tutte le celle sono azzerate (libere).
 
  Ritorna:
    Un puntatore a una nuova struttura prenotazioni con tutte le celle impostate a NULL.
@@ -31,11 +39,22 @@ ptr_prenotazione inizializza_prenotazioni()
 
 
 /*
+ Funzione: carica_prenotazioni_da_file
+ ------------------------------------
  Carica le prenotazioni associate a una targa da file, oppure inizializza una nuova giornata.
 
  Parametri:
    p: puntatore alla struttura delle prenotazioni da aggiornare.
    targa: targa del veicolo, usata per determinare il nome del file.
+
+  Pre-condizione:
+   p deve essere un puntatore valido.
+   targa deve essere una stringa valida.
+
+ Post-condizione:
+   La struttura prenotazioni è aggiornata con i dati letti dal file,
+   oppure azzerata se il file non esiste o il giorno è cambiato.
+   Le celle passate vengono bloccate.
 
  Ritorna:
    1 se il caricamento da file è avvenuto con successo, 0 se è stata inizializzata una nuova giornata.
@@ -79,11 +98,20 @@ int carica_prenotazioni_da_file(ptr_prenotazione p, const char *targa)
 
 
 /*
+ Funzione: salva_prenotazioni_su_file
+ -----------------------------------
  Salva su file lo stato attuale delle prenotazioni di un veicolo.
 
  Parametri:
    p: puntatore alla struttura delle prenotazioni da salvare.
    targa: targa del veicolo, usata per costruire il nome del file.
+ 
+  Pre-condizione:
+   p deve essere un puntatore valido.
+   targa deve essere una stringa valida.
+
+ Post-condizione:
+   Il file con le prenotazioni viene aggiornato.
 
  Effetti:
    Scrive il contenuto delle celle in un file chiamato "<targa>.txt".
@@ -104,10 +132,18 @@ void salva_prenotazioni_su_file(ptr_prenotazione p, const char *targa)
 
 
 /*
+ Funzione: leggi_cella_da_orario
+ -------------------------------
  Legge un orario in formato HH MM e lo converte nella corrispondente cella oraria.
 
  Parametri:
    messaggio: messaggio da mostrare all’utente per l’inserimento dell’orario.
+
+ Pre-condizione:
+   Nessuna.
+
+ Post-condizione:
+   Nessuna modifica.
 
  Valore di ritorno:
    Restituisce l’indice della cella (0–47) corrispondente all’orario,
@@ -129,12 +165,21 @@ int leggi_cella_da_orario(const char *messaggio)
 
 
 /*
+ Funzione: prenota_intervallo
+ ----------------------------
  Tenta di prenotare un intervallo di celle orarie consecutive.
 
  Parametri:
    p: puntatore alla struttura delle prenotazioni.
    inizio_cella: indice della cella iniziale dell’intervallo.
    fine_cella: indice della cella finale (esclusiva) dell’intervallo.
+
+  Pre-condizione:
+   p deve essere un puntatore valido.
+   inizio_cella e fine_cella devono essere indici validi e inizio_cella < fine_cella.
+
+ Post-condizione:
+   Se possibile, le celle nell’intervallo sono marcate come prenotate.
 
  Valore di ritorno:
    Restituisce 1 se l’intervallo è stato prenotato con successo, 0 altrimenti.
@@ -167,10 +212,18 @@ int prenota_intervallo(ptr_prenotazione p, int inizio_cella, int fine_cella)
 
 
 /*
+ Funzione: veicolo_disponibile_oggi
+ ----------------------------------
  Verifica se il veicolo ha almeno una cella disponibile per oggi.
 
  Parametri:
    p: puntatore alla struttura delle prenotazioni del veicolo.
+
+  Pre-condizione:
+   p deve essere un puntatore valido.
+
+ Post-condizione:
+   Nessuna modifica.
 
  Valore di ritorno:
    Restituisce true se almeno una cella è libera, false altrimenti.
@@ -189,10 +242,18 @@ bool veicolo_disponibile_oggi(ptr_prenotazione p)
 
 
 /*
+ Funzione: libera_prenotazioni
+ -----------------------------
  Libera la memoria associata alla struttura delle prenotazioni.
 
  Parametri:
    p: puntatore alla struttura di prenotazioni da deallocare.
+
+  Pre-condizione:
+   p deve essere un puntatore valido.
+
+ Post-condizione:
+   La memoria della struttura è liberata.
 
  Effetti:
    Dealloca la memoria solo se il puntatore è valido.
@@ -204,11 +265,19 @@ void libera_prenotazioni(ptr_prenotazione p)
 
 
 /*
+ Funzione: blocca_celle_passate
+ -----------------------------
  Blocca le celle temporali già trascorsi nella giornata corrente.
 
  Parametri:
    p: puntatore alla struttura delle prenotazioni da aggiornare.
 
+  Pre-condizione:
+   p deve essere un puntatore valido.
+
+ Post-condizione:
+   Tutti le celle antecedenti all’orario corrente sono marcate come occupate.
+   
  Effetti:
    Segna come occupate le celle corrispondenti a orari già passati rispetto all'orario attuale.
    L'approssimazione considera lo slot successivo anche se si è oltre :00 o :30.
@@ -233,6 +302,8 @@ void blocca_celle_passate(ptr_prenotazione p)
 
 
 /*
+ Funzione: costo_noleggio
+ -------------------------
  Calcola il costo del noleggio di un veicolo in base all'intervallo orario 
  richiesto e ad un eventuale sconto.
 
@@ -240,6 +311,15 @@ void blocca_celle_passate(ptr_prenotazione p)
    inizio_cella: indice della cella di inizio noleggio (inclusiva, da 0 a 47)
    fine_cella: indice della cella di fine noleggio (esclusiva)
    sconto: valore numerico usato per determinare se applicare una tariffa scontata fissa
+
+  Pre-condizione:
+   inizio_cella e fine_cella devono essere compresi tra 0 e 48,
+   con inizio_cella < fine_cella.
+   Il valore di sconto deve essere >= 0.
+
+ Post-condizione:
+   Viene stampato il costo totale del noleggio.
+   Il valore di ritorno rappresenta il costo calcolato.
 
  Valore di ritorno:
    Restituisce il costo totale del noleggio come valore float.

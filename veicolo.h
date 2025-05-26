@@ -1,10 +1,12 @@
 #ifndef VEICOLO_H
 #define VEICOLO_H
 
+/*
+ Tipo astratto di dato: prenotazione
+ ------------------------------------
+ Struttura che rappresenta una prenotazione associata a un veicolo.
+*/
 typedef struct veicolo *ptr_veicolo;
-
-#include "lista_veicoli.h"
-#include "prenotazione.h"
 
 
 /*
@@ -30,6 +32,7 @@ typedef struct veicolo *ptr_veicolo;
 */
 ptr_veicolo inizia_veicolo(const char *marca_veicolo, const char *modello_veicolo, const char *targa_veicolo, const char *posizione_veicolo);
 
+
 /*
  Funzione: prendi_marca
  ----------------------
@@ -49,6 +52,7 @@ ptr_veicolo inizia_veicolo(const char *marca_veicolo, const char *modello_veicol
    oppure NULL se il puntatore ve è NULL
 */
 char *prendi_marca(ptr_veicolo ve);
+
 
 /*
  Funzione: prendi_modello
@@ -90,6 +94,28 @@ char *prendi_modello(ptr_veicolo ve);
    oppure NULL se il puntatore ve è NULL
 */
 char *prendi_targa(ptr_veicolo ve);
+
+
+/*
+ Funzione: prendi_posizione
+ --------------------------
+ Restituisce la posizione attuale del veicolo.
+
+ Parametri:
+   ve: puntatore alla struttura veicolo da cui prelevare la posizione
+
+ Pre-condizione:
+   Il puntatore ve deve essere valido (non NULL)
+
+ Post-condizione:
+   Nessuna modifica allo stato del veicolo
+
+ Ritorna:
+   Una stringa contenente la posizione attuale del veicolo,
+   oppure NULL se il puntatore ve è NULL
+*/
+char *prendi_posizione(ptr_veicolo ve);
+
 
 /*
  Funzione: prendi_stato
@@ -133,7 +159,6 @@ char *prendi_stato(ptr_veicolo ve);
 ptr_prenotazione prendi_prenotazioni(ptr_veicolo ve);
 
 
-
 /*
  Funzione: stampa_veicolo
  ------------------------
@@ -175,6 +200,7 @@ void stampa_veicolo(ptr_veicolo ve);
 */
 void carica_veicoli_da_file(const char *nome_file, ptr_lista l);
 
+
 /*
  Funzione: aggiorna_stato_veicolo
  --------------------------------
@@ -194,7 +220,6 @@ void carica_veicoli_da_file(const char *nome_file, ptr_lista l);
    true se il veicolo non è disponibile oggi,
    false se il veicolo è disponibile o se il puntatore è nullo
 */
-
 bool aggiorna_stato_veicolo(ptr_veicolo ve);
 
 
