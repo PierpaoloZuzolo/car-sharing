@@ -9,6 +9,7 @@
 #include "utile.h"
 #include "utile_utente.h"
 #include "utile_prenotazione.h"
+#include "utile_veicolo.h"
 
 #define DIM_HASH 200
 
