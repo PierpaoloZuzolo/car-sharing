@@ -4,6 +4,7 @@
 #include <stdbool.h>
 #include "veicolo.h"
 #include "lista_veicoli.h"
+#include "utile_veicolo.h"
 
 typedef struct nodo{
     ptr_veicolo veicolo;
@@ -174,7 +175,7 @@ void stampa_lista_veicoli(ptr_lista li)
 
 
 /*
- Funzione: libera_lista_veicoli
+ Funzione: distruggi_lista
  ------------------------------
  Libera tutta la memoria associata alla lista di veicoli.
 
@@ -190,7 +191,7 @@ void stampa_lista_veicoli(ptr_lista li)
  Effetti:
    Libera tutti i nodi e i veicoli contenuti, poi libera la lista stessa.
 */
-void libera_lista_veicoli(ptr_lista li)
+void distruggi_lista(ptr_lista li)
 {
     nodo *corr = li->testa;
 

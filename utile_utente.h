@@ -25,23 +25,27 @@
 */
 void stampa_utente(ptr_utente ut);
 
+
 /*
  Funzione: salva_utente_su_file
  ------------------------------
- Salva le informazioni dell'utente su un file.
+ Salva i dati di un utente su due file:
+  - Un file generico (append) che elenca nome ed email di tutti gli utenti
+  - Un file dedicato all'utente, con nome "nome_utente.txt",
+    contenente i dettagli specifici (nome, email, sconto, ecc.)
 
  Parametri:
-   nome_file: stringa contenente il nome del file di destinazione.
-   ut: puntatore all'utente da salvare.
+   nome_file: percorso del file generico dove aggiungere utente
+   ut: puntatore alla struttura utente da salvare
 
  Pre-condizione:
-   nome_file e ut devono essere puntatori validi.
+   ut deve essere un puntatore valido
 
  Post-condizione:
-   Le informazioni dell'utente vengono scritte nel file.
+   I file vengono creati/aggiornati con i dati dell'utente
 
- Ritorna:
-   Nessun valore.
+ Valore di ritorno:
+   Nessuno (void)
 */
 void salva_utente_su_file(char *nome_file, ptr_utente ut);
 

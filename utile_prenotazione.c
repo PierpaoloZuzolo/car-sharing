@@ -109,6 +109,7 @@ void salva_prenotazioni_su_file(ptr_prenotazione p, const char *targa)
 }
 
 
+
 /*
  Funzione: costo_noleggio
  -------------------------
@@ -147,15 +148,15 @@ float costo_noleggio(int inizio_cella, int fine_cella, int sconto)
     for (int i = inizio_cella; i < fine_cella; i++) {
         // Fascia oraria 01:00–06:00 (celle 2–11)
         if (i >= 2 && i < 12) {
-            costo += 3.5;
+            costo += 40.5;
         } else {
-            costo += 5.0;
+            costo += 65.8;
         }
     }
 
     // Se sconto è multiplo di 5, applica una tariffa scontata fissa per ogni cella
     if (sconto % 5 == 0) {
-        costo = (fine_cella - inizio_cella) * 2.25;
+        costo = (fine_cella - inizio_cella) * 38;
     }
 
     printf("Il costo del veicolo: %.2f\n", costo);
@@ -166,33 +167,45 @@ float costo_noleggio(int inizio_cella, int fine_cella, int sconto)
 /*
  Funzione: leggi_cella_da_orario
  -------------------------------
- Legge un orario in formato HH MM e lo converte nella corrispondente cella oraria.
+ Legge un orario da tastiera nel formato "HH MM" (ore e minuti)
+ e converte l'orario nell'indice corrispondente della cella.
 
  Parametri:
-   messaggio: messaggio da mostrare all’utente per l’inserimento dell’orario.
+   messaggio: messaggio da mostrare all'utente per richiedere l'input.
 
  Pre-condizione:
    Nessuna.
 
  Post-condizione:
-   Nessuna modifica.
+   Nessuna modifica a variabili esterne.
 
  Valore di ritorno:
-   Restituisce l’indice della cella (0–47) corrispondente all’orario,
-   oppure -1 in caso di input non valido.
+   Restituisce l'indice della cella corrispondente all'orario inserito.
+   Continua a richiedere l'input finché non viene inserito un orario valido
+   con ore tra 0 e 24 e minuti solo 0 o 30.
 */
 int leggi_cella_da_orario(const char *messaggio)
 {
     int ora, minuto;
+    while (1) {
+        printf("%s formato HH MM (ore - minuti): ", messaggio);
+        int result = scanf("%d %d", &ora, &minuto);
 
-    printf("%s formato HH MM (ore - minuti): ", messaggio);
-    if (scanf("%d %d", &ora, &minuto) != 2 || ora < 0 || ora > 24 || (minuto != 0 && minuto != 30)) {
-        printf("Orario non valido. Usa solo :00 o :30.\n");
-        return -1;
+        // Pulizia del buffer in caso di input errato
+        if (result != 2) {
+            printf("Input non valido. Inserisci due numeri interi.\n");
+            while (getchar() != '\n'); // scarta input residuo
+            continue;
+        }
+
+        if (ora < 0 || ora > 24 || (minuto != 0 && minuto != 30)) {
+            printf("Orario non valido. Usa solo minuti :00 o :30 e ore tra 0 e 24.\n");
+            continue;
+        }
+
+        // Valido → restituisci indice della cella
+        return ora * 2 + (minuto == 30 ? 1 : 0);
     }
-
-    // Calcola l’indice della cella (es. 9:30 → 19)
-    return ora * 2 + (minuto == 30 ? 1 : 0);
 }
 
 
@@ -290,7 +303,7 @@ void mostra_orari_disponibili(ptr_prenotazione p) {
                 int ora_fine = i / 2;
                 int min_fine = (i % 2) * 30;
 
-                printf("Disponibile: dalle %02d:%02d alle %02d:%02d\n", 
+                printf("-Disponibile: dalle %02d:%02d alle %02d:%02d\n", 
                         ora_inizio, min_inizio, ora_fine, min_fine);
 
                 in_intervallo = false;

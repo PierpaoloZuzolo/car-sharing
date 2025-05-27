@@ -81,21 +81,22 @@ float costo_noleggio(int inizio_cella, int fine_cella, int sconto);
 /*
  Funzione: leggi_cella_da_orario
  -------------------------------
- Richiede all’utente di inserire un orario (HH MM),
- verifica la correttezza e lo converte in indice di slot.
+ Legge un orario da tastiera nel formato "HH MM" (ore e minuti)
+ e converte l'orario nell'indice corrispondente della cella.
 
  Parametri:
-   messaggio: stringa da visualizzare come prompt per l’inserimento.
+   messaggio: messaggio da mostrare all'utente per richiedere l'input.
 
  Pre-condizione:
    Nessuna.
 
  Post-condizione:
-   Nessuna modifica.
+   Nessuna modifica a variabili esterne.
 
- Ritorna:
-   Indice della cella corrispondente all’orario,
-   oppure -1 se l’orario inserito è non valido.
+ Valore di ritorno:
+   Restituisce l'indice della cella corrispondente all'orario inserito.
+   Continua a richiedere l'input finché non viene inserito un orario valido
+   con ore tra 0 e 24 e minuti solo 0 o 30.
 */
 int leggi_cella_da_orario(const char *messaggio);
 

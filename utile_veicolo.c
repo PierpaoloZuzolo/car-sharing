@@ -2,10 +2,12 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
+#include <time.h>
 #include "veicolo.h"
 #include "lista_veicoli.h"
 #include "prenotazione.h"
 #include "utile_veicolo.h"
+#include "utile_prenotazione.h"
 
 
 /*
@@ -28,8 +30,12 @@
 void stampa_veicolo(ptr_veicolo ve)
 {
     if(ve){
-        printf(" %s  %s [%s] \n\tposizione: %s\t\t(%s)", prendi_marca(ve), prendi_modello(ve),
-                                                         prendi_targa(ve), prendi_posizione(ve), prendi_stato(ve));
+        printf(" %s  %s [%s] \n\tposizione: %s\n", prendi_marca(ve), prendi_modello(ve),
+                                                         prendi_targa(ve), prendi_posizione(ve));
+        printf("\n\tOrari disponibili:\n");
+
+        mostra_orari_disponibili(prendi_prenotazioni(ve));
+        printf("\n");
     }
 }
 

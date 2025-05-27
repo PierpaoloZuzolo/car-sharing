@@ -109,7 +109,7 @@ void stampa_lista_veicoli(ptr_lista li);
  Ritorna:
    Nessun valore.
 */
-void libera_lista_veicoli(ptr_lista li);
+void distruggi_lista(ptr_lista li);
 
 
 /*

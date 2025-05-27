@@ -36,33 +36,56 @@ void stampa_utente(ptr_utente ut)
 /*
  Funzione: salva_utente_su_file
  ------------------------------
- Salva le informazioni di un utente su file in modalità append.
+ Salva i dati di un utente su due file:
+  - Un file generico (append) che elenca nome ed email di tutti gli utenti
+  - Un file dedicato all'utente, con nome "nome_utente.txt",
+    contenente i dettagli specifici (nome, email, sconto, ecc.)
 
  Parametri:
-   nome_file: nome del file dove salvare i dati.
-   ut: puntatore all'utente da salvare.
+   nome_file: percorso del file generico dove aggiungere utente
+   ut: puntatore alla struttura utente da salvare
 
-  Pre-condizione:
-   nome_file e ut devono essere puntatori validi.
+ Pre-condizione:
+   ut deve essere un puntatore valido
 
  Post-condizione:
-   Le informazioni dell'utente vengono scritte nel file.
+   I file vengono creati/aggiornati con i dati dell'utente
 
- Effetti:
-   Se il file si apre correttamente e ut non è NULL,
-   scrive nome ed email su una nuova riga nel file.
-   Altrimenti stampa un messaggio di errore.
+ Valore di ritorno:
+   Nessuno (void)
 */
 void salva_utente_su_file(char *nome_file, ptr_utente ut)
 {
+    if (!ut) {
+        printf("\nErrore: utente nullo.\n");
+        return;
+    }
+
+    // Salvataggio su file generale (append)
     FILE *file = fopen(nome_file, "a");
-    // Controlla se file e utente sono diversi da NULL.
-    if (file && ut){ 
+    if (file) {
         fprintf(file, "%s %s\n", prendi_nome(ut), prendi_email(ut));
         fclose(file);
-    } else printf("\nErrore salvataggio...");
-        
-    
+    } else {
+        printf("\nErrore salvataggio file utenti generico.\n");
+    }
+
+    // Creazione file dedicato "nome_utente.txt"
+    char nome_file_utente[256];
+    snprintf(nome_file_utente, sizeof(nome_file_utente), "%s.txt", prendi_nome(ut));
+
+    FILE *file_utente = fopen(nome_file_utente, "w");  // scrittura, sovrascrive se esiste
+    if (file_utente) {
+        // Qui puoi salvare i dati specifici dell'utente (es. sconto, prenotazioni, ecc.)
+        fprintf(file_utente, "Nome: %s\n", prendi_nome(ut));
+        fprintf(file_utente, "Email: %s\n", prendi_email(ut));
+        // Per esempio, sconto di default
+        fprintf(file_utente, "%d\n", 0);
+
+        fclose(file_utente);
+    } else {
+        printf("\nErrore nella creazione del file utente dedicato.\n");
+    }
 }
 
 

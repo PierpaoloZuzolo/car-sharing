@@ -5,6 +5,8 @@
 #include "veicolo.h"
 #include "lista_veicoli.h"
 #include "prenotazione.h"
+#include "utile_prenotazione.h"
+
 
 struct veicolo{
     char marca[30];
@@ -213,7 +215,7 @@ ptr_prenotazione prendi_prenotazioni(ptr_veicolo ve)
 
 
 /*
- Funzione: imposta_stato
+ Funzione: imposta_stato_veicolo
  -----------------------
  Imposta lo stato di un veicolo.
 
@@ -232,7 +234,7 @@ ptr_prenotazione prendi_prenotazioni(ptr_veicolo ve)
  Effetti:
    Modifica il campo stato all’interno della struttura veicolo.
 */
-void imposta_stato(ptr_veicolo ve, const char *stato)
+void imposta_stato_veicolo(ptr_veicolo ve, const char *stato)
 {
     if (ve && stato) {
         strncpy(ve->stato, stato, DIM_STATO - 1);

@@ -3,6 +3,8 @@
 
 #define DIM_STATO 20
 
+#include "prenotazione.h"
+
 /*
  Tipo astratto di dato: prenotazione
  ------------------------------------
@@ -162,7 +164,7 @@ ptr_prenotazione prendi_prenotazioni(ptr_veicolo ve);
 
 
 /*
- Funzione: imposta_stato
+ Funzione: imposta_stato_veicolo
  -----------------------
  Imposta lo stato di un veicolo.
 
@@ -181,7 +183,7 @@ ptr_prenotazione prendi_prenotazioni(ptr_veicolo ve);
  Effetti:
    Modifica il campo stato all’interno della struttura veicolo.
 */
-void imposta_stato(ptr_veicolo ve, const char *stato);
+void imposta_stato_veicolo(ptr_veicolo ve, const char *stato);
 
 
 #endif
