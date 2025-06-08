@@ -2,132 +2,199 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
+
+#include "tab_hash.h"
 #include "veicolo.h"
 #include "hash_veicoli.h"
 #include "utile_veicolo.h"
 
-typedef struct nodo{
-    ptr_veicolo veicolo;
-    struct nodo *prossimo;
-}nodo;
 
-struct tab_hash{
-    int dimensione;
-    nodo **tabella;
-};
+/*
+ Funzione: crea_hash_veicoli
+ ---------------------------
+
+ Crea una nuova tabella hash specificamente per la gestione dei veicoli.
+
+ Implementazione:
+    Chiama la funzione `crea_tabella_hash` passando la dimensione desiderata.
+
+ Parametri:
+    dimensione: numero di bucket da allocare nella tabella hash
+
+ Pre-condizioni:
+    dimensione deve essere maggiore di 0
+
+ Post-condizioni:
+    restituisce un puntatore a una nuova tabella hash per veicoli, oppure NULL in caso di errore
+
+ Ritorna:
+    un puntatore a una struttura `ptr_hash_veicoli`, o NULL se la creazione fallisce
+
+ Side-effect:
+    alloca memoria dinamicamente per la nuova tabella hash
+ */
 
 
-
-unsigned int hash(char *chiave, int dimensione)
+ptr_hash_veicoli crea_hash_veicoli(int dimensione)
 {
-    int valore_hash = 0;
-    while (*chiave) {
-        valore_hash = (valore_hash * 31 + *chiave) % dimensione;
-        chiave++;
-    }
-
-    return valore_hash;
+    return crea_tabella_hash(dimensione);
 }
 
+/*
+ Funzione: libera_veicolo_hash
+ -----------------------------
+
+ Funzione ausiliaria per liberare correttamente la memoria associata a un veicolo,
+ da usare come callback nei processi di distruzione della tabella hash.
+
+ Implementazione:
+    Converte il puntatore generico `void *` in un `ptr_veicolo`,
+    quindi chiama la funzione `libera_veicolo` per deallocare la memoria del veicolo.
+
+ Parametri:
+    veicolo: puntatore generico a un veicolo da liberare
+
+ Pre-condizioni:
+    veicolo deve essere non NULL e puntare a una struttura `veicolo` valida
+
+ Post-condizioni:
+    la memoria associata al veicolo viene deallocata
+
+ Ritorna:
+    niente (void)
+
+ Side-effect:
+    dealloca memoria dinamicamente associata al veicolo
+ */
 
 
-ptr_hash_veicolo nuova_tabella_hash(int dimensione)
+static void libera_veicolo_hash(void *veicolo)
 {
-
-    ptr_hash_veicolo h = (struct tab_hash *) malloc(sizeof(struct tab_hash));
-    if(!h){
-        return NULL;
-    }
-
-    h->dimensione = dimensione;
-
-    h->tabella = calloc(dimensione, sizeof(nodo*));
-    if(h->tabella == NULL){
-        free(h);
-        return NULL;
-    }
-
-    return h;
+    ptr_veicolo ve = (ptr_veicolo)veicolo;
+    libera_veicolo(ve);
 }
 
+/*
+ Funzione: distruggi_hash_veicoli
+ --------------------------------
+
+ Distrugge una tabella hash contenente veicoli, liberando tutta la memoria associata.
+
+ Implementazione:
+    Verifica che il puntatore alla tabella hash sia valido.
+    Se lo è, chiama `distruggi_hash` passando la funzione `libera_veicolo_hash` 
+    per liberare correttamente ogni valore (veicolo) memorizzato.
+
+ Parametri:
+    h: puntatore alla tabella hash di veicoli
+
+ Pre-condizioni:
+    h può essere NULL; se non lo è, deve essere una tabella hash valida creata con `crea_hash_veicoli`
+
+ Post-condizioni:
+    la memoria associata alla tabella hash e ai veicoli viene deallocata
+
+ Ritorna:
+    niente (void)
+
+ Side-effect:
+    dealloca memoria dinamicamente associata alla tabella hash e ai veicoli
+ */
 
 
-bool inserisci_hash(ptr_hash_veicolo h, ptr_veicolo ve)
+void distruggi_hash_veicoli(ptr_hash_veicoli h)
 {
-    // Controlla che l’utente non sia NULL.
-    if(!ve) return false;
-
-    // Calcola l’indice della tabella hash in cui inserire il veicolo.
-    char *targa = prendi_targa(ve);
-    if (!targa) return false;
-
-    int indice = hash(targa, h->dimensione); 
-
-    // Scorre la lista collegate per verificare duplicati in base al nome e libera l'utente duplicato
-    nodo *attuale = h->tabella[indice];
-    while(attuale){
-        if(strcmp(prendi_targa(attuale->veicolo), targa) == 0){
-          printf("\nErrore: targa gia' inserita.\n");
-            free(ve);
-             return false;
-        }
-      attuale = attuale->prossimo;
+    if(h){
+        distruggi_hash(h, libera_veicolo_hash);
     }
-
-    nodo *nuovo = malloc(sizeof(nodo));
-    nuovo->veicolo = ve;
-
-    nuovo->prossimo = h->tabella[indice];
-    h->tabella[indice] = nuovo;
-
-    return true;
-    
 }
 
+/*
+ Funzione: inserisci_veicolo_in_hash
+ -----------------------------------
+
+ Inserisce un veicolo nella tabella hash usando la targa come chiave.
+
+ Implementazione:
+    Verifica che la tabella hash e il veicolo siano non NULL.
+    Recupera la targa del veicolo con `prendi_targa`.
+    Se la targa è valida, chiama `inserisci_in_hash` per inserire nella tabella la coppia chiave-valore
+    dove la chiave è la targa e il valore è il puntatore al veicolo.
+
+ Parametri:
+    h: puntatore alla tabella hash dei veicoli
+    ve: puntatore al veicolo da inserire
+
+ Pre-condizioni:
+    h deve essere una tabella hash valida
+    ve deve essere un veicolo valido
+    la targa restituita da `prendi_targa(ve)` deve essere non NULL
+
+ Post-condizioni:
+    se la funzione ha successo, il veicolo è inserito nella tabella hash
+    altrimenti la tabella non viene modificata
+
+ Ritorna:
+    true se l'inserimento è andato a buon fine,
+    false in caso di errore (puntatori NULL, targa NULL o duplicato)
+
+ Side-effect:
+    può allocare memoria internamente tramite `inserisci_in_hash`
+ */
 
 
-ptr_veicolo cerca_veicolo(ptr_hash_veicolo h, ptr_veicolo ve)
+
+bool inserisci_veicolo_in_hash(ptr_hash_veicoli h, ptr_veicolo ve)
 {
-    char *targa = prendi_targa(ve);
-    if (!targa) return NULL;
+  if(h && ve){
+    char *nome = prendi_targa(ve);
+    if (nome){
+       return inserisci_in_hash(h, nome, (ptr_veicolo)ve);
+    }
+   
+  }
 
-    int indice = hash(targa, h->dimensione); 
+  return false;
+}
 
-    //Scorre la lista per trovare un utente con la stesso nome
-    nodo *attuale = h->tabella[indice];
-    while(attuale){
-        if(strcmp(prendi_targa(attuale->veicolo), targa) == 0){
-            return attuale->veicolo;
-        }
-        attuale = attuale->prossimo;
+/*
+ Funzione: cerca_veicolo_in_hash
+ -------------------------------
+
+ Cerca un veicolo nella tabella hash dato il numero di targa.
+
+ Implementazione:
+    Verifica che la tabella hash sia non NULL.
+    Usa la funzione `cerca_in_hash` passando la targa come chiave.
+    Se il veicolo viene trovato, ne restituisce il puntatore, altrimenti NULL.
+
+ Parametri:
+    h: puntatore alla tabella hash dei veicoli
+    targa: stringa che rappresenta la targa del veicolo da cercare
+
+ Pre-condizioni:
+    h deve essere una tabella hash valida
+    targa deve essere una stringa non NULL terminata da '\0'
+
+ Post-condizioni:
+    nessuna modifica alla tabella hash
+
+ Ritorna:
+    un puntatore al veicolo se trovato,
+    NULL se la tabella è NULL o il veicolo non è presente
+
+ Side-effect:
+    nessuno
+ */
+
+
+ptr_veicolo cerca_veicolo_in_hash(ptr_hash_veicoli h, const char *targa)
+{
+    if(h){
+        return (ptr_veicolo)cerca_in_hash(h, targa);
     }
 
     return NULL;
 }
 
 
-void distruggi_hash(ptr_hash_veicolo h)
-{
-    for(int i = 0; i < h->dimensione; i++){
-        nodo *attuale = h->tabella[i];
-
-        while(attuale){
-            nodo *temp = attuale;
-            attuale = attuale->prossimo;
-
-            libera_utente(temp->veicolo);
-            free(temp);
-        }
-    }
-
-    free(h->tabella);
-    free(h);
-}
-
-
-
-int dimensione_hash(ptr_hash_veicolo h)
-{
-  // Restituisce 0 se h punta a NULL.
-    return h ? h->dimensione : 0;
-}

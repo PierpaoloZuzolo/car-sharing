@@ -10,7 +10,7 @@
 */
 typedef struct utente *ptr_utente;
 
-#include "hash.h"
+#include "hash_utenti.h"
 
 
 /*

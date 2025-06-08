@@ -4,10 +4,10 @@
 #include <stdbool.h>
 #include <time.h>
 #include "veicolo.h"
-#include "lista_veicoli.h"
 #include "prenotazione.h"
 #include "utile_veicolo.h"
 #include "utile_prenotazione.h"
+#include "hash_veicoli.h"
 
 
 /*
@@ -59,7 +59,7 @@ Funzione: carica_veicoli_da_file
    Legge i dati da file e li aggiunge alla lista.
    Se il file non è accessibile, il programma termina con errore.
 */
-void carica_veicoli_da_file(const char *nome_file, ptr_lista l)
+void carica_veicoli_da_file(const char *nome_file, ptr_hash_veicoli h)
 {
     FILE *file = fopen(nome_file, "r");
     if(!file){
@@ -69,7 +69,7 @@ void carica_veicoli_da_file(const char *nome_file, ptr_lista l)
 
     char marca[30], modello[40], targa[8], posizione[60];
     while(fscanf(file, "%30s %40s %8s %60s", marca, modello, targa, posizione) == 4){
-        inserisci_veicolo_lista(l, inizia_veicolo(marca, modello, targa, posizione));
+        inserisci_veicolo_in_hash(h, inizia_veicolo(marca, modello, targa, posizione));
     }
 }
 
@@ -132,4 +132,16 @@ bool aggiorna_stato_veicolo(ptr_veicolo ve)
         imposta_stato_veicolo(ve, "NON disponibile");
         return true;
     }
+}
+
+
+bool veicolo_disponibile(ptr_veicolo ve)
+{
+  if(!ve) return false;
+
+  if(strcmp(prendi_stato(ve), "disponibile") == 0){
+    return true;
+  }
+
+  return false;
 }

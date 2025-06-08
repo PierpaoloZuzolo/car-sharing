@@ -2,7 +2,8 @@
 #define UTILE_VEICOLO_H
 
 #include "veicolo.h"
-#include "lista_veicoli.h"
+#include "hash_veicoli.h"
+
 
 /*
  Funzione: stampa_veicolo
@@ -43,7 +44,7 @@ void stampa_veicolo(ptr_veicolo ve);
  Ritorna:
    Nessun valore. Se il file non è accessibile, il programma termina con errore.
 */
-void carica_veicoli_da_file(const char *nome_file, ptr_lista l);
+void carica_veicoli_da_file(const char *nome_file, ptr_hash_veicoli h);
 
 
 
@@ -87,6 +88,10 @@ void libera_veicolo(ptr_veicolo ve);
    false se il veicolo è disponibile o se il puntatore è nullo
 */
 bool aggiorna_stato_veicolo(ptr_veicolo ve);
+
+
+
+bool veicolo_disponibile(ptr_veicolo ve);
 
 
 

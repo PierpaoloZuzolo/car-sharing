@@ -68,7 +68,7 @@ void salva_utente_su_file(char *nome_file, ptr_utente ut);
  Ritorna:
    Nessun valore.
 */
-void carica_utente_da_file(const char *nome_file, ptr_hash h);
+void carica_utente_da_file(const char *nome_file, ptr_hash_utenti h);
 
 
 /*
