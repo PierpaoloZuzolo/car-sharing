@@ -1,14 +1,17 @@
-main.exe: main.o hash.o lista_veicoli.o prenotazione.o utente.o utile_prenotazione.o utile_utente.o utile_veicolo.o utile.o veicolo.o
-	gcc main.o hash.o lista_veicoli.o prenotazione.o utente.o utile_prenotazione.o utile_utente.o utile_veicolo.o utile.o veicolo.o -o main.exe
+main.exe: main.o tab_hash.o hash_utenti.o hash_veicoli.o lista_veicoli.o prenotazione.o utente.o utile_prenotazione.o utile_utente.o utile_veicolo.o utile.o veicolo.o
+	gcc main.o tab_hash.o hash_utenti.o hash_veicoli.o lista_veicoli.o prenotazione.o utente.o utile_prenotazione.o utile_utente.o utile_veicolo.o utile.o veicolo.o -o main.exe
 
 main.o: main.c
 	gcc -c main.c -std=c99 -Wall -Wextra
 
-hash.o: hash.c
-	gcc -c hash.c -std=c99 -Wall -Wextra
+hash.o: tab_hash.c
+	gcc -c tab_hash.c -std=c99 -Wall -Wextra
 
-lista_veicoli.o: lista_veicoli.c
-	gcc -c lista_veicoli.c -std=c99 -Wall -Wextra
+hash_utenti.o: hash_utenti.c
+	gcc -c hash_utenti.c -std=c99 -Wall -Wextra
+
+hash_veicoli.o: hash_veicoli.c
+	gcc -c hash_veicoli.c -std=c99 -Wall -Wextra
 
 prenotazione.o: prenotazione.c
 	gcc -c prenotazione.c -std=c99 -Wall -Wextra
@@ -32,4 +35,4 @@ veicolo.o: veicolo.c
 	gcc -c veicolo.c -std=c99 -Wall -Wextra
 
 clean:
-    rm -f *.o main.exe
+	rm -f *.o main.exe

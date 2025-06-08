@@ -4,7 +4,7 @@
 #include <stdbool.h>
 #include "utile_utente.h"
 #include "utente.h"
-#include "hash.h"
+#include "hash_utenti.h"
 
 
 /*
@@ -109,7 +109,7 @@ void salva_utente_su_file(char *nome_file, ptr_utente ut)
    e lo inserisce nella tabella hash.
    Se il file non si apre, la funzione termina senza fare nulla.
 */
-void carica_utente_da_file(const char *nome_file, ptr_hash h)
+void carica_utente_da_file(const char *nome_file, ptr_hash_utenti h)
 {
     FILE *file = fopen(nome_file, "r");
     // Controlla se non esiste o non si apre, termina senza modificare.
@@ -122,7 +122,7 @@ void carica_utente_da_file(const char *nome_file, ptr_hash h)
 
     while(fscanf(file, "%50s %100s", nome, email) == 2){
         // Crea un nuovo utente e lo inserisce nella tabella hash.
-        inserisci_hash(h, inizia_utente(nome, email));
+        inserisci_utente_in_hash(h, inizia_utente(nome, email));
     }
 }
 
