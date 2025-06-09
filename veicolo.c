@@ -3,9 +3,8 @@
 #include <string.h>
 #include <stdbool.h>
 #include "veicolo.h"
-#include "lista_veicoli.h"
-#include "prenotazione.h"
-#include "utile_prenotazione.h"
+#include "array_prenotazione.h"
+#include "utile_array_prenotazione.h"
 
 
 struct veicolo{

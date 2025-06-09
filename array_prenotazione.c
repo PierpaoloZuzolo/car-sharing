@@ -3,7 +3,7 @@
 #include <string.h>
 #include <time.h>
 #include <stdbool.h>
-#include "prenotazione.h"
+#include "array_prenotazione.h"
 #include "utile.h"
 
 
@@ -35,6 +35,11 @@ ptr_prenotazione inizializza_prenotazioni()
     return p;
 }
 
+int prendi_grandezza_array_prenotazioni()
+{
+    return CELLE_GIORNALIERE;
+}
+
 
 /*
  Funzione: prenota_intervallo
@@ -62,14 +67,14 @@ int prenota_intervallo(ptr_prenotazione p, int inizio_cella, int fine_cella)
     if (!p) return 0;
 
     if (inizio_cella < 0 || fine_cella > CELLE_GIORNALIERE  || inizio_cella >= fine_cella) {
-        printf(" Intervallo non valido: inizio=%d, fine=%d\n", inizio_cella, fine_cella);
+        //printf(" Intervallo non valido: inizio=%d, fine=%d\n", inizio_cella, fine_cella);
         return 0;
     }
 
     // Verifica disponibilità in quell'orario
     for (int i = inizio_cella; i < fine_cella; i++) {
         if (p->cella[i]) {
-            printf(" Intervallo occupato (slot %d gia prenotato).\n", i);
+            //printf(" Intervallo occupato (slot %d gia prenotato).\n", i);
             return 0;
         }
     }
@@ -81,6 +86,28 @@ int prenota_intervallo(ptr_prenotazione p, int inizio_cella, int fine_cella)
 
     return 1;
 }
+
+
+//todo specifica!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+
+int libera_intervallo(ptr_prenotazione p, int inizio_cella, int fine_cella) 
+{
+    if (!p) return 0;
+
+    if (inizio_cella < 0 || fine_cella > CELLE_GIORNALIERE || inizio_cella >= fine_cella) {
+        //printf(" Intervallo non valido: inizio=%d, fine=%d\n", inizio_cella, fine_cella);
+        return 0;
+    }
+
+    // Libera le celle
+    for (int i = inizio_cella; i < fine_cella; i++) {
+        p->cella[i] = 0;
+    }
+
+    return 1;
+}
+
 
 
 /*
@@ -158,42 +185,6 @@ void azzera_celle(ptr_prenotazione p) {
 }
 
 
-/*
- Funzione: blocca_celle_passate
- -----------------------------
- Blocca le celle temporali già trascorsi nella giornata corrente.
-
- Parametri:
-   p: puntatore alla struttura delle prenotazioni da aggiornare.
-
-  Pre-condizione:
-   p deve essere un puntatore valido.
-
- Post-condizione:
-   Tutti le celle antecedenti all’orario corrente sono marcate come occupate.
-   
- Effetti:
-   Segna come occupate le celle corrispondenti a orari già passati rispetto all'orario attuale.
-   L'approssimazione considera lo slot successivo anche se si è oltre :00 o :30.
-*/
-void blocca_celle_passate(ptr_prenotazione p) 
-{
-    if (!p) return;
-
-    int ora, minuto;
-    ottieni_orario_corrente(&ora, &minuto);
-
-    // Calcola la prima cella prenotabile: approssimiamo sempre in avanti
-    int prossima_cella = ora * 2 + (minuto > 0 ? (minuto <= 30 ? 1 : 2) : 0);
-
-    if (prossima_cella > CELLE_GIORNALIERE) prossima_cella = CELLE_GIORNALIERE;
-
-    // Blocca celle non più disponibili
-    for (int i = 0; i < prossima_cella; i++) {
-        imposta_cella(p, i, 1);
-    }
-}
-
 
 /*
  Funzione: in_intervallo
@@ -212,6 +203,7 @@ void blocca_celle_passate(ptr_prenotazione p)
    1 se indice è nell'intervallo [inizio, fine),
    0 altrimenti.
 */
-int in_intervallo(int indice, int inizio, int fine) {
+int in_intervallo(int indice, int inizio, int fine)  // DA METTERE FUORI
+{
     return indice >= inizio && indice < fine;
 }

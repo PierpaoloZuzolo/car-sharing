@@ -4,9 +4,9 @@
 #include <stdbool.h>
 #include <time.h>
 #include "veicolo.h"
-#include "prenotazione.h"
+#include "array_prenotazione.h"
 #include "utile_veicolo.h"
-#include "utile_prenotazione.h"
+#include "utile_array_prenotazione.h"
 #include "hash_veicoli.h"
 
 
