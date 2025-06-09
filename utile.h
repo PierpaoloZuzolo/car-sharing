@@ -65,4 +65,12 @@ void data_attuale(int *giorno, int *mese, int *anno);
 */
 bool vedi_se_giorno_nuovo();
 
+
+void converti_orario_in_celle(int ora_inizio, int minuto_inizio, int ora_fine, int minuto_fine, int *cella_inizio, int *cella_fine);
+
+
+void converti_celle_in_orario(int cella_inizio, int cella_fine, int *ora_inizio, int *minuto_inizio, int *ora_fine, int *minuto_fine);
+
+
+
 #endif

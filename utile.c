@@ -109,6 +109,24 @@ bool vedi_se_giorno_nuovo()
 
     return false;
 
-   
-    
 }
+
+
+void converti_orario_in_celle(int ora_inizio, int minuto_inizio, int ora_fine, int minuto_fine, int *cella_inizio, int *cella_fine)
+{
+    *cella_inizio = ora_inizio * 2 + (minuto_inizio >= 30 ? 1 : 0);
+    *cella_fine = ora_fine * 2 + (minuto_fine > 0 ? (minuto_fine <= 30 ? 1 : 2) : 0);
+}
+
+
+
+void converti_celle_in_orario(int cella_inizio, int cella_fine, int *ora_inizio, int *minuto_inizio, int *ora_fine, int *minuto_fine) 
+{
+    *ora_inizio = cella_inizio / 2;
+    *minuto_inizio = (cella_inizio % 2) * 30;
+
+    *ora_fine = cella_fine / 2;
+    *minuto_fine = (cella_fine % 2) * 30;
+}
+
+

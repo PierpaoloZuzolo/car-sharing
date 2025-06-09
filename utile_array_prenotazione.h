@@ -1,7 +1,7 @@
 #ifndef UTILE_PRENOTAZIONE_H
 #define UTILE_PRENOTAZIONE_H
 
-#include "prenotazione.h"
+#include "array_prenotazione.h"
 
 /*
  Funzione: carica_prenotazioni_da_file
@@ -161,6 +161,11 @@ void libera_prenotazioni(ptr_prenotazione p);
    Nessuna modifica allo stato interno della struttura.
 */
 void mostra_orari_disponibili(ptr_prenotazione p);
+
+
+
+void blocca_celle_passate(ptr_prenotazione p);
+
 
 
 #endif

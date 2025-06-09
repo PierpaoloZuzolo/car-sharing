@@ -3,9 +3,9 @@
 #include <string.h>
 #include <time.h>
 #include <stdbool.h>
-#include "prenotazione.h"
+#include "array_prenotazione.h"
 #include "utile.h"
-#include "utile_prenotazione.h"
+#include "utile_array_prenotazione.h"
 
 
 /*
@@ -96,6 +96,7 @@ int carica_prenotazioni_da_file(ptr_prenotazione p, const char *targa)
 */
 void salva_prenotazioni_su_file(ptr_prenotazione p, const char *targa) 
 {
+    if (!p || !targa || strlen(targa) == 0) return;
     char nome_file[32];
     snprintf(nome_file, sizeof(nome_file), "%s.txt", targa);
 
@@ -309,5 +310,42 @@ void mostra_orari_disponibili(ptr_prenotazione p) {
                 in_intervallo = false;
             }
         }
+    }
+}
+
+
+/*
+ Funzione: blocca_celle_passate
+ -----------------------------
+ Blocca le celle temporali già trascorsi nella giornata corrente.
+
+ Parametri:
+   p: puntatore alla struttura delle prenotazioni da aggiornare.
+
+  Pre-condizione:
+   p deve essere un puntatore valido.
+
+ Post-condizione:
+   Tutti le celle antecedenti all’orario corrente sono marcate come occupate.
+   
+ Effetti:
+   Segna come occupate le celle corrispondenti a orari già passati rispetto all'orario attuale.
+   L'approssimazione considera lo slot successivo anche se si è oltre :00 o :30.
+*/
+void blocca_celle_passate(ptr_prenotazione p) 
+{
+    if (!p) return;
+
+    int ora, minuto;
+    ottieni_orario_corrente(&ora, &minuto);
+
+    // Calcola la prima cella prenotabile: approssimiamo sempre in avanti
+    int prossima_cella = ora * 2 + (minuto > 0 ? (minuto <= 30 ? 1 : 2) : 0);
+
+    if (prossima_cella > prendi_grandezza_array_prenotazioni()) prossima_cella = prendi_grandezza_array_prenotazioni();
+
+    // Blocca celle non più disponibili
+    for (int i = 0; i < prossima_cella; i++) {
+        imposta_cella(p, i, 1);
     }
 }

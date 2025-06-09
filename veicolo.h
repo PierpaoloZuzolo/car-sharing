@@ -3,7 +3,7 @@
 
 #define DIM_STATO 20
 
-#include "prenotazione.h"
+#include "array_prenotazione.h"
 
 /*
  Tipo astratto di dato: prenotazione

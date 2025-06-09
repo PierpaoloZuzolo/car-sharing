@@ -59,6 +59,10 @@ ptr_prenotazione inizializza_prenotazioni();
 int prenota_intervallo(ptr_prenotazione p, int inizio_cella, int fine_cella);
 
 
+int libera_intervallo(ptr_prenotazione p, int inizio_cella, int fine_cella);
+
+
+
 /*
  Funzione: ottiene_cella
  -----------------------
@@ -165,6 +169,11 @@ void blocca_celle_passate(ptr_prenotazione p);
    0 altrimenti.
 */
 int in_intervallo(int indice, int inizio, int fine);
+
+
+
+int prendi_grandezza_array_prenotazioni();
+
 
 
 #endif
