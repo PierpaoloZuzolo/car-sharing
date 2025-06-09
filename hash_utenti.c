@@ -1,3 +1,8 @@
+/*
+Autore: Roberto Saporoso
+Data: 07/06/2025
+*/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -36,8 +41,6 @@
  Side-effect:
     alloca memoria dinamicamente per la nuova tabella hash
  */
-
-
 ptr_hash_utenti crea_hash_utenti(int dimensione)
 {
   return crea_tabella_hash(dimensione);
@@ -69,8 +72,6 @@ ptr_hash_utenti crea_hash_utenti(int dimensione)
  Side-effect:
     dealloca memoria dinamicamente associata all'utente
  */
-
-
 static void libera_utente_hash(void *utente)
 {
   ptr_utente ut = (ptr_utente)utente;
@@ -102,8 +103,6 @@ static void libera_utente_hash(void *utente)
  Side-effect:
     dealloca memoria dinamicamente associata alla tabella hash e agli utenti
  */
-
-
 void distruggi_hash_utenti(ptr_hash_utenti h)
 {
   if(h){
@@ -143,8 +142,6 @@ void distruggi_hash_utenti(ptr_hash_utenti h)
  Side-effect:
     può allocare memoria internamente tramite `inserisci_in_hash`
  */
-
-
 bool inserisci_utente_in_hash(ptr_hash_utenti h, ptr_utente ut)
 {
   if(h && ut){
@@ -186,8 +183,6 @@ bool inserisci_utente_in_hash(ptr_hash_utenti h, ptr_utente ut)
  Side-effect:
     nessuno
  */
-
-
 ptr_utente cerca_utente_in_hash(ptr_hash_utenti h, const char* nome)
 {
   if(h){
@@ -196,5 +191,4 @@ ptr_utente cerca_utente_in_hash(ptr_hash_utenti h, const char* nome)
 
   return NULL;
 }
-
 

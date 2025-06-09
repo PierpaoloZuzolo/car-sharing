@@ -1,3 +1,8 @@
+/*
+Autore: Roberto Saporoso
+Data: 07/06/2025
+*/
+
 #ifndef HASH_UTENTI_H
 #define HASH_UTENTI_H
 
@@ -34,7 +39,6 @@ typedef struct tabella_hash *ptr_hash_utenti;
  Side-effect:
     alloca memoria dinamicamente per la nuova tabella hash
  */
-
 ptr_hash_utenti crea_hash_utenti(int dimensione);
 
 /*
@@ -59,11 +63,11 @@ ptr_hash_utenti crea_hash_utenti(int dimensione);
  Side-effect:
     dealloca memoria dinamicamente associata all'utente
  */
-
 static void libera_utente_hash(void *utente);
 
 /*
  Funzione: distruggi_hash_utenti
+ -------------------------------
 
  Distrugge una tabella hash contenente utenti, liberando tutta la memoria associata.
 
@@ -82,7 +86,6 @@ static void libera_utente_hash(void *utente);
  Side-effect:
     dealloca memoria dinamicamente associata alla tabella hash e agli utenti
  */
-
 void distruggi_hash_utenti(ptr_hash_utenti h);
 
 /*
@@ -111,7 +114,6 @@ void distruggi_hash_utenti(ptr_hash_utenti h);
  Side-effect:
     può allocare memoria internamente tramite `inserisci_in_hash`
  */
-
 bool inserisci_utente_in_hash(ptr_hash_utenti h, ptr_utente ut);
 
 /*
@@ -138,7 +140,6 @@ bool inserisci_utente_in_hash(ptr_hash_utenti h, ptr_utente ut);
  Side-effect:
     nessuno
  */
-
 ptr_utente cerca_utente_in_hash(ptr_hash_utenti h, const char* nome);
 
 

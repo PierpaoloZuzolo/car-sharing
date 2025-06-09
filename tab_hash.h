@@ -1,3 +1,8 @@
+/*
+Autore: Roberto Saporoso
+Data: 10/05/2025
+*/
+
 #ifndef HASH_H
 #define HASH_H
 

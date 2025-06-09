@@ -1,3 +1,8 @@
+/*
+Autore: Roberto Saporoso
+Data: 20/05/2025
+*/
+
 #ifndef UTILE_UTENTE_H
 #define UTILE_UTENTE_H
 
@@ -9,85 +14,101 @@
 /*
  Funzione: stampa_utente
  -----------------------
- Stampa a video le informazioni dell'utente.
+
+ Stampa a video il nome dell'utente se il puntatore fornito è valido.
 
  Parametri:
-   ut: puntatore all'utente da stampare.
+    ut: puntatore a una struttura `utente` da stampare.
 
- Pre-condizione:
-   ut deve essere un puntatore valido.
+ Pre-condizioni:
+    Il parametro `ut` deve essere un puntatore valido o NULL.
 
- Post-condizione:
-   Nessuna modifica all'utente.
+ Post-condizioni:
+    Nessuna modifica agli oggetti passati.
 
  Ritorna:
-   Nessun valore. Produce stampa a video.
-*/
-void stampa_utente(ptr_utente ut);
+    Nessun valore.
 
+ Side-effect:
+    Scrive sullo standard output il nome dell'utente, se presente.
+ */
+void stampa_utente(ptr_utente ut);
 
 /*
  Funzione: salva_utente_su_file
  ------------------------------
- Salva i dati di un utente su due file:
-  - Un file generico (append) che elenca nome ed email di tutti gli utenti
-  - Un file dedicato all'utente, con nome "nome_utente.txt",
-    contenente i dettagli specifici (nome, email, sconto, ecc.)
+
+ Salva i dati dell'utente su due file:
+ 1) un file generale di elenco utenti (append),
+ 2) un file dedicato con nome "<nome_utente>.txt" contenente dati specifici.
 
  Parametri:
-   nome_file: percorso del file generico dove aggiungere utente
-   ut: puntatore alla struttura utente da salvare
+    nome_file: stringa contenente il nome del file per l'elenco generale utenti
+    ut: puntatore alla struttura utente da salvare
 
- Pre-condizione:
-   ut deve essere un puntatore valido
+ Pre-condizioni:
+    `nome_file` deve essere una stringa valida.
+    `ut` deve essere un puntatore valido non NULL.
 
- Post-condizione:
-   I file vengono creati/aggiornati con i dati dell'utente
+ Post-condizioni:
+    I dati dell'utente sono salvati su disco su due file (append + dedicato).
 
- Valore di ritorno:
-   Nessuno (void)
-*/
+ Ritorna:
+    void
+
+ Side-effect:
+    Scrive su file su disco.
+    Può stampare messaggi di errore su stdout in caso di problemi.
+ */
 void salva_utente_su_file(char *nome_file, ptr_utente ut);
-
 
 /*
  Funzione: carica_utente_da_file
  -------------------------------
- Carica un utente da un file e lo inserisce in una struttura hash.
+
+ Carica gli utenti da un file e li inserisce nella tabella hash degli utenti.
 
  Parametri:
-   nome_file: stringa contenente il nome del file da cui leggere.
-   h: puntatore alla tabella hash in cui inserire l'utente.
+    nome_file: stringa contenente il nome del file da cui caricare gli utenti
+    h: puntatore alla tabella hash utenti in cui inserire gli utenti caricati
 
- Pre-condizione:
-   nome_file e h devono essere puntatori validi.
+ Pre-condizioni:
+    `nome_file` deve essere una stringa valida e puntatore non NULL.
+    `h` deve essere un puntatore valido alla tabella hash.
 
- Post-condizione:
-   Un utente viene caricato dal file e inserito nella tabella hash.
+ Post-condizioni:
+    La tabella hash `h` conterrà i nuovi utenti caricati dal file.
 
  Ritorna:
-   Nessun valore.
-*/
+    void
+
+ Side-effect:
+    Può allocare memoria per nuovi utenti e modificarne la tabella hash.
+ */
 void carica_utente_da_file(const char *nome_file, ptr_hash_utenti h);
 
 
 /*
  Funzione: libera_utente
  -----------------------
- Libera la memoria occupata da un utente.
+
+ Libera la memoria allocata per una struttura utente.
 
  Parametri:
-   ut: puntatore all'utente da liberare.
+    ut: puntatore alla struttura utente da liberare
 
- Pre-condizione:
-   ut deve essere un puntatore valido.
+ Pre-condizioni:
+    `ut` deve essere un puntatore valido o NULL.
 
- Post-condizione:
-   La memoria occupata dall'utente è liberata.
+ Post-condizioni:
+    La memoria occupata dalla struttura utente viene liberata.
 
  Ritorna:
-   Nessun valore.
-*/
+    void
+
+ Side-effect:
+    Libera memoria dinamica.
+ */
 void libera_utente(ptr_utente ut);
 
 

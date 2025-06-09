@@ -1,3 +1,8 @@
+/*
+Autore: Carmine Saporoso
+Data: 13/05/2025
+*/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -13,20 +18,30 @@
 /*
  Funzione: stampa_veicolo
  ------------------------
- Stampa a video le informazioni del veicolo in formato leggibile.
+
+ Visualizza le informazioni principali del veicolo e gli orari disponibili.
+
+ Implementazione:
+    Verifica che il puntatore al veicolo sia valido.
+    Stampa marca, modello, targa e posizione del veicolo.
+    Mostra gli orari disponibili tramite la funzione `mostra_orari_disponibili`.
 
  Parametri:
-   ve: puntatore al veicolo da stampare
+    ve: puntatore alla struttura `veicolo` da stampare
 
-  Pre-condizione:
-   Il puntatore ve deve essere valido (non NULL)
+ Pre-condizioni:
+    Il puntatore `ve` deve essere valido (non NULL)
 
- Post-condizione:
-   Nessuna modifica alla struttura veicolo
+ Post-condizioni:
+    Nessuna
 
- Effetti:
-   Stampa le principali informazioni del veicolo su standard output.
-*/
+ Ritorna:
+    Nessun valore di ritorno (void)
+
+ Side-effect:
+    Scrive su standard output le informazioni relative al veicolo
+    e gli orari disponibili letti dalla struttura delle prenotazioni
+ */
 void stampa_veicolo(ptr_veicolo ve)
 {
     if(ve){
@@ -41,24 +56,36 @@ void stampa_veicolo(ptr_veicolo ve)
 
 
 /*
-Funzione: carica_veicoli_da_file
- -------------------------------
- Carica i veicoli da un file e li inserisce in una lista.
+ Funzione: carica_veicoli_da_file
+ --------------------------------
+
+ Legge da file le informazioni relative ai veicoli e li inserisce nella tabella hash.
+
+ Implementazione:
+    Apre il file indicato dal nome.
+    Per ogni riga del file, legge marca, modello, targa e posizione di un veicolo.
+    Crea una nuova struttura veicolo con `inizia_veicolo` e la inserisce nella hash table con `inserisci_veicolo_in_hash`.
+    Se il file non può essere aperto, stampa un messaggio di errore ed esce dal programma.
 
  Parametri:
-   nome_file: stringa con il nome del file da leggere
-   l: puntatore alla lista di veicoli dove inserire i dati
+    nome_file: stringa contenente il nome del file da cui leggere i dati dei veicoli
+    h: puntatore alla tabella hash in cui inserire i veicoli
 
-  Pre-condizione:
-   Il file deve essere formattato correttamente con righe contenenti marca, modello, targa e posizione
+ Pre-condizioni:
+    `nome_file` deve essere una stringa valida e non NULL.
+    `h` deve essere un puntatore valido a una tabella hash inizializzata.
 
- Post-condizione:
-   Tutti i veicoli letti dal file vengono inseriti nella lista l
+ Post-condizioni:
+    Tutti i veicoli letti dal file vengono inseriti nella tabella hash.
 
- Effetti:
-   Legge i dati da file e li aggiunge alla lista.
-   Se il file non è accessibile, il programma termina con errore.
-*/
+ Ritorna:
+    Nessun valore di ritorno (void)
+
+ Side-effect:
+    Apre un file in lettura.
+    Alloca memoria dinamica per ogni veicolo letto.
+    In caso di errore nell'apertura del file, termina il programma con `exit(1)`.
+ */
 void carica_veicoli_da_file(const char *nome_file, ptr_hash_veicoli h)
 {
     FILE *file = fopen(nome_file, "r");
@@ -77,20 +104,30 @@ void carica_veicoli_da_file(const char *nome_file, ptr_hash_veicoli h)
 /*
  Funzione: libera_veicolo
  ------------------------
- Libera la memoria occupata da un veicolo, comprese le sue prenotazioni.
+
+ Libera la memoria allocata per una struttura veicolo, comprese le sue prenotazioni.
+
+ Implementazione:
+    Verifica che il puntatore al veicolo sia valido.
+    Chiama la funzione `libera_prenotazioni` per liberare la memoria associata alle prenotazioni.
+    Libera la memoria occupata dalla struttura veicolo stessa.
 
  Parametri:
-   ve: puntatore al veicolo da liberare
+    ve: puntatore alla struttura `veicolo` da liberare
 
- Pre-condizione:
-   ve deve essere un puntatore valido a una struttura veicolo allocata dinamicamente
+ Pre-condizioni:
+    `ve` può essere NULL o un puntatore valido a una struttura `veicolo`.
 
- Post-condizione:
-   La memoria occupata dal veicolo e dalle sue prenotazioni viene liberata
+ Post-condizioni:
+    Se `ve` è valido, tutta la memoria allocata per il veicolo e le sue prenotazioni viene liberata.
 
- Effetti:
-   Dealloca la memoria associata al veicolo e alle sue prenotazioni.
-*/
+ Ritorna:
+    Nessun valore di ritorno (void)
+
+ Side-effect:
+    Dealloca memoria dinamica per la struttura veicolo e le sue prenotazioni.
+ */
+
 void libera_veicolo(ptr_veicolo ve)
 {
     if(ve){
@@ -104,23 +141,29 @@ void libera_veicolo(ptr_veicolo ve)
 /*
  Funzione: aggiorna_stato_veicolo
  --------------------------------
- Aggiorna lo stato di disponibilità di un veicolo in base alle prenotazioni.
+
+ Aggiorna lo stato di disponibilità del veicolo in base alle prenotazioni del giorno corrente.
+
+ Implementazione:
+    Verifica se il veicolo è disponibile oggi analizzando le sue prenotazioni.
+    Imposta lo stato del veicolo su "disponibile" se è disponibile, altrimenti su "NON disponibile".
+    Restituisce true solo se lo stato è stato impostato su "NON disponibile".
 
  Parametri:
-   ve: puntatore al veicolo di cui aggiornare lo stato
+    ve: puntatore alla struttura `veicolo` da aggiornare
 
-  Pre-condizione:
-   ve deve essere un puntatore valido a una struttura veicolo
+ Pre-condizioni:
+    `ve` deve essere un puntatore valido a una struttura `veicolo`.
 
- Post-condizione:
-   Il campo 'stato' del veicolo viene aggiornato a "disponibile" se il veicolo è disponibile oggi,
-   altrimenti a "non disponibile".
+ Post-condizioni:
+    Lo stato del veicolo (`ve->stato`) viene aggiornato coerentemente con la sua disponibilità.
 
- Effetti:
-   Aggiorna il campo 'stato' del veicolo a "disponibile" o "non disponibile"
-   in base alla disponibilità odierna. Restituisce true se il veicolo
-   non è disponibile, false altrimenti.
-*/
+ Ritorna:
+    `true` se il veicolo è *non disponibile* oggi, `false` se disponibile o se `ve` è NULL.
+
+ Side-effect:
+    Modifica il campo `stato` all'interno della struttura `veicolo`.
+ */
 bool aggiorna_stato_veicolo(ptr_veicolo ve) 
 {
     if (!ve) return false;
@@ -134,7 +177,32 @@ bool aggiorna_stato_veicolo(ptr_veicolo ve)
     }
 }
 
+/*
+ Funzione: veicolo_disponibile
+ -----------------------------
 
+ Verifica se un veicolo è attualmente disponibile in base al suo stato.
+
+ Implementazione:
+    Controlla se il campo `stato` del veicolo è uguale alla stringa "disponibile".
+    Se il confronto ha successo, restituisce true, altrimenti false.
+
+ Parametri:
+    ve: puntatore a una struttura `veicolo` di cui si vuole verificare la disponibilità.
+
+ Pre-condizioni:
+    Il parametro `ve` deve essere un puntatore valido o NULL.
+
+ Post-condizioni:
+    Nessuna modifica agli oggetti passati.
+
+ Ritorna:
+    `true` se il campo `stato` del veicolo è "disponibile", `false` altrimenti
+    (incluso il caso in cui `ve` sia NULL).
+
+ Side-effect:
+    Nessuno.
+ */
 bool veicolo_disponibile(ptr_veicolo ve)
 {
   if(!ve) return false;

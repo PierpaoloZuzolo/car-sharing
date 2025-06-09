@@ -139,7 +139,7 @@ ptr_utente gestione_utente(ptr_hash_utenti h)
 
     while(1){
         printf("\n==============================\n");
-        printf("       💎Luxury Sharing💎     \n");
+        printf("       Luxury Sharing     \n");
         printf("==============================\n");
         printf(" 1. Registrazione\n");
         printf(" 2. Login\n");
@@ -150,19 +150,19 @@ ptr_utente gestione_utente(ptr_hash_utenti h)
 
         if(scanf("%d", &scelta) != 1) {
             // input non valido, svuota buffer e ripeti
-            printf("\n⚠️ Input non valido. Per favore inserisci un numero.\n");
+            printf("\nInput non valido. Per favore inserisci un numero.\n");
             while(getchar() != '\n'); // pulisci buffer
             continue;
         }
 
         switch (scelta) {
             case 0:
-                printf("\n👋 Hai scelto di uscire. Alla prossima!\n");
+                printf("\nHai scelto di uscire. Alla prossima!\n");
                 exit(0);
 
 
             case 1: {
-                printf("\n📝 Registrazione utente");
+                printf("\nRegistrazione utente");
                 printf("\nInserisci nome: ");
                 scanf("%49s", nome);
                 printf("Inserisci email: ");
@@ -170,13 +170,13 @@ ptr_utente gestione_utente(ptr_hash_utenti h)
            
            ptr_utente nuovo = inizia_utente(nome, email); //inizializzazione variabile utente
            if (!nuovo){
-            printf("\n⚠️ Errore risorse sistema insufficienti.\n");
+            printf("\nErrore risorse sistema insufficienti.\n");
             exit(1);
            }
 
            if(inserisci_utente_in_hash(h, nuovo)){
             salva_utente_su_file("utenti.txt", nuovo);
-            printf("\n✅ Registrazione completata!");
+            printf("\nRegistrazione completata!");
             printf("\nBenvenut* in Luxury Sharing, %s!\n", nome);
                 printf("\n");
             return nuovo;
@@ -195,7 +195,7 @@ ptr_utente gestione_utente(ptr_hash_utenti h)
            //Crea un utente temporaneo con solo il nome ed email vuota
            ptr_utente temp = inizia_utente(nome, "");
            if(!temp){
-            printf("\n⚠️ Errore risorse sistema insufficienti.");
+            printf("\nErrore risorse sistema insufficienti.");
             exit(1);
            }
 */
@@ -203,41 +203,16 @@ ptr_utente gestione_utente(ptr_hash_utenti h)
             //libera_utente(temp);
 
             if(trovato){
-                printf("\n✅ Login effettuato!");
+                printf("\nLogin effettuato!");
                 printf("\nBentornat* ");
                 stampa_utente(trovato);
                 printf("\n");
                 return trovato;
             } else {
-            printf("\n⚠️ Utente non trovato. Riprova o registrati.\n");
+            printf("\nUtente non trovato. Riprova o registrati.\n");
             }
             break;
             }
-            
-            case 3: {
-            printf("==============================\n");
-            printf("\nINFORMAZIONI SUL SITO WEB\n");
-            printf("==============================\n");
-            printf("Questo sito web e stato creato come progetto\n");
-            printf("nell'anno 2024-2025, durante la laurea triennale\n");
-            printf("in informatica, per Programmazione e strutture dati PEU-Z,\n");
-            printf("corso tenuto:\n");
-            printf("-Dalla Docente Carmen Bisogni\n");
-            printf("-Dalla Docente Gemma Catolino\n");
-            printf("-Dal Docente Giammaria Giordano\n");
-
-            printf("\n==============================\n");
-            printf("DESCRIZIONE DELLE PRENOTAZIONI\n");
-            printf("==============================\n");
-            printf("Le prenotazioni possono essere effettuate solo in intervalli di tempo\n");
-            printf("che iniziano e finiscono a orari precisi, ovvero solo alle .00 o alle .30 di ogni ora.\n");
-            printf("Ad esempio, potrai prenotare un veicolo dalle 10:00 alle 11:30,\n");
-            printf("ma non dalle 10:15 o 10:45.\n");
-
-            printf("\nSCONTO\n");
-            printf("Si ha diritto allo sconto ogni 5 prenotazioni.\n");
-           
-
 
             int sottoScelta;
             printf("\n==============================\n");
@@ -247,12 +222,12 @@ ptr_utente gestione_utente(ptr_hash_utenti h)
             printf(" Scelta: ");
             if (scanf("%d", &sottoScelta) != 1) {
              while(getchar() != '\n');
-             printf("\n⚠️ Input non valido. Torno al menu principale.\n");
+             printf("\nInput non valido. Torno al menu principale.\n");
              break;
             }
 
             if (sottoScelta == 0) {
-                printf("\n👋 Hai scelto di uscire. Alla prossima!\n");
+                printf("\nHai scelto di uscire. Alla prossima!\n");
                 exit(0);
             }
 
@@ -261,7 +236,6 @@ ptr_utente gestione_utente(ptr_hash_utenti h)
             }
         }
     }
-}
 
 
 /*

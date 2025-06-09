@@ -1,5 +1,7 @@
 {
     "files.associations": {
-        "lista_storico_prenotazioni.h": "c"
+        "lista_storico_prenotazioni.h": "c",
+        "lista.h": "c",
+        "utile.h": "c"
     }
 }

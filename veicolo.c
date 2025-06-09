@@ -1,3 +1,8 @@
+/*
+Autore: Carmine Saporoso
+Data: 13/05/2025
+*/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -18,27 +23,39 @@ struct veicolo{
    ptr_prenotazione prenotazione_veicolo;
 };
 
+
 /*
  Funzione: inizia_veicolo
  ------------------------
- Crea e inizializza un nuovo veicolo con i dati forniti.
- Utilizzata per costruire un oggetto veicolo e aggiungerlo alla lista.
+
+ Crea e inizializza una nuova struttura veicolo con i dati forniti,
+ carica le prenotazioni associate e imposta lo stato di disponibilità.
+
+ Implementazione:
+    Alloca memoria per un nuovo veicolo, copia i dati delle stringhe passate
+    nei rispettivi campi della struttura.
+    Inizializza la struttura delle prenotazioni e le carica da file in base alla targa.
+    Verifica la disponibilità del veicolo per oggi e aggiorna lo stato di conseguenza.
 
  Parametri:
-   marca_veicolo: stringa con la marca del veicolo
-   modello_veicolo: stringa con il modello del veicolo
-   targa_veicolo: stringa con la targa del veicolo
-   posizione_veicolo: stringa con la posizione attuale del veicolo
+    marca_veicolo: stringa contenente la marca del veicolo
+    modello_veicolo: stringa contenente il modello del veicolo
+    targa_veicolo: stringa contenente la targa del veicolo
+    posizione_veicolo: stringa contenente la posizione del veicolo
 
-  Pre-condizione:
-   Tutti i parametri devono essere stringhe valide terminate da '\0'.
+ Pre-condizioni:
+    Tutti i parametri devono essere stringhe valide e non NULL.
 
- Post-condizione:
-   Alloca dinamicamente una struttura veicolo e copia i dati ricevuti nei rispettivi campi.
+ Post-condizioni:
+    Restituisce un puntatore a una nuova struttura veicolo inizializzata,
+    oppure NULL se l'allocazione fallisce.
 
  Ritorna:
-   Un puntatore al nuovo veicolo allocato, oppure NULL in caso di errore.
-*/
+    Puntatore a una struttura `veicolo` allocata dinamicamente, o NULL in caso di errore
+
+ Side-effect:
+    Alloca memoria dinamica e può caricare dati da file per le prenotazioni.
+ */
 ptr_veicolo inizia_veicolo(const char *marca_veicolo, const char *modello_veicolo, const char *targa_veicolo, const char *posizione_veicolo)
 {
     ptr_veicolo nuovo_veicolo = malloc(sizeof(struct veicolo));
@@ -73,19 +90,29 @@ ptr_veicolo inizia_veicolo(const char *marca_veicolo, const char *modello_veicol
 /*
  Funzione: prendi_marca
  ----------------------
+
  Restituisce la marca del veicolo.
 
+ Implementazione:
+    Controlla se il puntatore al veicolo è valido.
+    Se sì, restituisce la stringa contenente la marca,
+    altrimenti restituisce NULL.
+
  Parametri:
-   ve: puntatore al veicolo
+    ve: puntatore alla struttura veicolo
 
-  Pre-condizione:
-   Il puntatore ve deve essere valido (non NULL)
+ Pre-condizioni:
+    Il puntatore `ve` può essere NULL.
 
- Post-condizione:
-   Nessuna modifica allo stato del veicolo
+ Post-condizioni:
+    Nessuna modifica allo stato delle strutture.
 
  Ritorna:
-   Una stringa con la marca, oppure NULL se il puntatore è invalido.
+    Puntatore alla stringa della marca del veicolo,
+    oppure NULL se il veicolo è NULL.
+
+ Side-effect:
+    Nessuno.
 */
 char *prendi_marca(ptr_veicolo ve)
 {
@@ -95,21 +122,31 @@ char *prendi_marca(ptr_veicolo ve)
 
 
 /*
-  Funzione: prendi_modello
+ Funzione: prendi_modello
  ------------------------
+
  Restituisce il modello del veicolo.
 
+ Implementazione:
+    Verifica se il puntatore al veicolo è valido.
+    Se sì, restituisce la stringa contenente il modello,
+    altrimenti restituisce NULL.
+
  Parametri:
-   ve: puntatore al veicolo
+    ve: puntatore alla struttura veicolo
 
-  Pre-condizione:
-   Il puntatore ve deve essere valido (non NULL)
+ Pre-condizioni:
+    Il puntatore `ve` può essere NULL.
 
- Post-condizione:
-   Nessuna modifica allo stato del veicolo
+ Post-condizioni:
+    Nessuna modifica allo stato delle strutture.
 
  Ritorna:
-   Una stringa con il modello, oppure NULL se il puntatore è invalido.
+    Puntatore alla stringa del modello del veicolo,
+    oppure NULL se il veicolo è NULL.
+
+ Side-effect:
+    Nessuno.
 */
 char *prendi_modello(ptr_veicolo ve)
 {
@@ -121,19 +158,29 @@ char *prendi_modello(ptr_veicolo ve)
 /*
  Funzione: prendi_targa
  ----------------------
+
  Restituisce la targa del veicolo.
 
+ Implementazione:
+    Verifica se il puntatore al veicolo è valido.
+    Se sì, restituisce la stringa contenente la targa,
+    altrimenti restituisce NULL.
+
  Parametri:
-   ve: puntatore al veicolo
+    ve: puntatore alla struttura veicolo
 
-  Pre-condizione:
-   Il puntatore ve deve essere valido (non NULL)
+ Pre-condizioni:
+    Il puntatore `ve` può essere NULL.
 
- Post-condizione:
-   Nessuna modifica allo stato del veicolo
+ Post-condizioni:
+    Nessuna modifica allo stato delle strutture.
 
  Ritorna:
-   Una stringa con la targa, oppure NULL se il puntatore è invalido.
+    Puntatore alla stringa della targa del veicolo,
+    oppure NULL se il veicolo è NULL.
+
+ Side-effect:
+    Nessuno.
 */
 char *prendi_targa(ptr_veicolo ve)
 {
@@ -144,20 +191,30 @@ char *prendi_targa(ptr_veicolo ve)
 
 /*
  Funzione: prendi_posizione
- ----------------------
- Restituisce la posizione del veicolo.
+ --------------------------
+
+ Restituisce la posizione attuale del veicolo.
+
+ Implementazione:
+    Controlla se il puntatore al veicolo è valido,
+    quindi restituisce la stringa contenente la posizione.
+    Se il veicolo è NULL, restituisce NULL.
 
  Parametri:
-   ve: puntatore al veicolo
+    ve: puntatore alla struttura veicolo
 
- Pre-condizione:
-   Il puntatore ve deve essere valido (non NULL)
+ Pre-condizioni:
+    Il puntatore `ve` può essere NULL.
 
- Post-condizione:
-   Nessuna modifica allo stato del veicolo
-   
+ Post-condizioni:
+    Nessuna modifica allo stato delle strutture.
+
  Ritorna:
-   Una stringa con la posizione, oppure NULL se il puntatore è invalido.
+    Puntatore alla stringa della posizione del veicolo,
+    oppure NULL se il veicolo è NULL.
+
+ Side-effect:
+    Nessuno.
 */
 char *prendi_posizione(ptr_veicolo ve)
 {
@@ -169,19 +226,29 @@ char *prendi_posizione(ptr_veicolo ve)
 /*
  Funzione: prendi_stato
  ----------------------
- Restituisce lo stato del veicolo (es. disponibile, occupato).
+
+ Restituisce lo stato corrente del veicolo.
+
+ Implementazione:
+    Verifica se il puntatore al veicolo è valido,
+    quindi restituisce la stringa contenente lo stato.
+    Se il veicolo è NULL, restituisce NULL.
 
  Parametri:
-   ve: puntatore al veicolo
+    ve: puntatore alla struttura veicolo
 
-   Pre-condizione:
-   Il puntatore ve deve essere valido (non NULL)
+ Pre-condizioni:
+    Il puntatore `ve` può essere NULL.
 
- Post-condizione:
-   Nessuna modifica allo stato del veicolo
+ Post-condizioni:
+    Nessuna modifica allo stato delle strutture.
 
  Ritorna:
-   Una stringa con lo stato, oppure NULL se il puntatore è invalido.
+    Puntatore alla stringa dello stato del veicolo,
+    oppure NULL se il veicolo è NULL.
+
+ Side-effect:
+    Nessuno.
 */
 char *prendi_stato(ptr_veicolo ve)
 {
@@ -193,19 +260,29 @@ char *prendi_stato(ptr_veicolo ve)
 /*
  Funzione: prendi_prenotazioni
  -----------------------------
- Restituisce il puntatore alla lista di prenotazioni del veicolo.
+
+ Restituisce il puntatore alla lista delle prenotazioni associate a un veicolo.
+
+ Implementazione:
+    Controlla se il puntatore al veicolo è valido,
+    quindi ritorna il puntatore alla struttura delle prenotazioni.
+    Se il veicolo è NULL, restituisce NULL.
 
  Parametri:
-   ve: puntatore al veicolo
+    ve: puntatore alla struttura veicolo
 
-  Pre-condizione:
-   Il puntatore ve deve essere valido (non NULL)
+ Pre-condizioni:
+    Il puntatore `ve` può essere NULL.
 
- Post-condizione:
-   Nessuna modifica ai dati del veicolo o delle prenotazioni
+ Post-condizioni:
+    Nessuna modifica allo stato delle strutture.
 
  Ritorna:
-   Un puntatore alla lista delle prenotazioni associate, oppure NULL.
+    Puntatore alla lista delle prenotazioni associata al veicolo,
+    oppure NULL se il veicolo è NULL.
+
+ Side-effect:
+    Nessuno.
 */
 ptr_prenotazione prendi_prenotazioni(ptr_veicolo ve)
 {
@@ -215,23 +292,30 @@ ptr_prenotazione prendi_prenotazioni(ptr_veicolo ve)
 
 /*
  Funzione: imposta_stato_veicolo
- -----------------------
- Imposta lo stato di un veicolo.
+ -------------------------------
+
+ Imposta lo stato del veicolo con la stringa fornita.
+
+ Implementazione:
+    Se il puntatore al veicolo e la stringa stato sono validi,
+    copia la stringa nel campo stato del veicolo, garantendo
+    la corretta terminazione della stringa.
 
  Parametri:
-   ve: puntatore al veicolo da modificare.
-   stato: stringa che rappresenta il nuovo stato.
+    ve: puntatore alla struttura veicolo da modificare
+    stato: stringa contenente il nuovo stato da assegnare
 
- Pre-condizione:
-   ve deve essere un puntatore valido.
-   stato deve essere una stringa valida.
+ Pre-condizioni:
+    Il puntatore `ve` e la stringa `stato` devono essere non NULL.
 
- Post-condizione:
-   Lo stato interno del veicolo è aggiornato con la nuova stringa.
-   La stringa è sempre terminata correttamente.
+ Post-condizioni:
+    Il campo stato della struttura veicolo è aggiornato con la nuova stringa.
 
- Effetti:
-   Modifica il campo stato all’interno della struttura veicolo.
+ Ritorna:
+    Nessun valore di ritorno.
+
+ Side-effect:
+    Modifica il campo `stato` della struttura veicolo.
 */
 void imposta_stato_veicolo(ptr_veicolo ve, const char *stato)
 {

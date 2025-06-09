@@ -1,3 +1,8 @@
+/*
+Autore: Roberto Saporoso
+Data: 10/05/2025
+*/
+
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>

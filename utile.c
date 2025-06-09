@@ -1,3 +1,8 @@
+/*
+Autore: Roberto Saporoso
+Data: 16/05/2025
+*/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -9,20 +14,29 @@
 /*
  Funzione: ottieni_orario_corrente
  ---------------------------------
- Recupera l'orario corrente del sistema.
+
+ Recupera l'orario corrente locale (ora e minuto).
+
+ Implementazione:
+    Utilizza le funzioni della libreria time.h per ottenere
+    l'orario locale corrente e assegna i valori di ora e minuto
+    ai parametri puntatori passati.
 
  Parametri:
-   ora: puntatore a intero dove viene salvata l'ora corrente (0-23).
-   minuto: puntatore a intero dove viene salvato il minuto corrente (0-59).
+    ora: puntatore a intero dove verrà salvata l'ora corrente (0-23)
+    minuto: puntatore a intero dove verrà salvato il minuto corrente (0-59)
 
- Pre-condizione:
-   I puntatori ora e minuto devono essere validi (non NULL).
+ Pre-condizioni:
+    I puntatori `ora` e `minuto` devono essere validi e non NULL.
 
- Post-condizione:
-   I valori puntati vengono aggiornati con l'orario corrente.
+ Post-condizioni:
+    I valori puntati da `ora` e `minuto` sono aggiornati all'orario corrente.
 
- Effetti:
-   Nessun effetto collaterale oltre all'aggiornamento dei valori.
+ Ritorna:
+    void
+
+ Side-effect:
+    Nessuno.
 */
 void ottieni_orario_corrente(int *ora, int *minuto) 
 {
@@ -36,21 +50,29 @@ void ottieni_orario_corrente(int *ora, int *minuto)
 /*
  Funzione: data_attuale
  ----------------------
- Recupera la data corrente del sistema.
+
+ Recupera la data attuale del sistema (giorno, mese e anno).
+
+ Implementazione:
+    Utilizza la libreria time.h per ottenere la data corrente locale
+    e assegna i valori di giorno, mese e anno ai rispettivi puntatori.
 
  Parametri:
-   giorno: puntatore a intero dove salvare il giorno corrente.
-   mese: puntatore a intero dove salvare il mese corrente.
-   anno: puntatore a intero dove salvare l'anno corrente.
+    giorno: puntatore a intero dove verrà salvato il giorno del mese (1-31)
+    mese: puntatore a intero dove verrà salvato il numero del mese (1-12)
+    anno: puntatore a intero dove verrà salvato l'anno (es. 2025)
 
- Pre-condizione:
-   I puntatori devono essere validi (non NULL).
+ Pre-condizioni:
+    I puntatori `giorno`, `mese` e `anno` devono essere validi e non NULL.
 
- Post-condizione:
-   I valori vengono aggiornati con la data attuale (gg/mm/aaaa).
+ Post-condizioni:
+    I valori puntati da `giorno`, `mese` e `anno` vengono aggiornati alla data corrente.
 
- Effetti:
-   Nessun effetto collaterale oltre all'aggiornamento dei parametri.
+ Ritorna:
+    void
+
+ Side-effect:
+    Nessuno.
 */
 void data_attuale(int *giorno, int *mese, int *anno)
 {
@@ -66,25 +88,32 @@ void data_attuale(int *giorno, int *mese, int *anno)
 /*
  Funzione: vedi_se_giorno_nuovo
  ------------------------------
- Verifica se è iniziato un nuovo giorno rispetto all'ultimo avvio.
+
+ Verifica se la data corrente del sistema è diversa dall'ultima data salvata
+ in precedenza. Utile per rilevare un nuovo giorno di esecuzione del programma.
+
+ Implementazione:
+    Ottiene la data corrente del sistema tramite `data_attuale`.
+    Legge l'ultima data salvata da un file ("ultimo_avvio.txt").
+    Confronta la data corrente con quella salvata:
+    se è diversa, restituisce true indicando che è un nuovo giorno.
 
  Parametri:
-   Nessuno.
+    Nessuno.
 
- Pre-condizione:
-   Deve esistere (o essere creato) un file "ultimo_avvio.txt" per il salvataggio persistente.
+ Pre-condizioni:
+    Il file "ultimo_avvio.txt" (se esiste) deve contenere una riga con tre interi
+    nel formato: giorno mese anno.
 
- Post-condizione:
-   Confronta la data attuale con quella salvata precedentemente.
-   Se è un giorno nuovo, restituisce true. Altrimenti false.
+ Post-condizioni:
+    Nessuna modifica viene effettuata nel file.
 
  Ritorna:
-   true se la data è diversa da quella precedentemente salvata,
-   false se è la stessa.
+    true se la data attuale è diversa da quella salvata;
+    false altrimenti.
 
- Effetti:
-   Nessun salvataggio automatico. Solo lettura da file.
-   Il salvataggio della nuova data dovrebbe essere gestito separatamente.
+ Side-effect:
+    Legge da file "ultimo_avvio.txt".
 */
 bool vedi_se_giorno_nuovo() 
 {
@@ -112,6 +141,41 @@ bool vedi_se_giorno_nuovo()
 }
 
 
+/*
+ Funzione: converti_orario_in_celle
+ ----------------------------------
+
+ Converte un intervallo orario in unità discrete ("celle") di mezz'ora
+ all'interno di una giornata, dove ogni ora è suddivisa in due celle.
+
+ Implementazione:
+    Calcola la cella iniziale sommando il doppio delle ore all'offset dei minuti (0 o 1).
+    Calcola la cella finale considerando se i minuti superano o meno i 30.
+    Le celle sono numerate da 0 a 47 (per una giornata di 24 ore, divisa in 48 intervalli da 30 minuti).
+
+ Parametri:
+    ora_inizio: ora di inizio (intero da 0 a 23)
+    minuto_inizio: minuti dell'ora di inizio (intero da 0 a 59)
+    ora_fine: ora di fine (intero da 0 a 23)
+    minuto_fine: minuti dell'ora di fine (intero da 0 a 59)
+    cella_inizio: puntatore a intero dove verrà salvata la cella iniziale
+    cella_fine: puntatore a intero dove verrà salvata la cella finale
+
+ Pre-condizioni:
+    Tutti i valori di ora devono essere nell'intervallo [0, 23]
+    Tutti i valori di minuto devono essere nell'intervallo [0, 59]
+    I puntatori cella_inizio e cella_fine devono essere validi (non NULL)
+
+ Post-condizioni:
+    Vengono scritti in `*cella_inizio` e `*cella_fine` gli indici delle celle corrispondenti
+    all'inizio e alla fine dell'intervallo orario.
+
+ Ritorna:
+    Nessun valore di ritorno (void)
+
+ Side-effect:
+    Scrive nei puntatori forniti.
+ */
 void converti_orario_in_celle(int ora_inizio, int minuto_inizio, int ora_fine, int minuto_fine, int *cella_inizio, int *cella_fine)
 {
     *cella_inizio = ora_inizio * 2 + (minuto_inizio >= 30 ? 1 : 0);
@@ -119,7 +183,39 @@ void converti_orario_in_celle(int ora_inizio, int minuto_inizio, int ora_fine, i
 }
 
 
+/*
+ Funzione: converti_celle_in_orario
+ ----------------------------------
 
+ Converte un intervallo espresso in celle di mezz'ora nel formato orario
+ classico (ore e minuti), determinando l'orario di inizio e di fine.
+
+ Implementazione:
+    Ogni cella rappresenta un intervallo di 30 minuti. 
+    Divide l'indice della cella per 2 per ottenere l'ora,
+    e usa il modulo per calcolare i minuti (0 o 30).
+
+ Parametri:
+    cella_inizio: intero rappresentante la cella di inizio (da 0 a 47)
+    cella_fine: intero rappresentante la cella di fine (da 0 a 48)
+    ora_inizio: puntatore a intero per salvare l'ora di inizio
+    minuto_inizio: puntatore a intero per salvare i minuti di inizio
+    ora_fine: puntatore a intero per salvare l'ora di fine
+    minuto_fine: puntatore a intero per salvare i minuti di fine
+
+ Pre-condizioni:
+    I valori di cella_inizio e cella_fine devono essere nell'intervallo [0, 48]
+    I puntatori ora_inizio, minuto_inizio, ora_fine e minuto_fine devono essere validi (non NULL)
+
+ Post-condizioni:
+    I valori delle ore e dei minuti corrispondenti vengono scritti nei puntatori forniti
+
+ Ritorna:
+    Nessun valore di ritorno (void)
+
+ Side-effect:
+    Scrive nei puntatori passati come argomenti.
+ */
 void converti_celle_in_orario(int cella_inizio, int cella_fine, int *ora_inizio, int *minuto_inizio, int *ora_fine, int *minuto_fine) 
 {
     *ora_inizio = cella_inizio / 2;

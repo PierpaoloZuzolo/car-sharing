@@ -1,3 +1,8 @@
+/*
+Autore: Roberto Saporoso, Carmine Saporoso
+Data: 07/06/2025
+*/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -33,8 +38,6 @@
  Side-effect:
     alloca memoria dinamicamente per la nuova tabella hash
  */
-
-
 ptr_hash_veicoli crea_hash_veicoli(int dimensione)
 {
     return crea_tabella_hash(dimensione);
@@ -66,8 +69,6 @@ ptr_hash_veicoli crea_hash_veicoli(int dimensione)
  Side-effect:
     dealloca memoria dinamicamente associata al veicolo
  */
-
-
 static void libera_veicolo_hash(void *veicolo)
 {
     ptr_veicolo ve = (ptr_veicolo)veicolo;
@@ -100,8 +101,6 @@ static void libera_veicolo_hash(void *veicolo)
  Side-effect:
     dealloca memoria dinamicamente associata alla tabella hash e ai veicoli
  */
-
-
 void distruggi_hash_veicoli(ptr_hash_veicoli h)
 {
     if(h){
@@ -141,9 +140,6 @@ void distruggi_hash_veicoli(ptr_hash_veicoli h)
  Side-effect:
     può allocare memoria internamente tramite `inserisci_in_hash`
  */
-
-
-
 bool inserisci_veicolo_in_hash(ptr_hash_veicoli h, ptr_veicolo ve)
 {
   if(h && ve){
@@ -186,8 +182,6 @@ bool inserisci_veicolo_in_hash(ptr_hash_veicoli h, ptr_veicolo ve)
  Side-effect:
     nessuno
  */
-
-
 ptr_veicolo cerca_veicolo_in_hash(ptr_hash_veicoli h, const char *targa)
 {
     if(h){
