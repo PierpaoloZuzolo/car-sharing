@@ -6,4 +6,4 @@
 -1 5         # intervallo non valido (inizio negativo) → fallisce
 5 49         # intervallo non valido (fine > CELLE_GIORNALIERE) → fallisce
 30 30        # intervallo vuoto (inizio == fine) → fallisce
-40 42        # intervallo libero → OK
+40 42        # intervallo libero → OK 

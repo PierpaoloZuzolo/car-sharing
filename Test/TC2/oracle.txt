@@ -2,12 +2,12 @@ Prenotazione 1: FALLITA
 -Disponibile: dalle 00:00 alle 24:00
 
 Prenotazione 2: OK
-# Ora nessuna disponibilità, tutto prenotato
-
-Prenotazione 3: FALLITA
 -Disponibile: dalle 00:00 alle 24:00
 
-Prenotazione 4: OK
+Prenotazione 3: OK
+-Disponibile: dalle 00:00 alle 24:00
+
+Prenotazione 4: FALLITA
 -Disponibile: dalle 00:00 alle 05:00
 -Disponibile: dalle 07:30 alle 24:00
 
@@ -24,6 +24,11 @@ Prenotazione 7: FALLITA
 -Disponibile: dalle 07:30 alle 24:00
 
 Prenotazione 8: OK
+-Disponibile: dalle 00:00 alle 05:00
+-Disponibile: dalle 05:00 alle 07:30
+-Disponibile: dalle 09:00 alle 24:00
+
+Prenotazione 9: OK
 -Disponibile: dalle 00:00 alle 05:00
 -Disponibile: dalle 05:00 alle 07:30
 -Disponibile: dalle 09:00 alle 24:00
