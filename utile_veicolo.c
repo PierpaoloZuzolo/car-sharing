@@ -213,3 +213,45 @@ bool veicolo_disponibile(ptr_veicolo ve)
 
   return false;
 }
+
+/*
+ Funzione: aggiorna_prenotazione_veicolo
+ ---------------------------------------
+
+ Aggiorna lo stato delle prenotazioni di un veicolo, blocca le celle non più prenotabili 
+ in base all'orario corrente, salva le prenotazioni aggiornate su file e aggiorna lo stato 
+ del veicolo (disponibile o non disponibile).
+
+ Implementazione:
+    - Ottiene il puntatore alla prenotazione associata al veicolo.
+    - Blocca le celle delle prenotazioni che non sono più utilizzabili (celle passate).
+    - Salva le prenotazioni aggiornate su file, usando la targa del veicolo per il nome file.
+    - Aggiorna lo stato del veicolo in base alla disponibilità odierna.
+
+ Parametri:
+    ve: puntatore al veicolo di cui aggiornare le prenotazioni e lo stato.
+
+ Pre-condizioni:
+    ve deve essere un puntatore valido a un veicolo con prenotazioni valide.
+
+ Post-condizioni:
+    Le prenotazioni del veicolo sono aggiornate, salvate su file e lo stato del veicolo è aggiornato.
+
+ Ritorna:
+    Nessun valore di ritorno (void).
+
+ Side-effect:
+    Modifica le prenotazioni associate al veicolo.
+    Scrive su file i dati aggiornati delle prenotazioni.
+    Modifica lo stato interno del veicolo.
+*/
+
+
+void aggiorna_prenotazione_veicolo(ptr_veicolo ve)
+{
+    if (!ve) return;
+    ptr_prenotazione pren = prendi_prenotazioni(ve);
+    blocca_celle_passate(pren);
+    salva_prenotazioni_su_file(pren, prendi_targa(ve));
+    aggiorna_stato_veicolo(ve);
+}

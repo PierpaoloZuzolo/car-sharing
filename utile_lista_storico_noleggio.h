@@ -205,4 +205,32 @@ int stampa_lista_noleggi(ptr_lista_noleggi l);
  */
 int stampa_dopo_coda(ptr_lista_noleggi l);
 
+
+/*
+ Funzione: conta_fino_a_coda
+ ---------------------------
+
+ Conta il numero di elementi nella lista dei noleggi, partendo dalla testa fino ad arrivare alla coda inclusa.
+
+
+ Parametri:
+    l: puntatore a una lista di noleggi (ptr_lista_noleggi)
+
+ Pre-condizioni:
+    l deve essere un puntatore valido a una lista non vuota, con testa e coda correttamente impostate.
+
+ Post-condizioni:
+    Nessuna modifica alla lista originale.
+
+ Ritorna:
+    Un intero che rappresenta il numero di elementi dalla testa alla coda inclusa.
+    Se la coda non è raggiungibile dalla testa, restituisce 0.
+
+ Side-effect:
+    Nessuno.
+*/
+
+int conta_fino_a_coda(ptr_lista_noleggi l);
+
+
 #endif

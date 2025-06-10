@@ -57,7 +57,7 @@ int main (){
    int scelta;
     do {
         printf("\n====== MENU PRINCIPALE ======\n");
-        printf("1. Prenota un veicolo\n");
+        printf("1. Visualliza veicoli disponibili\n");
         printf("2. Visualizza storico prenotazioni\n");
         printf("0. Esci\n");
         printf("Scelta: ");
@@ -93,7 +93,7 @@ int main (){
     } while (scelta != 0);
 
 
-   // distruggi_lista(lista);
+   
     distruggi_hash_utenti(hash_ut);
     distruggi_hash_veicoli(hash_veicoli);
 
@@ -260,10 +260,28 @@ ptr_veicolo menu_prenotazione(ptr_hash_veicoli hash_veicoli, const char *nome_ut
 
     ptr_veicolo ve = NULL;
 
+
+    printf("\n\n===== VEICOLI DISPONIBILI =====\n\n");
+    stampa_veicoli_disponibili(hash_veicoli);
+
+    printf("\n1. Prenota un veicolo\n");
+    printf("\n0. Indietro\n");
+    int scelta;
+    while(1){
+    printf("\nScelta: ");
+    scanf("%d", &scelta);
+    printf("\n\n");                         // DA MIGLIORARE CONTROLLO SU INPUT
+    if (1 == scelta || 0 == scelta) break;
+    printf("\nScelta non valida. Digitare o 0 o 1.\n");
+
+    }
+
+    if(0 == scelta) return NULL;
+
     while (1) {
 
-        //stampa_hash_veicoli(hash_veicoli); // TODO
-
+        
+        
 
         printf("\nDigitare la targa del veicolo da prenotare: ");
         
@@ -277,6 +295,7 @@ ptr_veicolo menu_prenotazione(ptr_hash_veicoli hash_veicoli, const char *nome_ut
 
 
         while (1) {
+            
             int inizio = leggi_cella_da_orario("Inserisci orario di inizio");
             int fine = leggi_cella_da_orario("Inserisci orario di fine");
 
@@ -285,19 +304,41 @@ ptr_veicolo menu_prenotazione(ptr_hash_veicoli hash_veicoli, const char *nome_ut
                 continue;
             }
 
+            ptr_lista_noleggi lista_noleggi = crea_lista_storico();
+            carica_lista_storico_noleggio_da_file(lista_noleggi, nome_utente);
+            int sconto = conta_fino_a_coda(lista_noleggi);
+            distruggi_lista_storico_noleggio(lista_noleggi);
+
+            float costo = calcola_costo_noleggio(inizio, fine, sconto);
+
+            if(sconto >= 10){
+                printf("\nIl costo per il noleggio del veicolo è di %.2f euro,\nsul quale è stato applicato lo sconto per frequenza d'uso.\n\n", costo);
+            } else {
+                printf("\nIl costo del veicolo e' di %.2f euro.\n\n", costo);
+            }
+
+            printf("\nConfermare prenotazione");
+            printf("\n1. Conferma prenotazione");
+            printf("\n0. Annulla prenotazione\n");
+            int scelta;
+            while(1){
+                printf("\nScelta: ");
+                scanf("%d", &scelta);
+                printf("\n\n");                              // DA MIGLIORARE CONTROLLO SU INPUT
+                if (1 == scelta || 0 == scelta) break;
+                printf("\nScelta non valida. Digitare o 0 o 1.\n");
+            }
+            if (0 == scelta) return NULL;
+
+
+
+            //blocca_celle_passate(prendi_prenotazioni(ve));
             if (prenota_intervallo(prendi_prenotazioni(ve), inizio, fine)) {
-            salva_prenotazioni_su_file(prendi_prenotazioni(ve), prendi_targa(ve));
+            aggiorna_prenotazione_veicolo(ve);
 
-            aggiorna_stato_veicolo(ve);
-
-
+            
 
             printf("Prenotazione per veicolo [%s] completata!\n", prendi_targa(ve));
-
-            int sconto = 0; //DA FARE
-
-
-            float costo = costo_noleggio(inizio, fine, sconto); // stampa e restituisce il costo
 
 
             int ora_inizio, minuto_inizio, ora_fine, minuto_fine;
@@ -346,7 +387,7 @@ void gestione_storico_prenotazioni(char *nome_utente, ptr_hash_veicoli hash_veic
     carica_lista_storico_noleggio_da_file(lista_noleggi, nome_utente);
 
 
-
+    printf("\n===== STORICO NOLEGGI =====\n\n");
     int lunghezza_lista = stampa_lista_noleggi(lista_noleggi);
 
     if(0 == lunghezza_lista) return;
@@ -355,6 +396,7 @@ void gestione_storico_prenotazioni(char *nome_utente, ptr_hash_veicoli hash_veic
     int scelta;
     scanf("%d", &scelta);
     if(scelta == 1){
+        printf("\n=== PRENOTAZIONI CHE PUOI ELIMINARE ===\n\n");
         char targa_veicolo_eliminato[8];
         int ora_inizio, minuto_inizio, ora_fine, minuto_fine, cella_inizio, cella_fine;
         if (elimina_nodo_storico_noleggio(lista_noleggi, targa_veicolo_eliminato, &ora_inizio, &minuto_inizio, &ora_fine, &minuto_fine)){
@@ -369,9 +411,9 @@ void gestione_storico_prenotazioni(char *nome_utente, ptr_hash_veicoli hash_veic
 
         salva_lista_storico_noleggio_su_file(lista_noleggi, nome_utente);
 
-        stampa_lista_noleggi(lista_noleggi); //debug
+        //stampa_lista_noleggi(lista_noleggi); //debug
 
-        printf("Funziono");
+        //printf("Funziono");
         }
         distruggi_lista_storico_noleggio(lista_noleggi);
     } else {
@@ -379,4 +421,6 @@ void gestione_storico_prenotazioni(char *nome_utente, ptr_hash_veicoli hash_veic
 
         return;
     }
+
+    return;
 }

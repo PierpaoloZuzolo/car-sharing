@@ -226,3 +226,57 @@ void converti_celle_in_orario(int cella_inizio, int cella_fine, int *ora_inizio,
 }
 
 
+/*
+ Funzione: calcola_costo_noleggio
+ --------------------------------
+
+ Calcola il costo totale del noleggio in base all'intervallo di tempo specificato (espresso in celle orarie) 
+ e applica eventualmente uno sconto.
+
+ Implementazione:
+    - Per ogni cella da inizio a fine (esclusa la fine), somma il costo:
+        - Se la cella è compresa tra le 01:00 e le 06:00 (celle 2–11), applica una tariffa ridotta (40.5).
+        - In tutti gli altri casi, applica la tariffa normale (65.8).
+        - Se viene specificato uno sconto maggiore o uguale a 10, ignora i costi per fascia oraria
+          e applica una tariffa scontata fissa (38) per ogni cella del periodo.
+
+ Parametri:
+    inizio_cella: intero che rappresenta la cella oraria di inizio (inclusa).
+    fine_cella: intero che rappresenta la cella oraria di fine (esclusa).
+    sconto: intero che rappresenta una soglia per applicare una tariffa scontata.
+
+ Pre-condizioni:
+    - inizio_cella e fine_cella devono essere compresi nel range valido di celle (es. 0 <= inizio_cella < fine_cella <= CELLE_GIORNALIERE).
+    - sconto deve essere >= 0.
+
+ Post-condizioni:
+    Nessuna modifica a strutture esterne o parametri.
+
+ Ritorna:
+    Un valore `float` che rappresenta il costo complessivo del noleggio, eventualmente scontato.
+
+ Side-effect:
+    Nessuno.
+*/
+
+float calcola_costo_noleggio(int inizio_cella, int fine_cella, int sconto)
+{
+    float costo = 0.0;
+    
+    for (int i = inizio_cella; i < fine_cella; i++) {
+        // Fascia oraria 01:00–06:00 (celle 2–11)
+        if (i >= 2 && i < 12) {
+            costo += 40.5;
+        } else {
+            costo += 65.8;
+        }
+    }
+
+    // Se sconto è maggiore o uguale a 10, applica una tariffa scontata fissa per ogni cella
+    if (sconto >= 10) {
+        costo = (fine_cella - inizio_cella) * 38;
+    }
+
+   
+    return costo;
+}

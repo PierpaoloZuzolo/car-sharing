@@ -10,34 +10,31 @@ Data: 13/05/2025
 
 /*
  Funzione: carica_prenotazioni_da_file
- ------------------------------------
+ -------------------------------------
 
- Carica le prenotazioni giornaliere da file per un dato veicolo identificato dalla targa,
- aggiorna la struttura in memoria, e gestisce il reset e il blocco delle celle temporali
- in base alla data corrente.
+ Carica le prenotazioni associate a una targa da un file, aggiornando la struttura
+ di prenotazione fornita in input. Se il giorno è cambiato o il file non esiste,
+ azzera la prenotazione e salva uno stato iniziale aggiornato.
 
  Parametri:
-    p     : puntatore alla struttura prenotazione da aggiornare
-    targa : stringa identificativa del veicolo
+    p: puntatore a una struttura di prenotazione valida.
+    targa: stringa che rappresenta la targa del veicolo, usata per accedere al file.
 
  Pre-condizioni:
-    p deve essere un puntatore valido a una struttura prenotazione
-    targa deve essere una stringa valida e non NULL
-    Le funzioni vedi_se_giorno_nuovo, azzera_celle, blocca_celle_passate,
-    salva_prenotazioni_su_file e imposta_cella devono essere definite e funzionanti
+    - p deve essere un puntatore valido a una struttura di prenotazione inizializzata.
+    - targa deve essere una stringa valida e non NULL.
 
  Post-condizioni:
-    La struttura prenotazione è aggiornata con i dati caricati dal file o inizializzata se necessario.
-    Il file storico delle prenotazioni viene aggiornato in base allo stato attuale.
+    - La struttura di prenotazione `p` sarà aggiornata in base al contenuto del file o inizializzata.
+    - Il file associato alla targa sarà aggiornato con lo stato corrente delle prenotazioni.
 
  Ritorna:
-    1 se la struttura è stata caricata da file con successo
-    0 se è stato un nuovo giorno o il file non esisteva (dunque struttura inizializzata)
+    - 1 se il file è stato letto correttamente e i dati sono stati caricati.
+    - 0 se era un nuovo giorno o se il file non esisteva (stato inizializzato).
 
  Side-effect:
-    Modifica la struttura prenotazione in memoria
-    Effettua letture e scritture su file corrispondente alla targa
-    Effettua stampe di errore su stdout se presenti (non implementato esplicitamente)
+    - Lettura/scrittura da/per file.
+    - Output aggiornato salvato su file.
 */
 int carica_prenotazioni_da_file(ptr_prenotazione p, const char *targa);
 
@@ -45,27 +42,31 @@ int carica_prenotazioni_da_file(ptr_prenotazione p, const char *targa);
 /*
  Funzione: salva_prenotazioni_su_file
  -----------------------------------
- Salva su file le prenotazioni aggiornate di un veicolo.
+
+ Salva su file lo stato corrente delle prenotazioni giornaliere relative a un veicolo
+ identificato tramite la sua targa.
 
  Parametri:
-   p: puntatore alla struttura prenotazioni da salvare.
-   targa: stringa contenente la targa del veicolo, usata per costruire il nome file.
+    p     : puntatore alla struttura contenente le prenotazioni
+    targa : stringa identificativa del veicolo
 
- Pre-condizione:
-   p deve essere un puntatore valido.
-   targa deve essere una stringa valida.
+ Pre-condizioni:
+    p deve essere un puntatore valido
+    targa deve essere una stringa valida e non vuota
+    La funzione ottiene_cella deve restituire il valore corretto della cella di prenotazione
 
- Post-condizione:
-   Il file con le prenotazioni viene aggiornato.
+ Post-condizioni:
+    Il file associato alla targa è aggiornato con lo stato corrente delle prenotazioni.
 
  Ritorna:
-   Nessun valore.
+    void
+
+ Side-effect:
+    Effettua scrittura su file
 */
 void salva_prenotazioni_su_file(ptr_prenotazione p, const char *targa);
 
 
-//DA FAREEEE
-float costo_noleggio(int inizio_cella, int fine_cella, int sconto);
 
 
 

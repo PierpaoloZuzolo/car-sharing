@@ -305,3 +305,67 @@ void distruggi_hash(TabellaHash h, void (*distruggi_valore)(void *)) {
 int dimensione_hash(TabellaHash h) {
     return h ? h->dimensione : 0;
 }
+
+
+/*
+ Funzione: ottieni_valori_hash
+ -----------------------------
+
+ Restituisce un array di tutti i valori presenti nella tabella hash.
+
+ Implementazione:
+    Scorre tutti i bucket della tabella hash.
+    Conta quanti elementi totali ci sono e poi crea un array di puntatori ai valori.
+    Popola l'array con i valori contenuti in ogni nodo.
+
+ Parametri:
+    h: puntatore alla tabella hash
+    numero_elementi: puntatore a intero dove verrà scritto il numero di elementi trovati
+
+ Pre-condizioni:
+    h deve essere non NULL
+    numero_elementi deve essere un puntatore valido
+
+ Post-condizioni:
+    se la tabella contiene elementi, restituisce un array di puntatori ai valori;
+    il chiamante è responsabile di liberare la memoria dell'array (ma non i valori).
+
+ Ritorna:
+    un array allocato dinamicamente di `void *` contenente i valori,
+    o NULL in caso di errore o se la tabella è vuota
+
+ Side-effect:
+    alloca memoria per l'array dei risultati
+*/
+void **ottieni_valori_hash(TabellaHash h, int *numero_elementi) 
+{
+    if (!h || !numero_elementi) return NULL;
+
+    *numero_elementi = 0;
+
+    // Prima passata: conta gli elementi
+    for (int i = 0; i < h->dimensione; ++i) {
+        Nodo *corrente = h->buckets[i];
+        while (corrente) {
+            (*numero_elementi)++;
+            corrente = corrente->prossimo;
+        }
+    }
+
+    if (*numero_elementi == 0) return NULL;
+
+    // Seconda passata: raccoglie i valori
+    void **valori = malloc(sizeof(void *) * (*numero_elementi));
+    if (!valori) return NULL;
+
+    int idx = 0;
+    for (int i = 0; i < h->dimensione; ++i) {
+        Nodo *corrente = h->buckets[i];
+        while (corrente) {
+            valori[idx++] = corrente->item->valore;
+            corrente = corrente->prossimo;
+        }
+    }
+
+    return valori;
+}

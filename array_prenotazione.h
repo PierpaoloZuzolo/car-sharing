@@ -7,7 +7,7 @@ Data: 13/05/2025
 #define PRENOTAZIONE_H
 
 #include <stdbool.h>
-#define CELLE_GIORNALIERE 48  // 48 mezz'ore in un giorno
+
 
 /*
  Tipo astratto di dato: prenotazioni

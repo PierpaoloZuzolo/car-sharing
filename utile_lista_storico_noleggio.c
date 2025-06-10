@@ -544,3 +544,57 @@ void aggiungi_prenotazione_storico_su_file(
     fclose(fp);
 }
 
+/*
+ Funzione: conta_fino_a_coda
+ ---------------------------
+
+ Conta il numero di elementi nella lista dei noleggi, partendo dalla testa fino ad arrivare alla coda inclusa.
+
+ Implementazione:
+    - Verifica la validità della lista e dei puntatori a testa e coda.
+    - Scorre la lista a partire dalla testa.
+    - Incrementa un contatore per ogni nodo visitato fino a raggiungere il nodo di coda.
+    - Se la coda non viene trovata (lista mal formata), restituisce 0.
+
+ Parametri:
+    l: puntatore a una lista di noleggi (ptr_lista_noleggi)
+
+ Pre-condizioni:
+    l deve essere un puntatore valido a una lista non vuota, con testa e coda correttamente impostate.
+
+ Post-condizioni:
+    Nessuna modifica alla lista originale.
+
+ Ritorna:
+    Un intero che rappresenta il numero di elementi dalla testa alla coda inclusa.
+    Se la coda non è raggiungibile dalla testa, restituisce 0.
+
+ Side-effect:
+    Nessuno.
+*/
+
+
+int conta_fino_a_coda(ptr_lista_noleggi l) 
+{
+    if (!l || !prendi_testa(l) || !prendi_coda(l)) {
+        // Precondizione violata
+        return 0;
+    }
+
+    ptr_lista corrente = prendi_testa(l);
+    ptr_lista coda = prendi_coda(l);
+    int count = 0;
+
+    while (corrente) {
+        count++;
+        if (corrente == coda) break;
+        corrente = prendi_prossimo(corrente);
+    }
+
+    
+    if (corrente != coda) {// Se non abbiamo trovato la coda, restituiamo 0
+        return 0;
+    }
+
+    return count;
+}

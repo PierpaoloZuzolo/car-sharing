@@ -150,6 +150,33 @@ void converti_orario_in_celle(int ora_inizio, int minuto_inizio, int ora_fine, i
  */
 void converti_celle_in_orario(int cella_inizio, int cella_fine, int *ora_inizio, int *minuto_inizio, int *ora_fine, int *minuto_fine);
 
+/*
+ Funzione: calcola_costo_noleggio
+ --------------------------------
+
+ Calcola il costo totale del noleggio in base all'intervallo di tempo specificato (espresso in celle orarie) 
+ e applica eventualmente uno sconto.
+
+ Parametri:
+    inizio_cella: intero che rappresenta la cella oraria di inizio (inclusa).
+    fine_cella: intero che rappresenta la cella oraria di fine (esclusa).
+    sconto: intero che rappresenta una soglia per applicare una tariffa scontata.
+
+ Pre-condizioni:
+    - inizio_cella e fine_cella devono essere compresi nel range valido di celle (es. 0 <= inizio_cella < fine_cella <= CELLE_GIORNALIERE).
+    - sconto deve essere >= 0.
+
+ Post-condizioni:
+    Nessuna modifica a strutture esterne o parametri.
+
+ Ritorna:
+    Un valore `float` che rappresenta il costo complessivo del noleggio, eventualmente scontato.
+
+ Side-effect:
+    Nessuno.
+*/
+
+float calcola_costo_noleggio(int inizio_cella, int fine_cella, int sconto);
 
 
 #endif

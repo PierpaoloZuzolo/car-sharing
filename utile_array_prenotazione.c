@@ -15,51 +15,46 @@ Data: 13/05/2025
 
 /*
  Funzione: carica_prenotazioni_da_file
- ------------------------------------
+ -------------------------------------
 
- Carica le prenotazioni giornaliere da file per un dato veicolo identificato dalla targa,
- aggiorna la struttura in memoria, e gestisce il reset e il blocco delle celle temporali
- in base alla data corrente.
+ Carica le prenotazioni associate a una targa da un file, aggiornando la struttura
+ di prenotazione fornita in input. Se il giorno è cambiato o il file non esiste,
+ azzera la prenotazione e salva uno stato iniziale aggiornato.
 
  Implementazione:
-    Costruisce il nome del file a partire dalla targa con estensione ".txt".
-    Controlla se è un nuovo giorno:
-       - se sì, azzera tutte le celle, blocca quelle passate e salva la struttura su file,
-         quindi ritorna 0.
-    Tenta di aprire il file in lettura:
-       - se il file non esiste, azzera le celle, blocca quelle passate e salva,
-         quindi ritorna 0.
-    Legge da file i valori delle celle (numeri interi) fino a un massimo di CELLE_GIORNALIERE.
-       - se incontra un errore di lettura, azzera le celle rimanenti.
-    Chiude il file.
-    Blocca le celle del tempo passato in base all'ora corrente e salva nuovamente su file.
-    Ritorna 1 se il caricamento è avvenuto da file, 0 in caso di nuovo giorno o file mancante.
+    - Verifica se è un nuovo giorno tramite vedi_se_giorno_nuovo:
+        - In tal caso azzera le celle, blocca le celle passate e salva su file.
+    - Se il file non esiste:
+        - Inizializza le celle a 0, blocca le celle passate e crea il file con lo stato aggiornato.
+    - Se il file esiste:
+        - Legge i valori da file e li imposta nella prenotazione.
+        - Se la lettura è incompleta, le celle rimanenti vengono azzerate.
+        - Blocca comunque le celle passate e salva lo stato aggiornato su file.
 
  Parametri:
-    p     : puntatore alla struttura prenotazione da aggiornare
-    targa : stringa identificativa del veicolo
+    p: puntatore a una struttura di prenotazione valida.
+    targa: stringa che rappresenta la targa del veicolo, usata per accedere al file.
 
  Pre-condizioni:
-    p deve essere un puntatore valido a una struttura prenotazione
-    targa deve essere una stringa valida e non NULL
-    Le funzioni vedi_se_giorno_nuovo, azzera_celle, blocca_celle_passate,
-    salva_prenotazioni_su_file e imposta_cella devono essere definite e funzionanti
+    - p deve essere un puntatore valido a una struttura di prenotazione inizializzata.
+    - targa deve essere una stringa valida e non NULL.
 
  Post-condizioni:
-    La struttura prenotazione è aggiornata con i dati caricati dal file o inizializzata se necessario.
-    Il file storico delle prenotazioni viene aggiornato in base allo stato attuale.
+    - La struttura di prenotazione `p` sarà aggiornata in base al contenuto del file o inizializzata.
+    - Il file associato alla targa sarà aggiornato con lo stato corrente delle prenotazioni.
 
  Ritorna:
-    1 se la struttura è stata caricata da file con successo
-    0 se è stato un nuovo giorno o il file non esisteva (dunque struttura inizializzata)
+    - 1 se il file è stato letto correttamente e i dati sono stati caricati.
+    - 0 se era un nuovo giorno o se il file non esisteva (stato inizializzato).
 
  Side-effect:
-    Modifica la struttura prenotazione in memoria
-    Effettua letture e scritture su file corrispondente alla targa
-    Effettua stampe di errore su stdout se presenti (non implementato esplicitamente)
+    - Lettura/scrittura da/per file.
+    - Output aggiornato salvato su file.
 */
+
 int carica_prenotazioni_da_file(ptr_prenotazione p, const char *targa) 
 {
+    int dimensione_array = prendi_grandezza_array_prenotazioni();
     char nome_file[32];
     snprintf(nome_file, sizeof(nome_file), "%s.txt", targa);
 
@@ -83,13 +78,13 @@ int carica_prenotazioni_da_file(ptr_prenotazione p, const char *targa)
         return 0;
     }
 
-    for (int i = 0; i < CELLE_GIORNALIERE; i++) {
+    for (int i = 0; i < dimensione_array; i++) {
         int valore;
         if (fscanf(f, "%d", &valore) == 1) {
             imposta_cella(p, i, valore);
         } else {
             // In caso di errore di lettura, azzera il resto
-            for (; i < CELLE_GIORNALIERE; i++)
+            for (; i < dimensione_array; i++)
                 imposta_cella(p, i, 0);
             break;
         }
@@ -144,8 +139,8 @@ void salva_prenotazioni_su_file(ptr_prenotazione p, const char *targa)
 
     FILE *f = fopen(nome_file, "w");
     if (!f) return;
-
-    for (int i = 0; i < CELLE_GIORNALIERE; i++)
+    int dimensione_array = prendi_grandezza_array_prenotazioni();
+    for (int i = 0; i < dimensione_array; i++)
         fprintf(f, "%d\n", ottiene_cella(p, i));
 
     fclose(f);
@@ -153,28 +148,6 @@ void salva_prenotazioni_su_file(ptr_prenotazione p, const char *targa)
 
 
 
-//DA FINIREEE
-float costo_noleggio(int inizio_cella, int fine_cella, int sconto)
-{
-    float costo = 0.0;
-    
-    for (int i = inizio_cella; i < fine_cella; i++) {
-        // Fascia oraria 01:00–06:00 (celle 2–11)
-        if (i >= 2 && i < 12) {
-            costo += 40.5;
-        } else {
-            costo += 65.8;
-        }
-    }
-
-    // Se sconto è multiplo di 5, applica una tariffa scontata fissa per ogni cella
-    if (sconto % 5 == 0) {
-        costo = (fine_cella - inizio_cella) * 38;
-    }
-
-    printf("Il costo del veicolo: %.2f\n", costo);
-    return costo;
-}
 
 
 /*
@@ -265,7 +238,9 @@ bool veicolo_disponibile_oggi(ptr_prenotazione p)
 {
     if (!p) return false;
 
-    for (int i = 0; i < CELLE_GIORNALIERE; i++) {
+    int dimensione_array = prendi_grandezza_array_prenotazioni();
+
+    for (int i = 0; i < dimensione_array; i++) {
         int valore = ottiene_cella(p, i);  
         
         if (valore == 0) return true;
@@ -340,10 +315,11 @@ void mostra_orari_disponibili(ptr_prenotazione p) {
     }
 
     bool in_intervallo = false;
-    int inizio = 0;
+    int inizio = 0, dimensione_array;
+    dimensione_array = prendi_grandezza_array_prenotazioni();
 
-    for (int i = 0; i <= CELLE_GIORNALIERE; i++) {
-        if (i < CELLE_GIORNALIERE && ottiene_cella(p, i) == 0) {
+    for (int i = 0; i <= dimensione_array; i++) {
+        if (i < dimensione_array && ottiene_cella(p, i) == 0) {
             if (!in_intervallo) {
                 inizio = i;
                 in_intervallo = true;

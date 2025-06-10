@@ -146,6 +146,30 @@ bool inserisci_veicolo_in_hash(ptr_hash_veicoli h, ptr_veicolo ve);
  */
 ptr_veicolo cerca_veicolo_in_hash(ptr_hash_veicoli h, const char *targa);
 
+/*
+ Funzione: stampa_veicoli_disponibili
+ ------------------------------------
+
+ Stampa tutti i veicoli che risultano attualmente disponibili nella tabella hash.
+
+ Parametri:
+    h: puntatore alla tabella hash contenente i veicoli
+
+ Pre-condizioni:
+    h deve essere un puntatore valido a una TabellaHash.
+
+ Post-condizioni:
+    Nessuna modifica permanente alla tabella o ai veicoli (solo aggiornamento temporaneo dello stato prenotazioni).
+
+ Ritorna:
+    Nessun valore di ritorno (void)
+
+ Side-effect:
+    Stampa su standard output i veicoli disponibili.
+    Libera la memoria temporanea allocata per l’elenco dei valori.
+ */
+
+void stampa_veicoli_disponibili(ptr_hash_veicoli h);
 
 
 
