@@ -156,7 +156,7 @@ ptr_veicolo cerca_veicolo_in_hash(ptr_hash_veicoli h, const char *targa);
     h: puntatore alla tabella hash contenente i veicoli
 
  Pre-condizioni:
-    h deve essere un puntatore valido a una TabellaHash.
+    h deve essere un puntatore valido a una ptr_tabella_hash.
 
  Post-condizioni:
     Nessuna modifica permanente alla tabella o ai veicoli (solo aggiornamento temporaneo dello stato prenotazioni).

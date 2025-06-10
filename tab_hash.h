@@ -6,7 +6,7 @@ Data: 10/05/2025
 #ifndef HASH_H
 #define HASH_H
 
-typedef struct tabella_hash *TabellaHash;
+typedef struct tabella_hash *ptr_tabella_hash;
 
 
 /*
@@ -22,7 +22,7 @@ typedef struct tabella_hash *TabellaHash;
      dimensione > 0
  
   Post-condizioni:
-     se l'allocazione della memoria ha successo, viene restituito un puntatore a una struttura TabellaHash inizializzata;
+     se l'allocazione della memoria ha successo, viene restituito un puntatore a una struttura ptr_tabella_hash inizializzata;
      altrimenti viene restituito NULL.
  
   Ritorna:
@@ -32,7 +32,7 @@ typedef struct tabella_hash *TabellaHash;
      alloca memoria dinamicamente per la struttura tabella hash e l'array di bucket
  */
 
-TabellaHash crea_tabella_hash(int dimensione);
+ptr_tabella_hash crea_tabella_hash(int dimensione);
 
 /*
  Funzione: inserisci_in_hash
@@ -62,7 +62,7 @@ TabellaHash crea_tabella_hash(int dimensione);
     alloca memoria dinamicamente per la nuova chiave, per l'item e per il nodo
  */
 
-bool inserisci_in_hash(TabellaHash h, const char *chiave, void *valore);
+bool inserisci_in_hash(ptr_tabella_hash h, const char *chiave, void *valore);
 
 /*
  Funzione: cerca_in_hash
@@ -89,7 +89,7 @@ bool inserisci_in_hash(TabellaHash h, const char *chiave, void *valore);
     nessuno
  */
 
-void *cerca_in_hash(TabellaHash h, const char *chiave);
+void *cerca_in_hash(ptr_tabella_hash h, const char *chiave);
 
 /*
  Funzione: distruggi_hash
@@ -116,7 +116,7 @@ void *cerca_in_hash(TabellaHash h, const char *chiave);
     può chiamare una funzione fornita dall'utente per liberare i valori
  */
 
-void distruggi_hash(TabellaHash h, void (*distruggi_valore)(void *));
+void distruggi_hash(ptr_tabella_hash h, void (*distruggi_valore)(void *));
 
 /*
  Funzione: dimensione_hash
@@ -140,7 +140,7 @@ void distruggi_hash(TabellaHash h, void (*distruggi_valore)(void *));
     nessuno
  */
 
-int dimensione_hash(TabellaHash h);
+int dimensione_hash(ptr_tabella_hash h);
 
 
 /*
@@ -169,6 +169,6 @@ int dimensione_hash(TabellaHash h);
     alloca memoria per l'array dei risultati
 */
 
-void **ottieni_valori_hash(TabellaHash h, int *numero_elementi);
+void **ottieni_valori_hash(ptr_tabella_hash h, int *numero_elementi);
 
 #endif

@@ -81,20 +81,20 @@ static unsigned long hash_fun(const char *str) {
      dimensione > 0
  
   Post-condizioni:
-     se l'allocazione della memoria ha successo, viene restituito un puntatore a una struttura TabellaHash inizializzata;
+     se l'allocazione della memoria ha successo, viene restituito un puntatore a una struttura ptr_tabella_hash inizializzata;
      altrimenti viene restituito NULL.
  
   Ritorna:
-     un puntatore a una nuova struttura TabellaHash o NULL in caso di errore
+     un puntatore a una nuova struttura ptr_tabella_hash o NULL in caso di errore
  
   Side-effect:
      alloca memoria dinamicamente per la struttura tabella hash e l'array di bucket
  */
 
-TabellaHash crea_tabella_hash(int dimensione) {
+ptr_tabella_hash crea_tabella_hash(int dimensione) {
     if (dimensione <= 0) return NULL;
 
-    TabellaHash h = malloc(sizeof(struct tabella_hash));
+    ptr_tabella_hash h = malloc(sizeof(struct tabella_hash));
     if (!h) return NULL;
 
     h->dimensione = dimensione;
@@ -141,7 +141,7 @@ TabellaHash crea_tabella_hash(int dimensione) {
     alloca memoria dinamicamente per la nuova chiave, per l'item e per il nodo
  */
 
-bool inserisci_in_hash(TabellaHash h, const char *chiave, void *valore) {
+bool inserisci_in_hash(ptr_tabella_hash h, const char *chiave, void *valore) {
     if (!h || !chiave || !valore) return false;
 
     unsigned long indice = hash_fun(chiave) % h->dimensione;
@@ -205,7 +205,7 @@ bool inserisci_in_hash(TabellaHash h, const char *chiave, void *valore) {
     nessuno
  */
 
-void *cerca_in_hash(TabellaHash h, const char *chiave) {
+void *cerca_in_hash(ptr_tabella_hash h, const char *chiave) {
     if (!h || !chiave) return NULL;
 
     unsigned long indice = hash_fun(chiave) % h->dimensione;
@@ -252,7 +252,7 @@ void *cerca_in_hash(TabellaHash h, const char *chiave) {
     può chiamare una funzione fornita dall'utente per liberare i valori
  */
 
-void distruggi_hash(TabellaHash h, void (*distruggi_valore)(void *)) {
+void distruggi_hash(ptr_tabella_hash h, void (*distruggi_valore)(void *)) {
     if (!h) return;
 
     for (int i = 0; i < h->dimensione; ++i) {
@@ -302,7 +302,7 @@ void distruggi_hash(TabellaHash h, void (*distruggi_valore)(void *)) {
     nessuno
  */
 
-int dimensione_hash(TabellaHash h) {
+int dimensione_hash(ptr_tabella_hash h) {
     return h ? h->dimensione : 0;
 }
 
@@ -337,7 +337,7 @@ int dimensione_hash(TabellaHash h) {
  Side-effect:
     alloca memoria per l'array dei risultati
 */
-void **ottieni_valori_hash(TabellaHash h, int *numero_elementi) 
+void **ottieni_valori_hash(ptr_tabella_hash h, int *numero_elementi) 
 {
     if (!h || !numero_elementi) return NULL;
 
