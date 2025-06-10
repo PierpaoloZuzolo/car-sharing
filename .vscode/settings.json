@@ -1,7 +1,10 @@
 {
     "files.associations": {
-        "lista_storico_prenotazioni.h": "c",
-        "lista.h": "c",
-        "utile.h": "c"
+        "utile.h": "c",
+        "utile_utente.h": "c",
+        "utile_array_prenotazione.h": "c",
+        "utile_veicolo.h": "c",
+        "utile_lista_storico_noleggio.h": "c",
+        "hash_utenti.h": "c"
     }
 }

@@ -2,18 +2,18 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "utente.h"
-#include "hash_utenti.h"
-#include "veicolo.h"
-#include "array_prenotazione.h"
-#include "utile.h"
-#include "utile_utente.h"
-#include "utile_array_prenotazione.h"
-#include "utile_veicolo.h"
-#include "hash_veicoli.h"
-#include "storico_noleggio.h"
-#include "lista_storico_noleggio.h"
-#include "utile_lista_storico_noleggio.h"
+#include "Modello_utente/utente.h"
+#include "ADT_hash/hash_utenti.h"
+#include "Modello_veicolo/veicolo.h"
+#include "ADT_array/array_prenotazione.h"
+#include "utili/utile.h"
+#include "utili/utile_utente.h"
+#include "utili/utile_array_prenotazione.h"
+#include "utili/utile_veicolo.h"
+#include "ADT_hash/hash_veicoli.h"
+#include "Modello_storico_noleggio/storico_noleggio.h"
+#include "ADT_lista/lista_storico_noleggio.h"
+#include "utili/utile_lista_storico_noleggio.h"
 
 #define DIM_HASH_UTENTI 200
 #define DIM_HASH_VEICOLI 150
@@ -35,7 +35,7 @@ int main (){
 
 
     ptr_hash_veicoli hash_veicoli = crea_hash_veicoli(DIM_HASH_VEICOLI);
-    carica_veicoli_da_file("veicoli.txt", hash_veicoli);
+    carica_veicoli_da_file("txt/Veicoli/veicoli.txt", hash_veicoli);
 
 
 /*
@@ -133,7 +133,7 @@ ptr_utente gestione_utente(ptr_hash_utenti h)
 {
     char nome[50], email[100];
 
-    carica_utente_da_file("utenti.txt", h);
+    carica_utente_da_file("txt/Utenti/utenti.txt", h);
 
     int scelta;
 
@@ -175,7 +175,7 @@ ptr_utente gestione_utente(ptr_hash_utenti h)
            }
 
            if(inserisci_utente_in_hash(h, nuovo)){
-            salva_utente_su_file("utenti.txt", nuovo);
+            salva_utente_su_file("txt/Utenti/utenti.txt", nuovo);
             printf("\nRegistrazione completata!");
             printf("\nBenvenut* in Luxury Sharing, %s!\n", nome);
                 printf("\n");
@@ -250,7 +250,7 @@ ptr_veicolo menu_prenotazione(ptr_hash_veicoli hash_veicoli, const char *nome_ut
         int giorno, mese, anno;
         data_attuale(&giorno, &mese, &anno);
     
-        FILE *f = fopen("ultimo_avvio.txt", "w");
+        FILE *f = fopen("txt/ultimo_avvio.txt", "w");
         if (f) {
          fprintf(f, "%d %d %d", giorno, mese, anno);
          fclose(f);
@@ -268,7 +268,7 @@ ptr_veicolo menu_prenotazione(ptr_hash_veicoli hash_veicoli, const char *nome_ut
     printf("\n0. Indietro\n");
     int scelta;
     while(1){
-        scelta = inserisci_scelta();                        // DA TESTARE
+        scelta = inserisci_scelta();                        
     if (1 == scelta || 0 == scelta) break;
     printf("\nScelta non valida. Digitare o 0 o 1.\n");
 
