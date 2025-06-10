@@ -131,7 +131,7 @@ void carica_veicoli_da_file(const char *nome_file, ptr_hash_veicoli h)
 void libera_veicolo(ptr_veicolo ve)
 {
     if(ve){
-        libera_prenotazioni(prendi_prenotazioni(ve));
+        distruggi_array_prenotazioni(prendi_prenotazioni(ve));
         free(ve);
     }
 }

@@ -122,30 +122,6 @@ int leggi_cella_da_orario(const char *messaggio);
 bool veicolo_disponibile_oggi(ptr_prenotazione p);
 
 
-/*
- Funzione: libera_prenotazioni
- -----------------------------
-
- Libera la memoria allocata per la struttura prenotazione puntata da p.
-
- Parametri:
-    p: puntatore alla struttura prenotazione da liberare
-
- Pre-condizioni:
-    p deve essere un puntatore valido ottenuto da malloc o simile,
-    oppure NULL (in questo caso la funzione non fa nulla).
-
- Post-condizioni:
-    La memoria puntata da p viene liberata.
-
- Ritorna:
-    void
-
- Side-effect:
-    Libera memoria allocata dinamicamente.
-*/
-void libera_prenotazioni(ptr_prenotazione p);
-
 
 /*
  Funzione: mostra_orari_disponibili
