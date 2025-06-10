@@ -249,36 +249,7 @@ bool veicolo_disponibile_oggi(ptr_prenotazione p)
 }
 
 
-/*
- Funzione: libera_prenotazioni
- -----------------------------
 
- Libera la memoria allocata per la struttura prenotazione puntata da p.
-
- Implementazione:
-    Verifica che il puntatore p non sia NULL.
-    Se valido, esegue la deallocazione della memoria tramite free().
-
- Parametri:
-    p: puntatore alla struttura prenotazione da liberare
-
- Pre-condizioni:
-    p deve essere un puntatore valido ottenuto da malloc o simile,
-    oppure NULL (in questo caso la funzione non fa nulla).
-
- Post-condizioni:
-    La memoria puntata da p viene liberata.
-
- Ritorna:
-    void
-
- Side-effect:
-    Libera memoria allocata dinamicamente.
-*/
-void libera_prenotazioni(ptr_prenotazione p) 
-{
-    if (p) free(p);
-}
 
 
 /*

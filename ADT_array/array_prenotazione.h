@@ -1,232 +1,234 @@
+#ifndef ARRAY_PRENOTAZIONE_H
+#define ARRAY_PRENOTAZIONE_H
+
+#include "array.h"
+
+
+typedef struct array *ptr_prenotazione;
+
 /*
-Autore: Pierpaolo Zuzolo
-Data: 13/05/2025
+  Funzione: inizializza_prenotazioni
+  ----------------------------------
+
+  Crea e inizializza un nuovo array di prenotazioni.
+
+  Parametri:
+     Nessuno
+
+  Pre-condizioni:
+     Nessuna
+
+  Post-condizioni:
+     Se l’allocazione ha successo, restituisce un array con tutte le celle a NULL.
+
+  Ritorna:
+     Un puntatore a un nuovo array di prenotazioni, oppure NULL in caso di errore.
+
+  Side-effect:
+     Alloca memoria dinamicamente per l’array.
 */
-
-#ifndef PRENOTAZIONE_H
-#define PRENOTAZIONE_H
-
-#include <stdbool.h>
-
-
-/*
- Tipo astratto di dato: prenotazioni
- ----------------------------------
- Struttura che rappresenta le prenotazioni di un veicolo
- suddivise in celle giornaliere (es. 48 slot per 24 ore a intervalli di 30 min)
- per un periodo di 6 giorni (lunedì-sabato).
-*/
-typedef struct prenotazioni *ptr_prenotazione;
-
-
-/*
- Funzione: inizializza_prenotazioni
- ----------------------------------
-
- Crea e inizializza una nuova struttura per la gestione delle prenotazioni.
-
- Parametri:
-    Nessuno
-
- Pre-condizioni:
-    Nessuna
-
- Post-condizioni:
-    restituisce un puntatore a una nuova struttura `prenotazioni` con celle inizializzate a 0,
-    oppure NULL in caso di errore di allocazione
-
- Ritorna:
-    un puntatore a una struttura `ptr_prenotazione`, o NULL se la creazione fallisce
-
- Side-effect:
-    alloca memoria dinamicamente per la struttura delle prenotazioni
- */
 ptr_prenotazione inizializza_prenotazioni();
 
 /*
- Funzione: prenota_intervallo
- ----------------------------
+  Funzione: prendi_grandezza_array_prenotazioni
+  ---------------------------------------------
 
- Tenta di prenotare un intervallo di tempo specificato all'interno della struttura delle prenotazioni.
+  Restituisce la dimensione dell’array delle prenotazioni.
 
- Parametri:
-    p: puntatore alla struttura `prenotazioni`
-    inizio_cella: indice iniziale dell'intervallo da prenotare (incluso)
-    fine_cella: indice finale dell'intervallo da prenotare (escluso)
+  Parametri:
+     Nessuno
 
- Pre-condizioni:
-    - `p` deve essere diverso da NULL
-    - `inizio_cella` deve essere >= 0
-    - `fine_cella` deve essere <= CELLE_GIORNALIERE
-    - `inizio_cella` deve essere < `fine_cella`
+  Pre-condizioni:
+     Nessuna
 
- Post-condizioni:
-    - se tutte le celle nell'intervallo sono libere, vengono marcate come occupate
-    - se l'intervallo è già parzialmente occupato o non valido, non viene effettuata alcuna modifica
+  Post-condizioni:
+     Nessuna
 
- Ritorna:
-    1 se la prenotazione è stata effettuata con successo, 0 altrimenti
+  Ritorna:
+     Un intero pari al numero di celle disponibili nell’array.
 
- Side-effect:
-    modifica lo stato interno della struttura `prenotazioni` riservando le celle indicate
- */
+  Side-effect:
+     Nessuno
+*/
+int prendi_grandezza_array_prenotazioni();
+
+/*
+  Funzione: prenota_intervallo
+  ----------------------------
+
+  Segna come prenotate le celle comprese in un intervallo specificato.
+
+  Parametri:
+     p            - puntatore all’array delle prenotazioni
+     inizio_cella - indice iniziale (inclusivo)
+     fine_cella   - indice finale (esclusivo)
+
+  Pre-condizioni:
+     p != NULL
+     inizio_cella e fine_cella - 1 devono essere in range valido
+     inizio_cella < fine_cella
+
+  Post-condizioni:
+     Se tutte le celle sono libere, l’intervallo è prenotato.
+
+  Ritorna:
+     1 se la prenotazione ha successo, 0 altrimenti.
+
+  Side-effect:
+     Modifica lo stato dell’array prenotazioni.
+*/
 int prenota_intervallo(ptr_prenotazione p, int inizio_cella, int fine_cella);
 
 /*
- Funzione: libera_intervallo
- ---------------------------
+  Funzione: libera_intervallo
+  ---------------------------
 
- Libera un intervallo di celle precedentemente prenotate nella struttura delle prenotazioni.
+  Libera tutte le celle dell’intervallo specificato.
 
- Parametri:
-    p: puntatore alla struttura `prenotazioni`
-    inizio_cella: indice iniziale dell'intervallo da liberare (incluso)
-    fine_cella: indice finale dell'intervallo da liberare (escluso)
+  Parametri:
+     p            - puntatore all’array delle prenotazioni
+     inizio_cella - indice iniziale (inclusivo)
+     fine_cella   - indice finale (esclusivo)
 
- Pre-condizioni:
-    - `p` deve essere diverso da NULL
-    - `inizio_cella` deve essere >= 0
-    - `fine_cella` deve essere <= CELLE_GIORNALIERE
-    - `inizio_cella` deve essere < `fine_cella`
+  Pre-condizioni:
+     p != NULL
+     inizio_cella e fine_cella - 1 devono essere in range valido
+     inizio_cella < fine_cella
 
- Post-condizioni:
-    le celle dell'intervallo specificato sono marcate come libere (valore 0)
+  Post-condizioni:
+     Le celle nell’intervallo risultano libere.
 
- Ritorna:
-    1 se l’intervallo è stato liberato con successo, 0 se l’operazione non è stata eseguita (es. puntatore NULL o intervallo non valido)
+  Ritorna:
+     1 se l’operazione ha successo, 0 altrimenti.
 
- Side-effect:
-    modifica lo stato interno della struttura `prenotazioni`, liberando le celle indicate
- */
+  Side-effect:
+     Modifica lo stato dell’array prenotazioni.
+*/
 int libera_intervallo(ptr_prenotazione p, int inizio_cella, int fine_cella);
 
 /*
- Funzione: ottiene_cella
- -----------------------
+  Funzione: ottiene_cella
+  -----------------------
 
- Restituisce lo stato di una specifica cella all'interno della struttura delle prenotazioni.
+  Verifica se una determinata cella è prenotata.
 
- Parametri:
-    p: puntatore alla struttura `prenotazioni`
-    indice: posizione della cella da leggere
+  Parametri:
+     p      - puntatore all’array delle prenotazioni
+     indice - indice della cella da controllare
 
- Pre-condizioni:
-    - `p` deve essere diverso da NULL
-    - `indice` deve essere compreso tra 0 (incluso) e CELLE_GIORNALIERE (escluso)
+  Pre-condizioni:
+     p != NULL
+     indice in range valido
 
- Post-condizioni:
-    Nessuna modifica alla struttura
+  Post-condizioni:
+     Nessuna
 
- Ritorna:
-    - 1 se la cella è prenotata
-    - 0 se la cella è libera
-    - -1 se il puntatore è NULL o l’indice è fuori dal range
+  Ritorna:
+     1 se la cella è prenotata, 0 se libera, -1 se indice non valido.
 
- Side-effect:
-    Nessuno
- */
-int ottiene_cella (ptr_prenotazione p, int indice);
+  Side-effect:
+     Nessuno
+*/
+int ottiene_cella(ptr_prenotazione p, int indice);
 
 /*
- Funzione: imposta_cella
- -----------------------
+  Funzione: imposta_cella
+  -----------------------
 
- Imposta manualmente il valore di una specifica cella nella struttura delle prenotazioni.
+  Imposta manualmente lo stato di una singola cella.
 
- Parametri:
-    p: puntatore alla struttura `prenotazioni`
-    indice: posizione della cella da modificare
-    valore: nuovo valore da assegnare alla cella (tipicamente 0 per libero, 1 per occupato)
+  Parametri:
+     p      - puntatore all’array delle prenotazioni
+     indice - indice della cella da modificare
+     valore - 0 per liberare, diverso da 0 per prenotare
 
- Pre-condizioni:
-    - `p` deve essere diverso da NULL
-    - `indice` deve essere compreso tra 0 (incluso) e CELLE_GIORNALIERE (escluso)
+  Pre-condizioni:
+     p != NULL
+     indice in range valido
 
- Post-condizioni:
-    la cella all’indice specificato assume il valore passato
+  Post-condizioni:
+     La cella indicata assume il valore corrispondente.
 
- Ritorna:
-    Nessuno
+  Ritorna:
+     Nulla
 
- Side-effect:
-    modifica il contenuto della struttura `prenotazioni` alla cella specificata
- */
+  Side-effect:
+     Modifica la cella specificata.
+*/
 void imposta_cella(ptr_prenotazione p, int indice, int valore);
 
 /*
- Funzione: azzera_celle
- ----------------------
+  Funzione: azzera_celle
+  ----------------------
 
- Inizializza tutte le celle della struttura delle prenotazioni a 0, marcandole come libere.
+  Libera tutte le celle dell’array, azzerandole.
 
- Parametri:
-    p: puntatore alla struttura `prenotazioni`
+  Parametri:
+     p - puntatore all’array delle prenotazioni
 
- Pre-condizioni:
-    - `p` deve essere diverso da NULL
+  Pre-condizioni:
+     p != NULL
 
- Post-condizioni:
-    tutte le celle della struttura sono impostate a 0 (libere)
+  Post-condizioni:
+     Tutte le celle risultano libere (NULL).
 
- Ritorna:
-    Nessuno
+  Ritorna:
+     Nulla
 
- Side-effect:
-    modifica tutte le celle della struttura `prenotazioni` azzerandole
- */
+  Side-effect:
+     Modifica tutte le celle dell’array.
+*/
+
 void azzera_celle(ptr_prenotazione p);
 
 /*
- Funzione: in_intervallo
- -----------------------
+  Funzione: in_intervallo
+  -----------------------
 
- Verifica se un indice è compreso all'interno di un intervallo semi-aperto [inizio, fine).
+  Controlla se un indice si trova nell'intervallo [inizio, fine).
 
- Parametri:
-    indice: valore da verificare
-    inizio: limite inferiore (incluso) dell’intervallo
-    fine: limite superiore (escluso) dell’intervallo
+  Parametri:
+     indice - valore da verificare
+     inizio - limite inferiore (inclusivo)
+     fine   - limite superiore (esclusivo)
 
- Pre-condizioni:
-    Nessuna
+  Pre-condizioni:
+     Nessuna
 
- Post-condizioni:
-    Nessuna
+  Post-condizioni:
+     Nessuna
 
- Ritorna:
-    1 se `indice` ∈ [inizio, fine), 0 altrimenti
+  Ritorna:
+     1 se indice ∈ [inizio, fine), 0 altrimenti.
 
- Side-effect:
-    Nessuno
- */
+  Side-effect:
+     Nessuno
+*/
+
 int in_intervallo(int indice, int inizio, int fine);
 
+
 /*
- Funzione: prendi_grandezza_array_prenotazioni
- ---------------------------------------------
+  Funzione: distruggi_array_prenotazioni
+  --------------------------------------
 
- Restituisce la dimensione dell'array utilizzato per memorizzare le prenotazioni giornaliere.
+  Distrugge l’array delle prenotazioni e libera la memoria.
 
- Implementazione:
-    Restituisce il valore della costante `CELLE_GIORNALIERE`.
+  Parametri:
+     p - puntatore all’array delle prenotazioni
 
- Parametri:
-    Nessuno
+  Pre-condizioni:
+     Nessuna
 
- Pre-condizioni:
-    Nessuna
+  Post-condizioni:
+     L’array viene deallocato.
 
- Post-condizioni:
-    Nessuna
+  Ritorna:
+     Nulla
 
- Ritorna:
-    un intero che rappresenta il numero di celle giornaliere disponibili per le prenotazioni
-
- Side-effect:
-    Nessuno
- */
-int prendi_grandezza_array_prenotazioni();
-
-
+  Side-effect:
+     Libera memoria dinamica.
+*/
+void distruggi_array_prenotazioni(ptr_prenotazione p);
 
 #endif

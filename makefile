@@ -1,5 +1,5 @@
-car-sharing: main.o array_prenotazione.o hash_utenti.o hash_veicoli.o tab_hash.o lista_storico_noleggio.o lista.o storico_noleggio.o utente.o veicolo.o utile_array_prenotazione.o utile_lista_storico_noleggio.o utile_utente.o utile_veicolo.o utile.o
-	gcc main.o array_prenotazione.o hash_utenti.o hash_veicoli.o tab_hash.o lista_storico_noleggio.o lista.o storico_noleggio.o utente.o veicolo.o utile_array_prenotazione.o utile_lista_storico_noleggio.o utile_utente.o utile_veicolo.o utile.o -o main.exe
+car-sharing: main.o array.o array_prenotazione.o hash_utenti.o hash_veicoli.o tab_hash.o lista_storico_noleggio.o lista.o storico_noleggio.o utente.o veicolo.o utile_array_prenotazione.o utile_lista_storico_noleggio.o utile_utente.o utile_veicolo.o utile.o
+	gcc main.o array.o array_prenotazione.o hash_utenti.o hash_veicoli.o tab_hash.o lista_storico_noleggio.o lista.o storico_noleggio.o utente.o veicolo.o utile_array_prenotazione.o utile_lista_storico_noleggio.o utile_utente.o utile_veicolo.o utile.o -o main.exe
 
 main.o: main.c
 	gcc -Wall -Wextra -std=c99 -I. -c main.c -o main.o
@@ -46,6 +46,9 @@ utile.o: utili/utile.c utili/utile.h
 
 utile_veicolo.o: utili/utile_veicolo.c utili/utile_veicolo.h
 	gcc -Wall -Wextra -std=c99 -I. -c utili/utile_veicolo.c -o utile_veicolo.o
+
+array.o: ADT_array/array.c ADT_array/array.h
+	gcc -Wall -Wextra -std=c99 -I. -c ADT_array/array.c -o array.o
 
 ifeq ($(OS),Windows_NT)
     RM = del /Q
