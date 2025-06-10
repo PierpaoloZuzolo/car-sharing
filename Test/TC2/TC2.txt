@@ -1,0 +1,2 @@
+Verifica della corretta creazione delle prenotazioni e dell'aggiornamento della
+disponibilità dei veicoli

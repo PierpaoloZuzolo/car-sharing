@@ -1,0 +1,1 @@
+Test del calcolo del costo del noleggio in base al tempo di utilizzo
