@@ -280,3 +280,50 @@ float calcola_costo_noleggio(int inizio_cella, int fine_cella, int sconto)
    
     return costo;
 }
+
+/*
+ Funzione: inserisci_scelta
+ --------------------------
+
+ Richiede all'utente l'inserimento di un numero intero e
+ continua a chiedere finché non viene fornito un input valido.
+
+ Implementazione:
+    Usa scanf per leggere un intero dalla tastiera.
+    Verifica che l'input sia corretto.
+    In caso di errore, stampa un messaggio e svuota il buffer di input.
+    Ripete la richiesta finché l'utente non inserisce un intero valido.
+
+ Parametri:
+    Nessuno
+
+ Pre-condizioni:
+    Nessuna
+
+ Post-condizioni:
+    L'utente avrà inserito correttamente un intero da tastiera.
+
+ Ritorna:
+    L'intero digitato dall'utente
+
+ Side-effect:
+    Legge da input standard e stampa eventuali messaggi d’errore
+*/
+int inserisci_scelta() 
+{
+    int numero;
+    char ch;
+
+    while (1) {
+        printf("Scelta: ");
+        if (scanf("%d", &numero) == 1) {
+            // Controlla che non ci siano caratteri extra dopo il numero
+            while ((ch = getchar()) != '\n' && ch != EOF); // pulisce il buffer
+            return numero;
+        } else {
+            // Input non valido
+            printf("Input non valido. Riprova.\n");
+            while ((ch = getchar()) != '\n' && ch != EOF); // pulisce il buffer
+        }
+    }
+}

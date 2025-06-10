@@ -3,6 +3,7 @@ Autore: Pierpaolo Zuzolo
 Data: 13/05/2025
 */
 
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -11,6 +12,7 @@ Data: 13/05/2025
 #include "array_prenotazione.h"
 #include "utile.h"
 
+#define CELLE_GIORNALIERE 48
 
 struct prenotazioni {
     int cella[CELLE_GIORNALIERE];  // ogni cella vale 30 minuti

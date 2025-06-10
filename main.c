@@ -268,9 +268,7 @@ ptr_veicolo menu_prenotazione(ptr_hash_veicoli hash_veicoli, const char *nome_ut
     printf("\n0. Indietro\n");
     int scelta;
     while(1){
-    printf("\nScelta: ");
-    scanf("%d", &scelta);
-    printf("\n\n");                         // DA MIGLIORARE CONTROLLO SU INPUT
+        scelta = inserisci_scelta();                        // DA TESTARE
     if (1 == scelta || 0 == scelta) break;
     printf("\nScelta non valida. Digitare o 0 o 1.\n");
 
@@ -322,9 +320,7 @@ ptr_veicolo menu_prenotazione(ptr_hash_veicoli hash_veicoli, const char *nome_ut
             printf("\n0. Annulla prenotazione\n");
             int scelta;
             while(1){
-                printf("\nScelta: ");
-                scanf("%d", &scelta);
-                printf("\n\n");                              // DA MIGLIORARE CONTROLLO SU INPUT
+                scelta = inserisci_scelta();                             // DA TESTARE
                 if (1 == scelta || 0 == scelta) break;
                 printf("\nScelta non valida. Digitare o 0 o 1.\n");
             }
@@ -357,10 +353,10 @@ ptr_veicolo menu_prenotazione(ptr_hash_veicoli hash_veicoli, const char *nome_ut
                 printf("0. Annullare e tornare al menu principale\n");
                 printf("Scelta: ");
 
-                if (scanf("%d", &scelta) != 1) {
-                    printf("Input non valido.\n");
-                    while (getchar() != '\n');
-                    continue;
+                while(1){
+                    scelta = inserisci_scelta();
+                    if (scelta == 0 || scelta == 1 || scelta == 2) break;
+                    printf("\nDigitare o 1 o 2 o 3 \n");
                 }
 
                 if (scelta == 1) {
@@ -394,7 +390,11 @@ void gestione_storico_prenotazioni(char *nome_utente, ptr_hash_veicoli hash_veic
 
     printf("\n\n1. Elimina prenotazione\n0. Indietro\n\n");
     int scelta;
-    scanf("%d", &scelta);
+    while(1){
+        scelta = inserisci_scelta();
+        if (0 == scelta || 1 == scelta) break;
+        printf("\nInserire o 1 o 0\n");
+    }
     if(scelta == 1){
         printf("\n=== PRENOTAZIONI CHE PUOI ELIMINARE ===\n\n");
         char targa_veicolo_eliminato[8];

@@ -178,5 +178,29 @@ void converti_celle_in_orario(int cella_inizio, int cella_fine, int *ora_inizio,
 
 float calcola_costo_noleggio(int inizio_cella, int fine_cella, int sconto);
 
+/*
+ Funzione: inserisci_scelta
+ --------------------------
+
+ Richiede all'utente l'inserimento di un numero intero e
+ continua a chiedere finché non viene fornito un input valido.
+
+ Parametri:
+    Nessuno
+
+ Pre-condizioni:
+    Nessuna
+
+ Post-condizioni:
+    L'utente avrà inserito correttamente un intero da tastiera.
+
+ Ritorna:
+    L'intero digitato dall'utente
+
+ Side-effect:
+    Legge da input standard e stampa eventuali messaggi d’errore
+*/
+int inserisci_scelta();
+
 
 #endif
