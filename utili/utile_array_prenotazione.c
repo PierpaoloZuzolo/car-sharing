@@ -134,7 +134,7 @@ int carica_prenotazioni_da_file(ptr_prenotazione p, const char *targa)
 void salva_prenotazioni_su_file(ptr_prenotazione p, const char *targa) 
 {
     if (!p || !targa || strlen(targa) == 0) return;
-    char nome_file[32];
+    char nome_file[50];
     snprintf(nome_file, sizeof(nome_file), "txt/Prenotazioni_veicoli/%s.txt", targa);
 
     FILE *f = fopen(nome_file, "w");

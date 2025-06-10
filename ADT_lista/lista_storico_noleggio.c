@@ -7,7 +7,7 @@ Data: 01/06/2025
 #include <stdlib.h>
 #include <stdbool.h>
 
-#include "storico_noleggio.h"
+#include "Modello_storico_noleggio/storico_noleggio.h"
 #include "lista_storico_noleggio.h"
 #include "lista.h"
 
