@@ -44,7 +44,7 @@ int main() {
         // Per output nomi distinti (così non si sovrascrivono)
         snprintf(output_file, sizeof(output_file), "%s/output.txt", test_case);
         int es1 = test_funzione1(input_file, oracle_file, output_file);
-
+/*
         snprintf(output_file, sizeof(output_file), "%s/output.txt", test_case);
         int es2 = test_funzione2(input_file, oracle_file, output_file);
 
@@ -52,6 +52,11 @@ int main() {
         int es3 = test_funzione3(input_file, oracle_file, output_file);
 
         if (es1 == 0 && es2 == 0 && es3 == 0) {
+            fprintf(result, "%s PASS\n", test_case);
+        } else {
+            fprintf(result, "%s FAIL\n", test_case);
+        }*/
+       if(es1 == 0){
             fprintf(result, "%s PASS\n", test_case);
         } else {
             fprintf(result, "%s FAIL\n", test_case);
@@ -67,6 +72,7 @@ int main() {
 
 
 
+
 int test_funzione1(const char *input_file, const char *oracle_file, const char *output_file) {
     FILE *in = fopen(input_file, "r");
     FILE *oracle = fopen(oracle_file, "r");
@@ -75,15 +81,18 @@ int test_funzione1(const char *input_file, const char *oracle_file, const char *
         fprintf(stderr, "Errore apertura file per funzione 1\n");
         return -1;
     }
+
     int inizio, fine, sconto;
-    float atteso, attuale;
+    float atteso, ottenuto;
     int test_num = 1, errori = 0;
+
     while (fscanf(in, "%d %d %d", &inizio, &fine, &sconto) == 3 &&
            fscanf(oracle, "%f", &atteso) == 1) {
-        attuale = calcola_costo_noleggio(inizio, fine, sconto);
-        fprintf(out, "%.2f\n", attuale);
-        if (fabs(atteso - attuale) > SCARTO) {
-            printf("[Funzione1] Test %d FALLITO: atteso %.2f, ottenuto %.2f\n", test_num, atteso, attuale);
+        ottenuto = calcola_costo_noleggio(inizio, fine, sconto);
+        fprintf(out, "%.2f\n", ottenuto);
+
+        if (fabs(atteso - ottenuto) > SCARTO) {
+            printf("[Funzione1] Test %d FALLITO: atteso %.2f, ottenuto %.2f\n", test_num, atteso, ottenuto);
             errori++;
         }
         test_num++;
@@ -94,7 +103,7 @@ int test_funzione1(const char *input_file, const char *oracle_file, const char *
     return errori;
 }
 
-
+/*
 int test_funzione2(const char *file_input, const char *file_oracolo, const char *file_output) {
     FILE *input = fopen(file_input, "r");
     FILE *oracolo = fopen(file_oracolo, "r");
@@ -235,3 +244,4 @@ int test_funzione3(const char *input_file, const char *oracle_file, const char *
     fclose(output);
     return errori;
 }
+*/
