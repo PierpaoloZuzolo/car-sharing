@@ -1,10 +1,8 @@
-Prenotazione 1: FALLITA
-Prenotazione 2: FALLITA
-Prenotazione 3: OK
-Prenotazione 4: FALLITA
-Prenotazione 5: OK
-Prenotazione 6: FALLITA
-Prenotazione 7: FALLITA
-Prenotazione 8: FALLITA
-Prenotazione 9: FALLITA
-Prenotazione 10: FALLITA
+TRUE FALSE
+FALSE TRUE
+FALSE TRUE
+FALSE FALSE
+TRUE TRUE
+FALSE TRUE
+FALSE TRUE
+FALSE TRUE
