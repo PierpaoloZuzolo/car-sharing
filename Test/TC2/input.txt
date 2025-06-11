@@ -1,0 +1,9 @@
+0 0          # intervallo vuoto, inizio == fine → deve fallire
+0 48         # prenota tutto il giorno → deve andare OK (assumendo 48 celle)
+47 48        # prenota ultima cella → deve fallire (se già occupata)
+10 15        # prenota intervallo libero → OK
+14 20        # intervallo parzialmente occupato (sovrapposizione) → fallisce
+-1 5         # intervallo non valido (inizio negativo) → fallisce
+5 49         # intervallo non valido (fine > CELLE_GIORNALIERE) → fallisce
+30 30        # intervallo vuoto (inizio == fine) → fallisce
+40 42        # intervallo libero → OK 

@@ -1,0 +1,2 @@
+Verifica della visualizzazione corretta dei veicoli disponibili e della gestione
+degli storici di prenotazione

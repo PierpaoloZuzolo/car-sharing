@@ -262,6 +262,9 @@ void converti_celle_in_orario(int cella_inizio, int cella_fine, int *ora_inizio,
 float calcola_costo_noleggio(int inizio_cella, int fine_cella, int sconto)
 {
     float costo = 0.0;
+    if(inizio_cella < 0 || fine_cella > 48){
+      return 0.00;
+    }
     
     for (int i = inizio_cella; i < fine_cella; i++) {
         // Fascia oraria 01:00–06:00 (celle 2–11)
