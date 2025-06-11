@@ -110,7 +110,7 @@ int prenota_intervallo(ptr_prenotazione p, int inizio_cella, int fine_cella)
     // Prenota l'intervallo
     for (int i = inizio_cella; i < fine_cella; i++) {
         // Usiamo (void*)1 per rappresentare "prenotato"
-        inserisci_in_array(p, i, (void*)1);
+        inserisci_in_array(p, i, (void*)1);                    //DEVI CHIAMARE FUNZONE IMPOSTA CELLA!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     }
 
     return 1;
@@ -156,7 +156,7 @@ int libera_intervallo(ptr_prenotazione p, int inizio_cella, int fine_cella)
 
     // Libera l'intervallo
     for (int i = inizio_cella; i < fine_cella; i++) {
-        inserisci_in_array(p, i, NULL);
+        inserisci_in_array(p, i, NULL);                       //DEVI CHIAMARE FUNZIONE IMPOSTA CELLA!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     }
 
     return 1;

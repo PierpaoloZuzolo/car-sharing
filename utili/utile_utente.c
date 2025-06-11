@@ -46,103 +46,129 @@ void stampa_utente(ptr_utente ut)
 
 
 /*
- Funzione: salva_utente_su_file
- ------------------------------
+  Funzione: salva_utente_su_file
+  ------------------------------
 
- Salva i dati dell'utente su due file:
- 1) un file generale di elenco utenti (append),
- 2) un file dedicato con nome "<nome_utente>.txt" contenente dati specifici.
+  Salva le informazioni di un utente su un file di testo, in modalità append.
 
- Implementazione:
-    Controlla che il puntatore utente sia valido.
-    Apre il file generale in append e scrive nome ed email.
-    Costruisce il nome del file dedicato basato sul nome dell'utente.
-    Apre il file dedicato in scrittura (sovrascrive se esiste).
-    Scrive dati specifici (nome, email, sconto di default).
-    Gestisce errori di apertura file con messaggi su stdout.
+  Implementazione:
+     Costruisce il nome completo del file a partire dal nome base e, se fornito, dal percorso.
+     Apre il file in modalità "append" ("a") per aggiungere l'utente alla fine del file.
+     Scrive su una nuova riga il nome e l'email dell’utente separati da uno spazio.
 
- Parametri:
-    nome_file: stringa contenente il nome del file per l'elenco generale utenti
-    ut: puntatore alla struttura utente da salvare
+  Parametri:
+     nome_file: nome base del file (senza estensione)
+     ut: puntatore alla struttura utente da salvare
+     percorso_file: percorso opzionale della cartella in cui salvare il file
 
- Pre-condizioni:
-    `nome_file` deve essere una stringa valida.
-    `ut` deve essere un puntatore valido non NULL.
+  Pre-condizioni:
+     ut != NULL
+     nome_file != NULL e non vuoto
 
- Post-condizioni:
-    I dati dell'utente sono salvati su disco su due file (append + dedicato).
+  Post-condizioni:
+     se il file viene aperto correttamente, i dati dell'utente sono scritti in append;
+     altrimenti, non viene scritto nulla.
 
- Ritorna:
-    void
+  Ritorna:
+     1 se il salvataggio ha avuto successo;
+     0 in caso di errore (es. parametri non validi o apertura file fallita)
 
- Side-effect:
-    Scrive su file su disco.
-    Può stampare messaggi di errore su stdout in caso di problemi.
+  Side-effect:
+     apre (o crea) e scrive su un file di testo;
+     aggiunge una nuova riga contenente i dati dell'utente.
  */
-void salva_utente_su_file(char *nome_file, ptr_utente ut)
+
+int salva_utente_su_file(char *nome_file, ptr_utente ut, const char *percorso_file)
 {
-    if (!ut) {
-        printf("\nErrore: utente nullo.\n");
-        return;
+   if (!ut || !nome_file || strlen(nome_file) == 0) {
+       //  printf("Lista o nome utente non validi.\n");
+        return 0;
+    }
+
+    char nome_file_completo[200];
+    if (percorso_file && strlen(percorso_file) > 0) {
+        snprintf(nome_file_completo, sizeof(nome_file_completo), "%s/%s.txt", percorso_file, nome_file);
+    } else {
+        snprintf(nome_file_completo, sizeof(nome_file_completo), "%s.txt", nome_file);
     }
 
     // Salvataggio su file generale (append)
-    FILE *file = fopen(nome_file, "a");
+    FILE *file = fopen(nome_file_completo, "a");
     if (file) {
         fprintf(file, "%s %s\n", prendi_nome(ut), prendi_email(ut));
         fclose(file);
+        return 1;
     } else {
-        printf("\nErrore salvataggio file utenti generico.\n");
+        //printf("\nErrore salvataggio file utenti generico.\n");
+        return 0;
     }
 
 }
 
 
 /*
- Funzione: carica_utente_da_file
- -------------------------------
+  Funzione: carica_utenti_da_file
+  -------------------------------
 
- Carica gli utenti da un file e li inserisce nella tabella hash degli utenti.
+  Carica da un file di testo gli utenti registrati e li inserisce in una tabella hash.
 
- Implementazione:
-    Apre il file in lettura.
-    Se il file non esiste o non può essere aperto, esce senza modificare la tabella hash.
-    Legge da file coppie di stringhe (nome e email) fino a fine file.
-    Per ogni coppia, crea un nuovo utente con `inizia_utente` e lo inserisce nella hash con `inserisci_utente_in_hash`.
+  Implementazione:
+     Costruisce il nome completo del file a partire dal nome base e, se fornito, dal percorso.
+     Apre il file in modalità lettura ("r").
+     Per ogni riga, legge nome ed email dell'utente, crea una nuova struttura utente
+     e la inserisce nella tabella hash tramite la funzione `inserisci_utente_in_hash`.
 
- Parametri:
-    nome_file: stringa contenente il nome del file da cui caricare gli utenti
-    h: puntatore alla tabella hash utenti in cui inserire gli utenti caricati
+  Parametri:
+     nome_file: nome del file contenente gli utenti (con o senza estensione)
+     h: puntatore alla tabella hash degli utenti
+     percorso_file: percorso opzionale della cartella in cui si trova il file
 
- Pre-condizioni:
-    `nome_file` deve essere una stringa valida e puntatore non NULL.
-    `h` deve essere un puntatore valido alla tabella hash.
+  Pre-condizioni:
+     nome_file != NULL
+     h != NULL
 
- Post-condizioni:
-    La tabella hash `h` conterrà i nuovi utenti caricati dal file.
+  Post-condizioni:
+     se il file è valido e contiene righe ben formattate (nome email),
+     gli utenti vengono inseriti nella tabella hash;
+     le righe mal formattate vengono ignorate.
 
- Ritorna:
-    void
+  Ritorna:
+     1 se il file è stato aperto correttamente e almeno un'operazione di lettura è stata tentata;
+     0 se il file non può essere aperto o i parametri sono invalidi.
 
- Side-effect:
-    Può allocare memoria per nuovi utenti e modificarne la tabella hash.
+  Side-effect:
+     apre e legge da un file su disco;
+     può allocare memoria dinamicamente per ogni utente letto e inserirlo nella tabella hash.
  */
-void carica_utente_da_file(const char *nome_file, ptr_hash_utenti h)
+
+int carica_utenti_da_file(const char *nome_file, ptr_hash_utenti h, const char *percorso_file)
 {
-    FILE *file = fopen(nome_file, "r");
-    // Controlla se non esiste o non si apre, termina senza modificare.
-    if(!file){
-        return;
+    if (!nome_file || !h) return 0;
+
+    char nome_file_completo[200];
+    if (percorso_file && strlen(percorso_file) > 0) {
+        snprintf(nome_file_completo, sizeof(nome_file_completo), "%s/%s", percorso_file, nome_file);
+    } else {
+        snprintf(nome_file_completo, sizeof(nome_file_completo), "%s", nome_file);
     }
 
-    char nome[50], 
-        email[100];
-
-    while(fscanf(file, "%50s %100s", nome, email) == 2){
-        // Crea un nuovo utente e lo inserisce nella tabella hash.
-        inserisci_utente_in_hash(h, inizia_utente(nome, email));
+    FILE *file = fopen(nome_file_completo, "r");
+    if (!file) {
+        return 0;
     }
+
+    char nome[51], email[101];
+    while (fscanf(file, "%50s %100s", nome, email) == 2) {
+        ptr_utente nuovo = inizia_utente(nome, email);
+        if (nuovo) {
+            inserisci_utente_in_hash(h, nuovo);
+        }
+    }
+
+    fclose(file);
+    return 1;
 }
+
 
 
 /*

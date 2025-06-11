@@ -37,35 +37,34 @@ void stampa_veicolo(ptr_veicolo ve);
 
 
 /*
- Funzione: carica_veicoli_da_file
- --------------------------------
+  Funzione: carica_veicoli_da_file
+  --------------------------------
 
- Carica i veicoli da un file di testo e li inserisce nella tabella hash dei veicoli.
- Per ogni veicolo letto dal file, viene creata una struttura `veicolo` e caricata la relativa disponibilità prenotazioni.
+  Carica i dati dei veicoli da un file di testo e li inserisce in una tabella hash.
 
- Parametri:
-    nome_file - stringa contenente il percorso/nome del file da cui caricare i veicoli.
-    h         - puntatore alla tabella hash di veicoli (ptr_hash_veicoli) in cui inserire i veicoli caricati.
+  Parametri:
+     nome_file: nome del file contenente i dati dei veicoli
+     h: puntatore alla tabella hash dei veicoli
+     percorso_file: percorso opzionale della cartella in cui si trova il file
 
- Pre-condizioni:
-    - Il puntatore `nome_file` deve essere valido e puntare a un file esistente e accessibile in lettura.
-    - La tabella hash `h` deve essere già inizializzata.
+  Pre-condizioni:
+     nome_file e h devono essere non NULL
 
- Post-condizioni:
-    - Inserisce in `h` tutti i veicoli validi letti dal file.
-    - Se il file non esiste o si verifica un errore di apertura, la funzione restituisce 0.
-    - Se il caricamento ha successo, restituisce 1.
+  Post-condizioni:
+     se il file è valido, i veicoli vengono letti e inseriti nella tabella hash;
+     le righe mal formattate vengono ignorate, e viene stampato un messaggio d'errore.
 
- Ritorna:
-    - 1 se il caricamento è avvenuto con successo.
-    - 0 in caso di errore di apertura file.
+  Ritorna:
+     1 se il file è stato aperto correttamente (indipendentemente dal contenuto);
+     0 se il file non può essere aperto.
 
- Side-effect:
-    - Alloca dinamicamente memoria per ciascun veicolo caricato.
-    - Inserisce i veicoli nella tabella hash.
-    - Stampa messaggi di errore su stderr in caso di problemi.
-*/
-int carica_veicoli_da_file(const char *nome_file, ptr_hash_veicoli h); // CAMBIARE SPECIFICA !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!11
+  Side-effect:
+     apre e legge da un file;
+     può allocare memoria dinamicamente per ogni veicolo e inserirlo nella tabella hash;
+     stampa su stderr eventuali messaggi d’errore se la creazione o l’inserimento fallisce.
+ */
+
+int carica_veicoli_da_file(const char *nome_file, ptr_hash_veicoli h, const char *percorso_file); // CAMBIARE SPECIFICA !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!11
 
 
 
@@ -94,26 +93,28 @@ void libera_veicolo(ptr_veicolo ve);
 
 
 /*
- Funzione: aggiorna_stato_veicolo
- --------------------------------
+  Funzione: aggiorna_stato_veicolo
+  --------------------------------
 
- Aggiorna lo stato di disponibilità del veicolo in base alle prenotazioni del giorno corrente.
+  Aggiorna lo stato attuale di un veicolo in base alla sua disponibilità per il giorno corrente.
 
- Parametri:
-    ve: puntatore alla struttura `veicolo` da aggiornare
+  Parametri:
+     ve: puntatore alla struttura del veicolo da aggiornare
 
- Pre-condizioni:
-    `ve` deve essere un puntatore valido a una struttura `veicolo`.
+  Pre-condizioni:
+     ve != NULL
 
- Post-condizioni:
-    Lo stato del veicolo (`ve->stato`) viene aggiornato coerentemente con la sua disponibilità.
+  Post-condizioni:
+     lo stato del veicolo è aggiornato in base alla disponibilità giornaliera
 
- Ritorna:
-    `true` se il veicolo è *non disponibile* oggi, `false` se disponibile o se `ve` è NULL.
+  Ritorna:
+     true se l’aggiornamento è stato eseguito con successo;
+     false se il puntatore al veicolo è NULL.
 
- Side-effect:
-    Modifica il campo `stato` all'interno della struttura `veicolo`.
+  Side-effect:
+     modifica il campo "stato" del veicolo.
  */
+
 bool aggiorna_stato_veicolo(ptr_veicolo ve);
 
 
@@ -141,33 +142,7 @@ bool aggiorna_stato_veicolo(ptr_veicolo ve);
  */
 bool veicolo_disponibile(ptr_veicolo ve);
 
-/*
- Funzione: aggiorna_prenotazione_veicolo
- ---------------------------------------
 
- Aggiorna lo stato delle prenotazioni di un veicolo, blocca le celle non più prenotabili 
- in base all'orario corrente, salva le prenotazioni aggiornate su file e aggiorna lo stato 
- del veicolo (disponibile o non disponibile).
-
- Parametri:
-    ve: puntatore al veicolo di cui aggiornare le prenotazioni e lo stato.
-
- Pre-condizioni:
-    ve deve essere un puntatore valido a un veicolo con prenotazioni valide.
-
- Post-condizioni:
-    Le prenotazioni del veicolo sono aggiornate, salvate su file e lo stato del veicolo è aggiornato.
-
- Ritorna:
-    Nessun valore di ritorno (void).
-
- Side-effect:
-    Modifica le prenotazioni associate al veicolo.
-    Scrive su file i dati aggiornati delle prenotazioni.
-    Modifica lo stato interno del veicolo.
-*/
-
-void aggiorna_prenotazione_veicolo(ptr_veicolo ve); // DA TOGLIERE
 
 /*
  Funzione: stampa_veicoli_disponibili
@@ -204,57 +179,81 @@ void aggiorna_prenotazione_veicolo(ptr_veicolo ve); // DA TOGLIERE
 int stampa_veicoli_disponibili(ptr_hash_veicoli h);
 
 /*
- Funzione: aggiorna_prenotazioni_veicoli
- ---------------------------------------
+  Funzione: aggiorna_prenotazioni_veicoli
+  ---------------------------------------
 
- Aggiorna lo stato delle prenotazioni per tutti i veicoli presenti nella tabella hash.
+  Aggiorna le prenotazioni di tutti i veicoli presenti nella tabella hash.
 
- Parametri:
-    h - puntatore alla tabella hash dei veicoli (ptr_hash_veicoli).
+  Parametri:
+     h: puntatore alla tabella hash contenente i veicoli
 
- Pre-condizioni:
-    - La tabella hash `h` deve essere valida e inizializzata.
-    - Le funzioni `blocca_celle_passate` e `aggiorna_stato_veicolo` devono essere definite e funzionanti.
+  Pre-condizioni:
+     h != NULL
 
- Post-condizioni:
-    - Le prenotazioni passate vengono bloccate.
-    - Lo stato di ogni veicolo viene aggiornato in base alle nuove prenotazioni.
+  Post-condizioni:
+     le prenotazioni e lo stato di ogni veicolo sono aggiornati in base alla data e all'ora correnti
 
- Ritorna:
-    - 1 se l'operazione è andata a buon fine.
-    - 0 in caso di errore (es. tabella hash vuota o non valida).
+  Ritorna:
+     1 se l’operazione è stata eseguita correttamente;
+     0 in caso di errore (hash NULL o vuota)
 
- Side-effect:
-    - Modifica le strutture di prenotazione e lo stato dei veicoli nella tabella hash.
-    - Libera la memoria temporaneamente allocata da `ottieni_valori_hash`.
+  Side-effect:
+     modifica le strutture interne di prenotazioni e stato di ogni veicolo;
+     libera la memoria dell’array temporaneo ottenuto da `ottieni_valori_hash`.
 */
 int aggiorna_prenotazioni_veicoli(ptr_hash_veicoli h);
 
 /*
- Funzione: aggiorna_file_prenotazione_veicoli
- --------------------------------------------
+  Funzione: aggiorna_file_prenotazione_veicoli
+  --------------------------------------------
 
- Salva su file le prenotazioni aggiornate di tutti i veicoli presenti nella tabella hash.
+  Salva su file le prenotazioni aggiornate di tutti i veicoli nella tabella hash.
 
- Parametri:
-    h - puntatore alla tabella hash dei veicoli (ptr_hash_veicoli).
+  Parametri:
+     h: puntatore alla tabella hash contenente i veicoli
+     percorso_file: percorso della cartella in cui salvare i file delle prenotazioni
 
- Pre-condizioni:
-    - La tabella hash `h` deve essere valida e inizializzata.
-    - La funzione `salva_prenotazioni_su_file` deve essere definita e funzionante.
+  Pre-condizioni:
+     h != NULL
 
- Post-condizioni:
-    - I file di prenotazione associati a ciascun veicolo sono aggiornati.
+  Post-condizioni:
+     i file delle prenotazioni dei veicoli sono aggiornati sul disco
 
- Ritorna:
-    - 1 se l'operazione è andata a buon fine.
-    - 0 in caso di errore (es. tabella hash vuota o non valida).
+  Ritorna:
+     1 se l’operazione ha avuto successo;
+     0 in caso di errore (hash NULL o vuota)
 
- Side-effect:
-    - Sovrascrive i file di prenotazione per ciascun veicolo.
-    - Libera la memoria temporaneamente allocata da `ottieni_valori_hash`.
+  Side-effect:
+     scrive su file le prenotazioni di ogni veicolo;
+     libera la memoria dell’array temporaneo ottenuto da `ottieni_valori_hash`.
 */
-int aggiorna_file_prenotazione_veicoli(ptr_hash_veicoli h);
+int aggiorna_file_prenotazione_veicoli(ptr_hash_veicoli h, const char *percorso_file);
 
+/*
+  Funzione: carica_prenotazioni_veicoli_da_file
+  ---------------------------------------------
+
+  Carica da file le prenotazioni associate a ciascun veicolo nella tabella hash.
+
+  Parametri:
+     h: puntatore alla tabella hash contenente i veicoli
+     percorso_file: percorso della cartella in cui si trovano i file delle prenotazioni
+
+  Pre-condizioni:
+     h != NULL
+
+  Post-condizioni:
+     le strutture prenotazioni dei veicoli sono caricate con i dati contenuti nei file
+
+  Ritorna:
+     1 se l’operazione ha avuto successo almeno parzialmente;
+     0 in caso di errore (hash NULL o vuota)
+
+  Side-effect:
+     legge da file le prenotazioni di ogni veicolo;
+     stampa messaggi di avviso in caso di errori di caricamento;
+     libera la memoria dell’array temporaneo ottenuto da `ottieni_valori_hash`.
+*/
+int carica_prenotazioni_veicoli_da_file(ptr_hash_veicoli h, const char *percorso_file);
 
 #endif

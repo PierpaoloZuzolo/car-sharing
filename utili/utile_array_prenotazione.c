@@ -13,69 +13,62 @@ Data: 13/05/2025
 #include "utile_array_prenotazione.h"
 
 
+
 /*
- Funzione: carica_prenotazioni_da_file
- -------------------------------------
+  Funzione: carica_prenotazioni_da_file
+  -------------------------------------
 
- Carica le prenotazioni associate a una targa da un file, aggiornando la struttura
- di prenotazione fornita in input. Se il giorno è cambiato o il file non esiste,
- azzera la prenotazione e salva uno stato iniziale aggiornato.
+  Carica le prenotazioni associate a una determinata targa da un file di testo.
 
- Implementazione:
-    - Verifica se è un nuovo giorno tramite vedi_se_giorno_nuovo:
-        - In tal caso azzera le celle, blocca le celle passate e salva su file.
-    - Se il file non esiste:
-        - Inizializza le celle a 0, blocca le celle passate e crea il file con lo stato aggiornato.
-    - Se il file esiste:
-        - Legge i valori da file e li imposta nella prenotazione.
-        - Se la lettura è incompleta, le celle rimanenti vengono azzerate.
-        - Blocca comunque le celle passate e salva lo stato aggiornato su file.
+  Implementazione:
+     Costruisce il nome del file a partire dal nome della targa e, se fornito, dal percorso.
+     Se il file non esiste, inizializza la struttura di prenotazioni a 0 e crea un nuovo file.
+     Se il file esiste, legge i valori interi e li assegna alle celle della struttura prenotazioni.
 
- Parametri:
-    p: puntatore a una struttura di prenotazione valida.
-    targa: stringa che rappresenta la targa del veicolo, usata per accedere al file.
+  Parametri:
+     p: puntatore alla struttura delle prenotazioni da inizializzare
+     targa: stringa che identifica la targa dell'auto
+     percorso_file: stringa opzionale contenente il percorso del file
 
- Pre-condizioni:
-    - p deve essere un puntatore valido a una struttura di prenotazione inizializzata.
-    - targa deve essere una stringa valida e non NULL.
+  Pre-condizioni:
+     p != NULL
+     targa != NULL e non vuota
 
- Post-condizioni:
-    - La struttura di prenotazione `p` sarà aggiornata in base al contenuto del file o inizializzata.
-    - Il file associato alla targa sarà aggiornato con lo stato corrente delle prenotazioni.
+  Post-condizioni:
+     se il file non esiste, la struttura prenotazioni è azzerata e viene creato un nuovo file vuoto;
+     se il file esiste e la lettura va a buon fine, le prenotazioni vengono caricate correttamente;
+     in caso di errori di lettura, le celle rimanenti vengono azzerate.
 
- Ritorna:
-    - 1 se il file è stato letto correttamente e i dati sono stati caricati.
-    - 0 se era un nuovo giorno o se il file non esisteva (stato inizializzato).
+  Ritorna:
+     1 in caso di successo (anche se il file non esiste e viene creato);
+     non gestisce casi di errore con valori di ritorno diversi da 1.
 
- Side-effect:
-    - Lettura/scrittura da/per file.
-    - Output aggiornato salvato su file.
-*/
+  Side-effect:
+     può creare un nuovo file se quello specificato non esiste;
+     può modificare il contenuto della struttura `p`;
+     può leggere da file e allocare risorse temporanee per il nome del file.
+ */
 
-int carica_prenotazioni_da_file(ptr_prenotazione p, const char *targa) 
+int carica_prenotazioni_da_file(ptr_prenotazione p, const char *targa, const char *percorso_file)
 {
     int dimensione_array = prendi_grandezza_array_prenotazioni();
-    char nome_file[40];
-    snprintf(nome_file, sizeof(nome_file), "txt/Prenotazioni_veicoli/%s.txt", targa);
+    char nome_file[256];
 
-    // Se è un nuovo giorno, azzera la struttura, blocca le celle passate e salva su file
-    if(vedi_se_giorno_nuovo()){
-        azzera_celle(p);  
-        blocca_celle_passate(p);
-        salva_prenotazioni_su_file(p, targa);
-
-        return 0;
+    if (percorso_file && percorso_file[0] != '\0') {
+        snprintf(nome_file, sizeof(nome_file), "%s/%s.txt", percorso_file, targa);
+    } else {
+        snprintf(nome_file, sizeof(nome_file), "%s.txt", targa);
     }
+
 
     FILE *f = fopen(nome_file, "r");
 
     // Se il file non esiste, inizializza la struttura e salva
     if (!f) {
         azzera_celle(p); 
-        blocca_celle_passate(p);
-        salva_prenotazioni_su_file(p, targa);
+        salva_prenotazione_su_file(p, targa, percorso_file);   // DA RIVEDERE SE FUNZIONA !!!!!!!!!!!!!!!!!!!!!1
 
-        return 0;
+        return 1;
     }
 
     for (int i = 0; i < dimensione_array; i++) {
@@ -91,51 +84,51 @@ int carica_prenotazioni_da_file(ptr_prenotazione p, const char *targa)
     }
     fclose(f);
 
-    // Blocca le celle del tempo passato e salva lo stato aggiornato
-    blocca_celle_passate(p);
-    salva_prenotazioni_su_file(p, targa);
-
     return 1;
 }
 
 
 /*
- Funzione: salva_prenotazioni_su_file
- -----------------------------------
+  Funzione: salva_prenotazione_su_file
+  ------------------------------------
 
- Salva su file lo stato corrente delle prenotazioni giornaliere relative a un veicolo
- identificato tramite la sua targa.
+  Salva su file le prenotazioni contenute nella struttura specificata.
 
- Implementazione:
-    Controlla che il puntatore alla struttura prenotazione e la targa siano validi.
-    Costruisce il nome del file aggiungendo ".txt" alla targa.
-    Apre il file in modalità scrittura (sovrascrive il contenuto precedente).
-    Scrive riga per riga i valori delle celle delle prenotazioni (interi).
-    Chiude il file.
+  Implementazione:
+     Costruisce il nome del file a partire dalla targa e, se fornito, dal percorso.
+     Apre il file in modalità scrittura ("w").
+     Scrive su file i valori interi contenuti nella struttura di prenotazioni, uno per riga.
 
- Parametri:
-    p     : puntatore alla struttura contenente le prenotazioni
-    targa : stringa identificativa del veicolo
+  Parametri:
+     p: puntatore alla struttura delle prenotazioni da salvare
+     targa: stringa che identifica la targa dell'auto
+     percorso_file: stringa opzionale contenente il percorso della directory
 
- Pre-condizioni:
-    p deve essere un puntatore valido
-    targa deve essere una stringa valida e non vuota
-    La funzione ottiene_cella deve restituire il valore corretto della cella di prenotazione
+  Pre-condizioni:
+     p != NULL
+     targa != NULL e non vuota (strlen(targa) > 0)
 
- Post-condizioni:
-    Il file associato alla targa è aggiornato con lo stato corrente delle prenotazioni.
+  Post-condizioni:
+     se il file può essere aperto correttamente, i dati della struttura `p` sono scritti su file;
+     se il file non può essere aperto, nessuna operazione viene effettuata.
 
- Ritorna:
-    void
+  Ritorna:
+     Nessun valore di ritorno (funzione `void`)
 
- Side-effect:
-    Effettua scrittura su file
-*/
-void salva_prenotazioni_su_file(ptr_prenotazione p, const char *targa) 
+  Side-effect:
+     crea o sovrascrive un file nella directory specificata;
+     scrive su disco i dati della struttura `p`.
+ */
+
+void salva_prenotazione_su_file(ptr_prenotazione p, const char *targa, const char *percorso_file) 
 {
     if (!p || !targa || strlen(targa) == 0) return;
-    char nome_file[50];
-    snprintf(nome_file, sizeof(nome_file), "txt/Prenotazioni_veicoli/%s.txt", targa);
+    char nome_file[256];
+    if (percorso_file && percorso_file[0] != '\0') {
+        snprintf(nome_file, sizeof(nome_file), "%s/%s.txt", percorso_file, targa);
+    } else {
+        snprintf(nome_file, sizeof(nome_file), "%s.txt", targa);
+    }
 
     FILE *f = fopen(nome_file, "w");
     if (!f) return;
@@ -189,7 +182,7 @@ int leggi_cella_da_orario(const char *messaggio)
 
         // Pulizia del buffer in caso di input errato
         if (result != 2) {
-            printf("Input non valido. Inserisci due numeri interi.\n");
+            printf("Input non valido. Inserisci due numeri interi.\n");   // DA SPOSTARE IN UTILI !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
             while (getchar() != '\n'); // scarta input residuo
             continue;
         }

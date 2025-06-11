@@ -8,63 +8,66 @@ Data: 13/05/2025
 
 #include "ADT_array/array_prenotazione.h"
 
-/*
- Funzione: carica_prenotazioni_da_file
- -------------------------------------
-
- Carica le prenotazioni associate a una targa da un file, aggiornando la struttura
- di prenotazione fornita in input. Se il giorno è cambiato o il file non esiste,
- azzera la prenotazione e salva uno stato iniziale aggiornato.
-
- Parametri:
-    p: puntatore a una struttura di prenotazione valida.
-    targa: stringa che rappresenta la targa del veicolo, usata per accedere al file.
-
- Pre-condizioni:
-    - p deve essere un puntatore valido a una struttura di prenotazione inizializzata.
-    - targa deve essere una stringa valida e non NULL.
-
- Post-condizioni:
-    - La struttura di prenotazione `p` sarà aggiornata in base al contenuto del file o inizializzata.
-    - Il file associato alla targa sarà aggiornato con lo stato corrente delle prenotazioni.
-
- Ritorna:
-    - 1 se il file è stato letto correttamente e i dati sono stati caricati.
-    - 0 se era un nuovo giorno o se il file non esisteva (stato inizializzato).
-
- Side-effect:
-    - Lettura/scrittura da/per file.
-    - Output aggiornato salvato su file.
-*/
-int carica_prenotazioni_da_file(ptr_prenotazione p, const char *targa);
-
 
 /*
- Funzione: salva_prenotazioni_su_file
- -----------------------------------
+  Funzione: carica_prenotazioni_da_file
+  -------------------------------------
 
- Salva su file lo stato corrente delle prenotazioni giornaliere relative a un veicolo
- identificato tramite la sua targa.
+  Carica le prenotazioni associate a una determinata targa da un file di testo.
+  
+  Parametri:
+     p: puntatore alla struttura delle prenotazioni da inizializzare
+     targa: stringa che identifica la targa dell'auto
+     percorso_file: stringa opzionale contenente il percorso del file
 
- Parametri:
-    p     : puntatore alla struttura contenente le prenotazioni
-    targa : stringa identificativa del veicolo
+  Pre-condizioni:
+     p != NULL
+     targa != NULL e non vuota
 
- Pre-condizioni:
-    p deve essere un puntatore valido
-    targa deve essere una stringa valida e non vuota
-    La funzione ottiene_cella deve restituire il valore corretto della cella di prenotazione
+  Post-condizioni:
+     se il file non esiste, la struttura prenotazioni è azzerata e viene creato un nuovo file vuoto;
+     se il file esiste e la lettura va a buon fine, le prenotazioni vengono caricate correttamente;
+     in caso di errori di lettura, le celle rimanenti vengono azzerate.
 
- Post-condizioni:
-    Il file associato alla targa è aggiornato con lo stato corrente delle prenotazioni.
+  Ritorna:
+     1 in caso di successo (anche se il file non esiste e viene creato);
+     non gestisce casi di errore con valori di ritorno diversi da 1.
 
- Ritorna:
-    void
+  Side-effect:
+     può creare un nuovo file se quello specificato non esiste;
+     può modificare il contenuto della struttura `p`;
+     può leggere da file e allocare risorse temporanee per il nome del file.
+ */
+int carica_prenotazioni_da_file(ptr_prenotazione p, const char *targa, const char *percorso_file);
 
- Side-effect:
-    Effettua scrittura su file
-*/
-void salva_prenotazioni_su_file(ptr_prenotazione p, const char *targa);
+
+/*
+  Funzione: salva_prenotazione_su_file
+  ------------------------------------
+
+  Salva su file le prenotazioni contenute nella struttura specificata.
+
+  Parametri:
+     p: puntatore alla struttura delle prenotazioni da salvare
+     targa: stringa che identifica la targa dell'auto
+     percorso_file: stringa opzionale contenente il percorso della directory
+
+  Pre-condizioni:
+     p != NULL
+     targa != NULL e non vuota (strlen(targa) > 0)
+
+  Post-condizioni:
+     se il file può essere aperto correttamente, i dati della struttura `p` sono scritti su file;
+     se il file non può essere aperto, nessuna operazione viene effettuata.
+
+  Ritorna:
+     Nessun valore di ritorno (funzione `void`)
+
+  Side-effect:
+     crea o sovrascrive un file nella directory specificata;
+     scrive su disco i dati della struttura `p`.
+ */
+void salva_prenotazione_su_file(ptr_prenotazione p, const char *targa, const char *percorso_file);
 
 
 

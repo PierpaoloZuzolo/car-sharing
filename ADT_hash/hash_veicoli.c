@@ -143,9 +143,9 @@ void distruggi_hash_veicoli(ptr_hash_veicoli h)
 bool inserisci_veicolo_in_hash(ptr_hash_veicoli h, ptr_veicolo ve)
 {
   if(h && ve){
-    char *nome = prendi_targa(ve);
-    if (nome){
-       return inserisci_in_hash(h, nome, (ptr_veicolo)ve);
+    char *targa = prendi_targa(ve);
+    if (targa){
+       return inserisci_in_hash(h, targa, (ptr_veicolo)ve);
     }
    
   }
