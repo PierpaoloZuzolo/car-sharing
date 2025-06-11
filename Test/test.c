@@ -39,7 +39,7 @@ int prendi_utenti_da_file(FILE *fp, ptr_hash_utenti utente);
 int test_funzione1(void);
 int test_funzione2(ptr_hash_veicoli);
 int test_funzione3(ptr_hash_utenti,ptr_hash_veicoli);
-int confronta_file(FILE*, FILE*);
+int confronta_file(const char *file1, const char *file2);
 
 
 int main(int argc, char **argv) {
@@ -55,7 +55,7 @@ int main(int argc, char **argv) {
     FILE *ts = fopen ("test_suite.txt", "r");
     FILE *file_utenti = fopen ("utenti.txt", "r");
     FILE *file_veicoli = fopen ("veicoli.txt", "r");
-    FILE *file_result = fopen("result.txt", "w");
+    FILE *file_result = fopen("risultato.txt", "w");
 
     if(!(ts && file_utenti && file_veicoli && file_result)){
         printf("Errore apertura file utenti!\n");
@@ -385,9 +385,28 @@ int test_funzione3(const char *input_file, const char *oracle_file, const char *
     return errori;
 }
 
-int confronta_file(FILE *a, FILE *b) {
-    int ca, cb;
-    for(ca = getc(a), cb = getc(b); (ca != EOF && cb != EOF) && (ca == cb); ca = getc(a), cb = getc(b));
-    return ca != cb;
+int confronta_file(const char *file1, const char *file2) {
+    FILE* f1 = fopen(file1, "r");
+    FILE* f2 = fopen(file2, "r");
+    if (!f1 || !f2){
+
+    int risultato = 1;
+    int c1, c2;
+    do{
+        c1 = fgetc(f1);
+        c2 = fgetc(f2);
+        if (c1 != c2) {
+            risultato = 0;
+            break;
+        }
+    } while (c1 != EOF && c2 != EOF);
+
+    if (c1 != c2) risultato = 0;
+
+    fclose(f1);
+    fclose(f2);
+
+
+    return risultato;
 }
     
