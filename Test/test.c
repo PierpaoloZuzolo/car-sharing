@@ -313,7 +313,42 @@ int test_funzione2(ptr_hash_veicoli veicolo) {
 
 
 
-int test_funzione3(const char *input_file, const char *oracle_file, const char *output_file) {
+int test_funzione3(ptr_hash_veicoli hash_veicoli, ptr_hash_utenti hash_utenti) 
+{
+    int test1, test2;
+    FILE *fout = fopen("TC£/output.txt", "w");
+    if(!fout){
+        printf("\nErrore apertura file output TC3");
+        return 1;
+    }
+    
+    int stdout_backup = dup(fileno(stdout)); //Salva fd stdout originale
+
+    //reindirizza stduot su file
+    dup2(fileno(fout), fileno(stdout));
+    fclose(fout);
+
+    //chiama la funzione da testare
+    stampa_veicoli_disponibili(hash_veicoli);
+
+    //ripristino di stdout
+    fflush(stdout);
+    dup2(stdout_backup, fileno(stdout));
+    close(stdout_backup);
+
+    //confronto output con oracolo
+    if(confronta_file("TC3/output.txt", "TC3/oracle.txt")) {
+        test1 = 1;
+    } else {
+        test1 = 0;
+    }
+
+
+
+
+
+
+    /*
     FILE *input = fopen(input_file, "r");
     FILE *oracle = fopen(oracle_file, "r");
     FILE *output = fopen(output_file, "w");
@@ -383,12 +418,18 @@ int test_funzione3(const char *input_file, const char *oracle_file, const char *
     fclose(oracle);
     fclose(output);
     return errori;
+
+*/
 }
 
 int confronta_file(const char *file1, const char *file2) {
     FILE* f1 = fopen(file1, "r");
     FILE* f2 = fopen(file2, "r");
     if (!f1 || !f2){
+        if (f1) fclose(f1);
+        if (f2) fclose(f2);
+        return 0;
+    }
 
     int risultato = 1;
     int c1, c2;
