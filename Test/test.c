@@ -135,7 +135,7 @@ int main(int argc, char **argv) {
         char file_output[CONTENITORE] = {0};
         snprintf(file_output, CONTENITORE, "%s/output.txt", tc_generale);
 
-
+        //Apertura file
         FILE *oracle_file = fopen(file_oracle, "r");
         FILE *output_file = fopen(file_output, "r");
 
@@ -143,8 +143,11 @@ int main(int argc, char **argv) {
             printf("Errore apertura file oracle o output\n");
             return -1;
         }
+
         int risultato = confronta_file(oracle_file, output_file);
-        fprintf(file_result, "%s: %sTest superato\n", tc_generale, risultato ? "NON " : "");
+        //Scrittura PASS/FAIL in 'result.txt' es. TC1:PASS
+        fprintf(file_result, "%s: %s\n", tc_generale, risultato ? "PASS" : "FAIL");
+
         fclose(oracle_file);
         fclose(output_file);
     }
@@ -245,6 +248,7 @@ int test_funzione1(void) {
 
 
 int test_funzione2(ptr_hash_veicoli veicolo) {
+    //Apre gli opportuni file nella cartella TC2
     FILE *in = fopen("TC2/input.txt", "r");
     FILE *oracle = fopen("TC2/oracle.txt", "r");
     FILE *out = fopen("TC2/output.txt", "w");
@@ -254,10 +258,12 @@ int test_funzione2(ptr_hash_veicoli veicolo) {
     }
 
     char riga[LUNGHEZZA_RIGA];
+    //Itera fino alla fine del file 'input.txt'e legge una riga alla volta
     while (fgets(riga, sizeof(riga), in)) {
         riga[strcspn(riga, "\n")] = 0;
 
-       
+       /*Legge dal file 'input.txt' la frase scritta nel formato targa cella_inizio cella_fine,
+        ad ogni spazio si ferma e salva nella corrispettiva variabile*/
         char *targa = strtok (riga, " ");
         char *cella_inizio = strtok (NULL, " ");
         char *cella_fine = strtok (NULL, " ");
@@ -267,46 +273,49 @@ int test_funzione2(ptr_hash_veicoli veicolo) {
             fclose(in);
             fclose(oracle);
             fclose(out);
+            return -1;
         }
 
-        //Creo una prenotazione
+        //Crea una prenotazione
         ptr_prenotazione pren = prendi_prenotazioni(ve);
-        prenota_intervallo(pren, cella_inizio, cella_fine);
 
+        //Prenota le celle di un veicolo e vede e se è disponibile o no nella giornata di oggi
+        int risultato_prenotazione = prenota_intervallo(pren, cella_inizio, cella_fine);
+        bool disponibile = veicolo_disponibile_oggi(pren);
 
-    
+        /*Scrive nel file 'output.txt' TRUE/FALSE se la prenotazione va a buon fine 
+        e dopo scrive TRUE/FALSE se il veicolo ha almeno una cella disponbile*/
+        fprintf(out, "%s %s\n", risultato_prenotazione ? "TRUE" : "FALSE", disponibile ? "TRUE" : "FALSE");
 
+    }
 
+    fclose(in);
+    fclose(out);
 
-    }   
-    
-
-    
-    // Creiamo la struttura prenotazioni per il test
-    ptr_prenotazione p = inizializza_prenotazioni();
-    if (!p) {
-        fprintf(stderr, "Errore allocazione struttura prenotazioni\n");
+    // Ora confronto output.txt con oracle.txt
+    out = fopen("TC2/output.txt", "r");
+    if (!out) {
+        fclose(oracle);
         return -1;
     }
 
-    int inizio, fine, atteso;
-    int test_num = 1, errori = 0;
+    char linea_oracle[10], linea_output[10];
+    while (fgets(linea_oracle, sizeof(linea_oracle), oracle) &&
+           fgets(linea_output, sizeof(linea_output), out)) {
+        // Rimuovi newline per confronto robusto
+        linea_oracle[strcspn(linea_oracle, "\n")] = 0;
+        linea_output[strcspn(linea_output, "\n")] = 0;
 
-    while (fscanf(in, "%d %d", &inizio, &fine) == 2) {
-        if (fscanf(oracle, "%d", &atteso) != 1) {
-            printf("Errore: file oracle più corto rispetto all'input.\n");
-            break;
+        if (strcmp(linea_oracle, linea_output) != 0) {
+            fclose(oracle);
+            fclose(out);
+            return 0; // Test fallito
         }
-    
-        int ottenuto = prenota_intervallo(p, inizio, fine);
-        fprintf(out, "Test %d: atteso %d, ottenuto %d\n", test_num, atteso, ottenuto);
-
-        if (ottenuto != atteso) {
-            printf("[Funzione2] Test %d FALLITO: atteso %d, ottenuto %d\n", test_num, atteso, ottenuto);
-            errori++;
-        }
-    test_num++;
     }
+
+    fclose(oracle);
+    fclose(out);
+    return 1; // Test superato
 }
 
 
