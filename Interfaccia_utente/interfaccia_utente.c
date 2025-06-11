@@ -410,8 +410,39 @@ void gestione_storico_prenotazioni(char *nome_utente, ptr_hash_veicoli hash_veic
         char targa_veicolo_eliminato[8];
         int ora_inizio, minuto_inizio, ora_fine, minuto_fine;
         int cella_inizio, cella_fine;
+        int count, scelta;
 
-        if (elimina_nodo_storico_noleggio(lista_noleggi, targa_veicolo_eliminato, &ora_inizio, &minuto_inizio, &ora_fine, &minuto_fine)) {
+        if (prendi_coda(lista_noleggi) == NULL) {
+        // coda == NULL -> eliminiamo da testa in poi
+        count = stampa_lista_noleggi(lista_noleggi);
+    } else {
+        // coda != NULL -> eliminiamo solo nodi dopo la coda
+        count = stampa_dopo_coda(lista_noleggi);
+        
+    }
+
+        if (count <= 0){
+            printf("\nNon ci sono prenotazioni eliminabili.\n");
+            distruggi_lista_storico_noleggio(lista_noleggi);
+            return;
+        }
+
+        printf("Inserisci il numero della prenotazione da eliminare (0 per annullare): ");
+        while(1){
+            scelta = inserisci_scelta();
+            if(scelta < 0 || scelta > count){
+                printf("\nInserire un numero valido (tra 1 e %d)", count);
+                continue;
+            }else if (scelta == 0){
+                     printf("\nOperazione annulata\nRitorno al menu,");
+                    distruggi_lista_storico_noleggio(lista_noleggi);
+                    return;
+            } else break;
+           
+        }
+
+
+        if (elimina_nodo_storico_noleggio(lista_noleggi, targa_veicolo_eliminato, &ora_inizio, &minuto_inizio, &ora_fine, &minuto_fine, scelta)) {
             ptr_veicolo ve = cerca_veicolo_in_hash(hash_veicoli, targa_veicolo_eliminato);
             if (ve != NULL) {
                 converti_orario_in_celle(ora_inizio, minuto_inizio, ora_fine, minuto_fine, &cella_inizio, &cella_fine);

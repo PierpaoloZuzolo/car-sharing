@@ -87,9 +87,9 @@ int salva_utente_su_file(char *nome_file, ptr_utente ut, const char *percorso_fi
 
     char nome_file_completo[200];
     if (percorso_file && strlen(percorso_file) > 0) {
-        snprintf(nome_file_completo, sizeof(nome_file_completo), "%s/%s.txt", percorso_file, nome_file);
+        snprintf(nome_file_completo, sizeof(nome_file_completo), "%s/%s", percorso_file, nome_file);
     } else {
-        snprintf(nome_file_completo, sizeof(nome_file_completo), "%s.txt", nome_file);
+        snprintf(nome_file_completo, sizeof(nome_file_completo), "%s", nome_file);
     }
 
     // Salvataggio su file generale (append)
