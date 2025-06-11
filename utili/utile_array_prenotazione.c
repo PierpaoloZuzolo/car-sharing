@@ -55,7 +55,7 @@ Data: 13/05/2025
 int carica_prenotazioni_da_file(ptr_prenotazione p, const char *targa) 
 {
     int dimensione_array = prendi_grandezza_array_prenotazioni();
-    char nome_file[32];
+    char nome_file[40];
     snprintf(nome_file, sizeof(nome_file), "txt/Prenotazioni_veicoli/%s.txt", targa);
 
     // Se è un nuovo giorno, azzera la struttura, blocca le celle passate e salva su file

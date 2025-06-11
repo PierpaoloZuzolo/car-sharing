@@ -61,7 +61,7 @@ void stampa_veicolo(ptr_veicolo ve);
     Alloca memoria dinamica per ogni veicolo letto.
     In caso di errore nell'apertura del file, termina il programma con `exit(1)`.
  */
-void carica_veicoli_da_file(const char *nome_file, ptr_hash_veicoli h);
+int carica_veicoli_da_file(const char *nome_file, ptr_hash_veicoli h); // CAMBIARE SPECIFICA !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!11
 
 
 
@@ -163,7 +163,13 @@ bool veicolo_disponibile(ptr_veicolo ve);
     Modifica lo stato interno del veicolo.
 */
 
-void aggiorna_prenotazione_veicolo(ptr_veicolo ve);
+void aggiorna_prenotazione_veicolo(ptr_veicolo ve); // DA TOGLIERE
+
+int stampa_veicoli_disponibili(ptr_hash_veicoli h);
+
+int aggiorna_prenotazioni_veicoli(ptr_hash_veicoli h);
+
+int aggiorna_file_prenotazione_veicoli(ptr_hash_veicoli h);
 
 
 #endif

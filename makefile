@@ -1,9 +1,11 @@
-car-sharing: main.o array.o array_prenotazione.o hash_utenti.o hash_veicoli.o tab_hash.o lista_storico_noleggio.o lista.o storico_noleggio.o utente.o veicolo.o utile_array_prenotazione.o utile_lista_storico_noleggio.o utile_utente.o utile_veicolo.o utile.o
-	gcc main.o array.o array_prenotazione.o hash_utenti.o hash_veicoli.o tab_hash.o lista_storico_noleggio.o lista.o storico_noleggio.o utente.o veicolo.o utile_array_prenotazione.o utile_lista_storico_noleggio.o utile_utente.o utile_veicolo.o utile.o -o main.exe
+car-sharing: main.o array.o array_prenotazione.o hash_utenti.o hash_veicoli.o tab_hash.o lista_storico_noleggio.o lista.o storico_noleggio.o utente.o veicolo.o utile_array_prenotazione.o utile_lista_storico_noleggio.o utile_utente.o utile_veicolo.o utile.o interfaccia_utente.o
+	gcc main.o array.o array_prenotazione.o hash_utenti.o hash_veicoli.o tab_hash.o lista_storico_noleggio.o lista.o storico_noleggio.o utente.o veicolo.o utile_array_prenotazione.o utile_lista_storico_noleggio.o utile_utente.o utile_veicolo.o utile.o interfaccia_utente.o -o main.exe
 
 main.o: main.c
-	gcc -Wall -Wextra -std=c99 -I. -c main.c -o main.o
+	gcc -Wall -Wextra -std=c99 -I. -IInterfaccia_utente -c main.c -o main.o
 
+interfaccia_utente.o: Interfaccia_utente/interfaccia_utente.c Interfaccia_utente/interfaccia_utente.h
+	gcc -Wall -Wextra -std=c99 -I. -IInterfaccia_utente -c Interfaccia_utente/interfaccia_utente.c -o interfaccia_utente.o
 
 array_prenotazione.o: ADT_array/array_prenotazione.c ADT_array/array_prenotazione.h
 	gcc -Wall -Wextra -std=c99 -I. -c ADT_array/array_prenotazione.c -o array_prenotazione.o
@@ -57,4 +59,5 @@ else
     RM = rm -f
     EXE_EXT =
 endif
+
 

@@ -18,32 +18,7 @@ Data: 13/05/2025
 typedef struct veicolo *ptr_veicolo;
 
 
-/*
- Funzione: inizia_veicolo
- ------------------------
 
- Crea e inizializza una nuova struttura veicolo con i dati forniti,
- carica le prenotazioni associate e imposta lo stato di disponibilità.
-
- Parametri:
-    marca_veicolo: stringa contenente la marca del veicolo
-    modello_veicolo: stringa contenente il modello del veicolo
-    targa_veicolo: stringa contenente la targa del veicolo
-    posizione_veicolo: stringa contenente la posizione del veicolo
-
- Pre-condizioni:
-    Tutti i parametri devono essere stringhe valide e non NULL.
-
- Post-condizioni:
-    Restituisce un puntatore a una nuova struttura veicolo inizializzata,
-    oppure NULL se l'allocazione fallisce.
-
- Ritorna:
-    Puntatore a una struttura `veicolo` allocata dinamicamente, o NULL in caso di errore
-
- Side-effect:
-    Alloca memoria dinamica e può caricare dati da file per le prenotazioni.
- */
 ptr_veicolo inizia_veicolo(const char *marca_veicolo, const char *modello_veicolo, const char *targa_veicolo, const char *posizione_veicolo);
 
 

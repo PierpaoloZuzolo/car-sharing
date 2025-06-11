@@ -327,3 +327,9 @@ int inserisci_scelta()
         }
     }
 }
+
+
+void errore_allocazione()
+{
+   printf("\nErrore risorse sistema.");
+}

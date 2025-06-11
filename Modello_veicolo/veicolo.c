@@ -24,38 +24,6 @@ struct veicolo{
 };
 
 
-/*
- Funzione: inizia_veicolo
- ------------------------
-
- Crea e inizializza una nuova struttura veicolo con i dati forniti,
- carica le prenotazioni associate e imposta lo stato di disponibilità.
-
- Implementazione:
-    Alloca memoria per un nuovo veicolo, copia i dati delle stringhe passate
-    nei rispettivi campi della struttura.
-    Inizializza la struttura delle prenotazioni e le carica da file in base alla targa.
-    Verifica la disponibilità del veicolo per oggi e aggiorna lo stato di conseguenza.
-
- Parametri:
-    marca_veicolo: stringa contenente la marca del veicolo
-    modello_veicolo: stringa contenente il modello del veicolo
-    targa_veicolo: stringa contenente la targa del veicolo
-    posizione_veicolo: stringa contenente la posizione del veicolo
-
- Pre-condizioni:
-    Tutti i parametri devono essere stringhe valide e non NULL.
-
- Post-condizioni:
-    Restituisce un puntatore a una nuova struttura veicolo inizializzata,
-    oppure NULL se l'allocazione fallisce.
-
- Ritorna:
-    Puntatore a una struttura `veicolo` allocata dinamicamente, o NULL in caso di errore
-
- Side-effect:
-    Alloca memoria dinamica e può caricare dati da file per le prenotazioni.
- */
 ptr_veicolo inizia_veicolo(const char *marca_veicolo, const char *modello_veicolo, const char *targa_veicolo, const char *posizione_veicolo)
 {
     ptr_veicolo nuovo_veicolo = malloc(sizeof(struct veicolo));
@@ -74,14 +42,16 @@ ptr_veicolo inizia_veicolo(const char *marca_veicolo, const char *modello_veicol
 
        
        nuovo_veicolo->prenotazione_veicolo = inizializza_prenotazioni();
-        carica_prenotazioni_da_file(nuovo_veicolo->prenotazione_veicolo, nuovo_veicolo->targa);
+        //carica_prenotazioni_da_file(nuovo_veicolo->prenotazione_veicolo, nuovo_veicolo->targa);
 
-       
+       /*
         if(veicolo_disponibile_oggi(nuovo_veicolo->prenotazione_veicolo))
 
             strcpy(nuovo_veicolo->stato, "disponibile");
         else
             strcpy(nuovo_veicolo->stato, "non disponibile");
+         */
+        strcpy(nuovo_veicolo->stato, "sconosciuto");
     } 
     return nuovo_veicolo;
 }
