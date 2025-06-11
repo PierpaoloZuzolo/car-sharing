@@ -263,7 +263,7 @@ float calcola_costo_noleggio(int inizio_cella, int fine_cella, int sconto)
 {
     float costo = 0.0;
     if(inizio_cella < 0 || fine_cella > 48){
-      return 0.0;
+      return 0.00;
     }
     
     for (int i = inizio_cella; i < fine_cella; i++) {

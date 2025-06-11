@@ -45,7 +45,7 @@ int main() {
         snprintf(output_file, sizeof(output_file), "%s/output.txt", test_case);
         int es1 = test_funzione1(input_file, oracle_file, output_file);
 /*
-        snprintf(output_file, sizeof(output_file), "%s/output.txt", test_case);
+       snprintf(output_file, sizeof(output_file), "%s/output.txt", test_case);
         int es2 = test_funzione2(input_file, oracle_file, output_file);
 
         snprintf(output_file, sizeof(output_file), "%s/output.txt", test_case);
