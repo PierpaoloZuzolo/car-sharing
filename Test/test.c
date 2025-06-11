@@ -23,6 +23,8 @@ Data: 10/06/2025
 #include "ADT_array/array.h"
 #include "ADT_hash/tab_hash.h"
 #include "utili/utile_utente.h"
+#include "ADT_lista/lista_storico_noleggio.h"
+#include "utili/utile_lista_storico_noleggio.h"
 
 
 
@@ -31,20 +33,23 @@ Data: 10/06/2025
 #define NUMERO_UTENTI 5
 #define NUMERO_VEICOLI 5
 #define SCARTO 0.01 //Errore del costo
-
+#define MAX_LINE 1024 //da eliminare
 
 
 int prendi_veicolo_da_file(FILE *fp, ptr_hash_veicoli utente);
 int prendi_utenti_da_file(FILE *fp, ptr_hash_utenti utente);
 int test_funzione1(void);
-int test_funzione2(ptr_hash_veicoli);
-int test_funzione3(ptr_hash_utenti,ptr_hash_veicoli);
-int confronta_file(const char *file1, const char *file2);
+
+int test_funzione2(ptr_hash_veicoli veicolo, ptr_hash_utenti ut);
+//int test_funzione3(ptr_hash_utenti,ptr_hash_veicoli);
+int confronta_file(FILE*, FILE*);
+
 
 
 int main(int argc, char **argv) {
     if(argc < 4){
         printf("Assicurati di mettere tutti i parametri!\n");
+        printf("Per runnare scrivere: ./test.exe test_suite.txt utenti.txt veicoli.txt\n");
         return -1;
     }
 
@@ -52,10 +57,12 @@ int main(int argc, char **argv) {
     char *file_utente = argv[2];
     char *file_veicolo= argv[3];
 
-    FILE *ts = fopen ("test_suite.txt", "r");
-    FILE *file_utenti = fopen ("utenti.txt", "r");
-    FILE *file_veicoli = fopen ("veicoli.txt", "r");
-    FILE *file_result = fopen("risultato.txt", "w");
+
+    FILE *ts = fopen (test_suite, "r");
+    FILE *file_utenti = fopen (file_utente, "r");
+    FILE *file_veicoli = fopen (file_veicolo, "r");
+    FILE *file_result = fopen("result.txt", "w");
+
 
     if(!(ts && file_utenti && file_veicoli && file_result)){
         printf("Errore apertura file utenti!\n");
@@ -68,14 +75,13 @@ int main(int argc, char **argv) {
 
     ptr_hash_utenti hash_utenti = crea_hash_utenti(NUMERO_UTENTI);
     if (!hash_utenti) {
-        errore_allocazione();
         fclose(ts);
         fclose(file_utenti);
         fclose(file_veicoli);
         fclose(file_result);
         return -1;
     }
-    if(carica_utenti_da_file(file_utenti, hash_utenti, NULL) < 0){
+    if(carica_utenti_da_file(file_utente, hash_utenti, NULL) < 0){
         printf("Errore caricamento utenti!\n(Controlla il formato nome email)");
         distruggi_hash_utenti(hash_utenti);
         fclose(ts);
@@ -86,7 +92,6 @@ int main(int argc, char **argv) {
 
     ptr_hash_veicoli hash_veicoli = crea_hash_veicoli(NUMERO_VEICOLI);
     if (!hash_veicoli) {
-        errore_allocazione();
         distruggi_hash_utenti(hash_utenti);
         fclose(ts);
         fclose(file_utenti);
@@ -94,7 +99,7 @@ int main(int argc, char **argv) {
         fclose(file_result);
         return -1;
     }
-    if(carica_veicoli_da_file(file_veicoli, hash_veicoli, NULL) == 0){
+    if(carica_veicoli_da_file(file_veicolo, hash_veicoli, NULL) == 0){
         printf("Errore caricamento veicoli!\n(Controlla il formato marca modello targa posizione)");
         distruggi_hash_utenti(hash_utenti);
         distruggi_hash_veicoli(hash_veicoli);
@@ -103,6 +108,7 @@ int main(int argc, char **argv) {
         fclose(file_veicoli);
         return -1;
     }
+
 
     char test_case[LUNGHEZZA_RIGA];
     while (fgets(test_case, sizeof(test_case), ts)) {
@@ -117,17 +123,17 @@ int main(int argc, char **argv) {
         }
 
         if(strcmp(tc_generale, "TC2") == 0){
-            if(test_funzione2(hash_veicoli) < 0){
+            if(test_funzione2(hash_veicoli, hash_utenti) < 0){
                 printf("Errore TC2\n");
                 continue;
             }
         }
-        if(strcmp(tc_generale, "TC3") == 0){
+       /* if(strcmp(tc_generale, "TC3") == 0){
             if(test_funzione3(hash_utenti, hash_veicoli) < 0){
                 printf("Errore TC3\n");
                 continue;
             }
-        }
+        }*/
 
         char file_oracle[CONTENITORE] = {0};
         snprintf(file_oracle, CONTENITORE, "%s/oracle.txt", tc_generale);
@@ -135,16 +141,29 @@ int main(int argc, char **argv) {
         char file_output[CONTENITORE] = {0};
         snprintf(file_output, CONTENITORE, "%s/output.txt", tc_generale);
 
-
+        //Apertura file
         FILE *oracle_file = fopen(file_oracle, "r");
         FILE *output_file = fopen(file_output, "r");
 
-        if((oracle_file == NULL) || (output_file == NULL)){
-            printf("Errore apertura file oracle o output\n");
-            return -1;
+        if (!oracle_file) {
+            printf("Errore apertura file %s\n", file_oracle);
+            fflush(stdout);
         }
+        if (!output_file) {
+            printf("Errore apertura file %s\n", file_output);
+            fflush(stdout);
+        }
+    
+        if (!oracle_file || !output_file) {
+            if (oracle_file) fclose(oracle_file);
+            if (output_file) fclose(output_file);
+            continue;
+        }
+
         int risultato = confronta_file(oracle_file, output_file);
-        fprintf(file_result, "%s: %sTest superato\n", tc_generale, risultato ? "NON " : "");
+        //Scrittura PASS/FAIL in 'result.txt' es. TC1:PASS
+        fprintf(file_result, "%s: %s\n", tc_generale, risultato ? "PASS" : "FAIL");
+
         fclose(oracle_file);
         fclose(output_file);
     }
@@ -156,6 +175,8 @@ int main(int argc, char **argv) {
     fclose(file_utenti);
     fclose(file_result);
 
+
+    printf("\n\nFino a qui arrivo--------------------");
     return 0;
 }
 
@@ -212,9 +233,9 @@ int prendi_veicolo_da_file(FILE *fp, ptr_hash_veicoli veicolo) {
 
 
 int test_funzione1(void) {
-    FILE *in = fopen("TC1/input", "r");
-    FILE *oracle = fopen("TC1/oracle", "r");
-    FILE *out = fopen("TC1/output", "w");
+    FILE *in = fopen("TC1/input.txt", "r");
+    FILE *oracle = fopen("TC1/oracle.txt", "r");
+    FILE *out = fopen("TC1/output.txt", "w");
     if (!in || !oracle || !out) {
         fprintf(stderr, "Errore apertura file per funzione 1\n");
         return -1;
@@ -244,7 +265,8 @@ int test_funzione1(void) {
 
 
 
-int test_funzione2(ptr_hash_veicoli veicolo) {
+int test_funzione2(ptr_hash_veicoli hash_veicoli, ptr_hash_utenti hash_utenti) {
+    //Apre gli opportuni file nella cartella TC2
     FILE *in = fopen("TC2/input.txt", "r");
     FILE *oracle = fopen("TC2/oracle.txt", "r");
     FILE *out = fopen("TC2/output.txt", "w");
@@ -254,104 +276,142 @@ int test_funzione2(ptr_hash_veicoli veicolo) {
     }
 
     char riga[LUNGHEZZA_RIGA];
+    //Itera fino alla fine del file 'input.txt'e legge una riga alla volta
     while (fgets(riga, sizeof(riga), in)) {
         riga[strcspn(riga, "\n")] = 0;
 
-       
+       /*Legge dal file 'input.txt' la frase scritta nel formato targa cella_inizio cella_fine,
+        ad ogni spazio si ferma e salva nella corrispettiva variabile*/
         char *targa = strtok (riga, " ");
         char *cella_inizio = strtok (NULL, " ");
         char *cella_fine = strtok (NULL, " ");
+        
 
-        ptr_veicolo ve = cerca_veicolo_in_hash(veicolo, targa);
+        //Conversione da chat a intero
+        int inizio = atoi(cella_inizio);
+        int fine = atoi (cella_fine);
+
+        ptr_veicolo ve = cerca_veicolo_in_hash(hash_veicoli, targa);
         if(ve == NULL){
             fclose(in);
             fclose(oracle);
             fclose(out);
+            return -1;
         }
 
-        //Creo una prenotazione
+        //Crea una prenotazione
         ptr_prenotazione pren = prendi_prenotazioni(ve);
-        prenota_intervallo(pren, cella_inizio, cella_fine);
+
+        //Prenota le celle di un veicolo e vede e se è disponibile o no nella giornata di oggi
+        int risultato_prenotazione = prenota_intervallo(pren, inizio, fine);
+        bool disponibile = veicolo_disponibile_oggi(pren);
+       
 
 
-    
+        /*Scrive nel file 'output.txt' TRUE/FALSE se la prenotazione va a buon fine 
+        e dopo scrive TRUE/FALSE se il veicolo ha almeno una cella disponbile*/
+        fprintf(out, "%s %s\n", risultato_prenotazione ? "TRUE" : "FALSE", disponibile ? "TRUE" : "FALSE");
 
+    }
 
+    fclose(in);
+    fclose(out);
 
-    }   
-    
-
-    
-    // Creiamo la struttura prenotazioni per il test
-    ptr_prenotazione p = inizializza_prenotazioni();
-    if (!p) {
-        fprintf(stderr, "Errore allocazione struttura prenotazioni\n");
+    // Ora confronto output.txt con oracle.txt
+    out = fopen("TC2/output.txt", "r");
+    if (!out) {
+        fclose(oracle);
         return -1;
     }
 
-    int inizio, fine, atteso;
-    int test_num = 1, errori = 0;
+    char linea_oracle[10], linea_output[10];
+    while (fgets(linea_oracle, sizeof(linea_oracle), oracle) &&
+           fgets(linea_output, sizeof(linea_output), out)) {
+        // Rimuovi newline per confronto robusto
+        linea_oracle[strcspn(linea_oracle, "\n")] = 0;
+        linea_output[strcspn(linea_output, "\n")] = 0;
 
-    while (fscanf(in, "%d %d", &inizio, &fine) == 2) {
-        if (fscanf(oracle, "%d", &atteso) != 1) {
-            printf("Errore: file oracle più corto rispetto all'input.\n");
-            break;
+        if (strcmp(linea_oracle, linea_output) != 0) {
+            fclose(oracle);
+            fclose(out);
+            return 0; // Test fallito
         }
-    
-        int ottenuto = prenota_intervallo(p, inizio, fine);
-        fprintf(out, "Test %d: atteso %d, ottenuto %d\n", test_num, atteso, ottenuto);
-
-        if (ottenuto != atteso) {
-            printf("[Funzione2] Test %d FALLITO: atteso %d, ottenuto %d\n", test_num, atteso, ottenuto);
-            errori++;
-        }
-    test_num++;
     }
+
+    fclose(oracle);
+    fclose(out);
+    return 1; // Test superato
 }
 
 
+int test_funzione3()
+{
 
+}
 
 
 int test_funzione3(ptr_hash_veicoli hash_veicoli, ptr_hash_utenti hash_utenti) 
 {
-    int test1, test2;
-    FILE *fout = fopen("TC£/output.txt", "w");
-    if(!fout){
+    int test1 = 0, test2 = 0;
+    FILE *fout = fopen("TC3/output.txt", "w");
+    if (!fout) {
         printf("\nErrore apertura file output TC3");
         return 1;
     }
-    
-    int stdout_backup = dup(fileno(stdout)); //Salva fd stdout originale
 
-    //reindirizza stduot su file
-    dup2(fileno(fout), fileno(stdout));
+    int stdout_backup = dup(fileno(stdout)); // Backup stdout
+    dup2(fileno(fout), fileno(stdout));      // Redirect stdout -> file
     fclose(fout);
 
-    //chiama la funzione da testare
+    // === Test 1: Stampa veicoli disponibili ===
     stampa_veicoli_disponibili(hash_veicoli);
 
-    //ripristino di stdout
+    fflush(stdout);                          // Flush e restore
+    dup2(stdout_backup, fileno(stdout));
+    close(stdout_backup);
+
+    if (confronta_file("TC3/output.txt", "TC3/oracle.txt")) {
+        printf("Test 1 (stampa veicoli disponibili): SUPERATO\n");
+        test1 = 1;
+    } else {
+        printf("Test 1 (stampa veicoli disponibili): FALLITO\n");
+    }
+
+    // === Test 2: Gestione degli storici di prenotazione ===
+    fout = fopen("TC3/output2.txt", "w");
+    if (!fout) {
+        printf("\nErrore apertura file output2 TC3");
+        return 1;
+    }
+
+    stdout_backup = dup(fileno(stdout));     // Backup stdout di nuovo
+    dup2(fileno(fout), fileno(stdout));      // Redirect su nuovo file
+    fclose(fout);
+
+    // Chiama funzione che stampa o gestisce lo storico delle prenotazioni
+    stampa_storico_prenotazioni_utenti(hash_utenti); // <-- Sostituisci con nome corretto
+
     fflush(stdout);
     dup2(stdout_backup, fileno(stdout));
     close(stdout_backup);
 
-    //confronto output con oracolo
-    if(confronta_file("TC3/output.txt", "TC3/oracle.txt")) {
-        test1 = 1;
+    if (confronta_file("TC3/output2.txt", "TC3/oracle2.txt")) {
+        printf("Test 2 (storico prenotazioni): SUPERATO\n");
+        test2 = 1;
     } else {
-        test1 = 0;
+        printf("Test 2 (storico prenotazioni): FALLITO\n");
     }
 
+    return (test1 && test2) ? 0 : 1;
+}
 
 
+/*
+int test_funzione3(ptr_hash_utenti ut,ptr_hash_veicoli ve) {
+    FILE *input = fopen("TC3/input.txt", "r");
+    FILE *oracle = fopen("TC3/oracle.txt", "r");
+    FILE *output = fopen("TC3/output.txt", "w");
 
-
-
-    /*
-    FILE *input = fopen(input_file, "r");
-    FILE *oracle = fopen(oracle_file, "r");
-    FILE *output = fopen(output_file, "w");
     if (!input || !oracle || !output) {
         fprintf(stderr, "Errore apertura file per funzione 3\n");
         if (input) fclose(input);
@@ -419,35 +479,51 @@ int test_funzione3(ptr_hash_veicoli hash_veicoli, ptr_hash_utenti hash_utenti)
     fclose(output);
     return errori;
 
-*/
+}*/
+
+
+
+// Rimuove newline e spazi finali
+static void rstrip(char *s) {
+    size_t n = strlen(s);
+    while (n > 0 && (s[n-1] == '\n' || s[n-1] == '\r' || s[n-1] == ' ' || s[n-1] == '\t')) {
+        s[--n] = '\0';
+    }
 }
 
-int confronta_file(const char *file1, const char *file2) {
-    FILE* f1 = fopen(file1, "r");
-    FILE* f2 = fopen(file2, "r");
-    if (!f1 || !f2){
-        if (f1) fclose(f1);
-        if (f2) fclose(f2);
-        return 0;
-    }
+int confronta_file(FILE *a, FILE *b) {
+    char linea_a[MAX_LINE];
+    char linea_b[MAX_LINE];
+    int line_num = 1;
 
-    int risultato = 1;
-    int c1, c2;
-    do{
-        c1 = fgetc(f1);
-        c2 = fgetc(f2);
-        if (c1 != c2) {
-            risultato = 0;
+    while (true) {
+        char *pa = fgets(linea_a, sizeof(linea_a), a);
+        char *pb = fgets(linea_b, sizeof(linea_b), b);
+
+        if (!pa || !pb) {
+            // Se uno finisce prima, i file differiscono
+            if (pa != pb) {
+                fprintf(stderr, "I file hanno lunghezze diverse (riga %d)\n", line_num);
+                return 0;
+            }
             break;
         }
-    } while (c1 != EOF && c2 != EOF);
 
-    if (c1 != c2) risultato = 0;
+        rstrip(linea_a);
+        rstrip(linea_b);
 
-    fclose(f1);
-    fclose(f2);
+        if (strcmp(linea_a, linea_b) != 0) {
+            fprintf(stderr, "Differenza alla riga %d:\n  A: \"%s\"\n  B: \"%s\"\n",
+                    line_num, linea_a, linea_b);
+            return 0; // Test non superato
+        }
+        line_num++;
+    }
 
+    return 1; // Test superato
 
-    return risultato;
 }
+
+
+
     
