@@ -202,5 +202,6 @@ float calcola_costo_noleggio(int inizio_cella, int fine_cella, int sconto);
 */
 int inserisci_scelta();
 
+void errore_allocazione();
 
 #endif

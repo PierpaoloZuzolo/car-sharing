@@ -13,6 +13,7 @@ Data: 13/05/2025
 #include "utile_veicolo.h"
 #include "utile_array_prenotazione.h"
 #include "ADT_hash/hash_veicoli.h"
+#include "ADT_hash/tab_hash.h"
 
 
 /*
@@ -55,50 +56,33 @@ void stampa_veicolo(ptr_veicolo ve)
 }
 
 
-/*
- Funzione: carica_veicoli_da_file
- --------------------------------
-
- Legge da file le informazioni relative ai veicoli e li inserisce nella tabella hash.
-
- Implementazione:
-    Apre il file indicato dal nome.
-    Per ogni riga del file, legge marca, modello, targa e posizione di un veicolo.
-    Crea una nuova struttura veicolo con `inizia_veicolo` e la inserisce nella hash table con `inserisci_veicolo_in_hash`.
-    Se il file non può essere aperto, stampa un messaggio di errore ed esce dal programma.
-
- Parametri:
-    nome_file: stringa contenente il nome del file da cui leggere i dati dei veicoli
-    h: puntatore alla tabella hash in cui inserire i veicoli
-
- Pre-condizioni:
-    `nome_file` deve essere una stringa valida e non NULL.
-    `h` deve essere un puntatore valido a una tabella hash inizializzata.
-
- Post-condizioni:
-    Tutti i veicoli letti dal file vengono inseriti nella tabella hash.
-
- Ritorna:
-    Nessun valore di ritorno (void)
-
- Side-effect:
-    Apre un file in lettura.
-    Alloca memoria dinamica per ogni veicolo letto.
-    In caso di errore nell'apertura del file, termina il programma con `exit(1)`.
- */
-void carica_veicoli_da_file(const char *nome_file, ptr_hash_veicoli h)
+int carica_veicoli_da_file(const char *nome_file, ptr_hash_veicoli h)
 {
     FILE *file = fopen(nome_file, "r");
-    if(!file){
-        printf("!!!VEICOLI NON DISPONIBILI!!!");
-        exit(1);
+    if (!file) {
+        fprintf(stderr, "[ERRORE] Impossibile aprire il file \"%s\"\n", nome_file);
+        return 0;
     }
 
-    char marca[30], modello[40], targa[8], posizione[60];
-    while(fscanf(file, "%30s %40s %8s %60s", marca, modello, targa, posizione) == 4){
-        inserisci_veicolo_in_hash(h, inizia_veicolo(marca, modello, targa, posizione));
+    char marca[31], modello[41], targa[9], posizione[61];
+
+    while (fscanf(file, "%30s %40s %8s %60s", marca, modello, targa, posizione) == 4) {
+        ptr_veicolo v = inizia_veicolo(marca, modello, targa, posizione);
+        if (v) {
+            carica_prenotazioni_da_file(prendi_prenotazioni(v),prendi_targa(v));
+            if (!inserisci_veicolo_in_hash(h, v)) {
+                fprintf(stderr, "[ERRORE] Inserimento hash fallito per %s\n", targa);
+                free(v);
+            }
+        } else {
+            fprintf(stderr, "[ERRORE] Creazione veicolo fallita per %s\n", targa);
+        }
     }
+
+    fclose(file);
+    return 1;
 }
+
 
 
 /*
@@ -250,8 +234,86 @@ bool veicolo_disponibile(ptr_veicolo ve)
 void aggiorna_prenotazione_veicolo(ptr_veicolo ve)
 {
     if (!ve) return;
-    ptr_prenotazione pren = prendi_prenotazioni(ve);
+    ptr_prenotazione pren = prendi_prenotazioni(ve);    // PENSO SIA DA TOGLIERE !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     blocca_celle_passate(pren);
     salva_prenotazioni_su_file(pren, prendi_targa(ve));
     aggiorna_stato_veicolo(ve);
+}
+
+
+
+
+int stampa_veicoli_disponibili(ptr_hash_veicoli h)
+{
+    if (!h) return 0;
+
+    int numero_elementi = 0;
+    void **valori = ottieni_valori_hash(h, &numero_elementi);
+
+    if (!valori || numero_elementi == 0) {
+        if (valori) free(valori);
+        return 0;
+    }
+    int conto = 0;
+    for (int i = 0; i < numero_elementi; ++i) {
+        ptr_veicolo ve = (ptr_veicolo)valori[i];
+        
+
+        if (veicolo_disponibile(ve)) {
+            printf("====================================\n");
+            stampa_veicolo(ve);
+            printf("====================================\n");
+            conto++;
+        }
+    }
+
+    free(valori); // Libera la memoria allocata da ottieni_valori_hash
+    return conto;
+}
+
+
+int aggiorna_prenotazioni_veicoli(ptr_hash_veicoli h)
+{
+   if (!h) return 0;
+
+   int numero_elementi = 0;
+   void **valori = ottieni_valori_hash(h, &numero_elementi);
+
+   if (!valori || numero_elementi == 0) {
+      if (valori) free(valori);
+      return 0;
+   }
+
+   for (int i = 0; i < numero_elementi; i++){
+      ptr_veicolo ve = (ptr_veicolo)valori[i];
+      ptr_prenotazione pren = prendi_prenotazioni(ve);
+      blocca_celle_passate(pren);
+      aggiorna_stato_veicolo(ve);
+   }
+   free(valori);
+   return 1;
+}
+
+
+int aggiorna_file_prenotazione_veicoli(ptr_hash_veicoli h)
+{
+   if (!h) return 0;
+
+   int numero_elementi = 0;
+   void **valori = ottieni_valori_hash(h, &numero_elementi);
+
+   if (!valori || numero_elementi == 0) {
+      if (valori) free(valori);
+      return 0;
+   }
+   for (int i = 0; i < numero_elementi; i++){
+      ptr_veicolo ve = (ptr_veicolo)valori[i];
+   
+      salva_prenotazioni_su_file(prendi_prenotazioni(ve), prendi_targa(ve) );
+      
+      
+      
+   }
+   free(valori);
+   return 1;
 }

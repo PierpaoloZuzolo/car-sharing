@@ -158,13 +158,13 @@ int stampa_lista_noleggi(ptr_lista_noleggi l)
 int stampa_dopo_coda(ptr_lista_noleggi l)
 {
     if (!l || !prendi_coda(l)) {
-        printf("Il puntatore coda e NULL.\n");
+        // printf("Il puntatore coda e NULL.\n");
         return 0;
     }
 
     ptr_lista corrente = prendi_prossimo(prendi_coda(l));
     if (!corrente) {
-        printf("Non ci sono nodi dopo la coda.\n");
+        //printf("Non ci sono nodi dopo la coda.\n");
         return 0;
     }
     int i = 1;
@@ -235,13 +235,13 @@ int elimina_nodo_storico_noleggio(ptr_lista_noleggi lista, char *targa_veicolo_e
         // coda != NULL -> eliminiamo solo nodi dopo la coda
         count = stampa_dopo_coda(lista);
         if (count == 0) {
-            printf("Non ci sono prenotazioni eliminabili dopo la coda.\n");
+            //printf("Non ci sono prenotazioni eliminabili dopo la coda.\n");
             return 0;
         }
     }
 
     if (count <= 0) {
-        printf("Nessuna prenotazione da eliminare.\n");
+       // printf("Nessuna prenotazione da eliminare.\n");
         return 0;
     }
 
