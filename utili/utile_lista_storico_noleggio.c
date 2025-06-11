@@ -15,6 +15,50 @@ Data: 07/06/2025
 
 
 /*
+ Funzione: dimensione_lista
+ --------------------------
+
+ Calcola il numero totale di nodi presenti nella lista dei noleggi.
+
+ Implementazione:
+    La funzione itera attraverso la lista a partire dalla testa,
+    contando ogni nodo finché non raggiunge la fine (NULL).
+
+ Parametri:
+    l: puntatore alla lista dei noleggi
+
+ Pre-condizioni:
+    `l` deve essere un puntatore valido a una struttura lista.
+    Tuttavia, la funzione gestisce anche il caso in cui `l` sia NULL o vuota.
+
+ Post-condizioni:
+    Nessuna modifica alla lista.
+
+ Ritorna:
+    Un intero rappresentante il numero di nodi presenti nella lista.
+    Restituisce 0 se la lista è NULL o se non ha nodi.
+
+ Side-effect:
+    Nessuno.
+ */
+
+int dimensione_lista(ptr_lista_noleggi l)
+{
+    if (!l || !prendi_testa(l)) {
+        
+        return 0;
+
+    }
+    ptr_lista corrente = prendi_testa(l);
+    int count = 0;
+    while (corrente) {
+        count++;
+        corrente = prendi_prossimo(corrente);
+    }
+    return count;
+}
+
+/*
  Funzione: inserisci_nodo_storico_noleggio
  -----------------------------------------
 
@@ -122,7 +166,7 @@ int stampa_lista_noleggi(ptr_lista_noleggi l)
         corrente = prendi_prossimo(corrente);
     }
 
-    return i;
+    return i - 1;
 }
 
 
@@ -176,7 +220,7 @@ int stampa_dopo_coda(ptr_lista_noleggi l)
         corrente = prendi_prossimo(corrente);
     }
 
-    return i;
+    return i-1;
 }
 
 
@@ -184,79 +228,54 @@ int stampa_dopo_coda(ptr_lista_noleggi l)
  Funzione: elimina_nodo_storico_noleggio
  ---------------------------------------
 
- Permette di eliminare un nodo dalla lista dei noleggi storici, scegliendo tra
- i nodi eliminabili (tutti se la coda è NULL, oppure solo quelli successivi alla coda).
+ Elimina un nodo specifico dalla lista dello storico noleggi, identificato
+ tramite una scelta numerica (1-based), e restituisce i dettagli del noleggio
+ eliminato attraverso parametri di output.
 
  Implementazione:
-    Se la coda è NULL stampa tutta la lista, altrimenti stampa solo i nodi dopo la coda.
-    Chiede all’utente quale prenotazione eliminare.
-    Rimuove il nodo scelto dalla lista scollegandolo.
-    Copia i dati della prenotazione eliminata nei parametri forniti.
-    Libera la memoria del nodo eliminato.
+    Se la lista è vuota o la scelta è fuori intervallo, la funzione termina senza modifiche.
+    Se esiste una coda (nodo non eliminabile), la navigazione inizia dal nodo successivo alla coda.
+    Altrimenti, la navigazione parte dalla testa della lista.
+    Il nodo corrispondente alla `scelta` viene scollegato dalla lista e deallocato.
+    Prima della distruzione, la funzione salva targa e orari della prenotazione eliminata
+    nei parametri passati per riferimento.
 
  Parametri:
-    lista                  : puntatore alla lista dei noleggi storici
-    targa_veicolo_eliminato: array di char dove verrà copiata la targa del veicolo eliminato (dimensione minima 8)
-    ora_inizio             : puntatore a int per memorizzare l’ora di inizio del noleggio eliminato
-    minuto_inizio          : puntatore a int per memorizzare il minuto di inizio
-    ora_fine               : puntatore a int per memorizzare l’ora di fine
-    minuto_fine            : puntatore a int per memorizzare il minuto di fine
+    lista: puntatore alla lista dei noleggi
+    targa_veicolo_eliminato: stringa dove viene salvata la targa del veicolo eliminato (lunghezza minima 8)
+    ora_inizio, minuto_inizio: puntatori per salvare l'orario di inizio del noleggio eliminato
+    ora_fine, minuto_fine: puntatori per salvare l'orario di fine del noleggio eliminato
+    scelta: posizione (1-based) del nodo da eliminare
 
  Pre-condizioni:
-    lista deve essere valida e non vuota
-    puntatori per copia dati devono essere validi
+    - `lista` deve essere un puntatore valido e inizializzato.
+    - `targa_veicolo_eliminato`, `ora_inizio`, `minuto_inizio`, `ora_fine`, `minuto_fine` devono essere puntatori validi.
+    - `scelta` deve essere maggiore di 0 e non superiore alla dimensione della lista nella parte eliminabile.
 
  Post-condizioni:
-    nodo scelto viene eliminato dalla lista e memoria liberata
-    dati della prenotazione eliminata copiati nei parametri passati
+    - Il nodo selezionato viene rimosso dalla lista.
+    - I dati della prenotazione eliminata vengono copiati nei parametri di output.
 
  Ritorna:
-    1 se l’eliminazione è avvenuta con successo
-    0 in caso di errore, input non valido o annullamento
+    1 se la rimozione è avvenuta con successo,
+    0 in caso di errore (lista vuota, indice non valido o nodo non trovato).
 
  Side-effect:
-    stampa messaggi su stdout
-    modifica la lista e libera la memoria del nodo eliminato
-*/
-int elimina_nodo_storico_noleggio(ptr_lista_noleggi lista, char *targa_veicolo_eliminato,             // DA RIVEDERE ?????????????
-                         int *ora_inizio, int *minuto_inizio, int *ora_fine, int *minuto_fine) {
+    Modifica la lista dei noleggi, deallocando la memoria del nodo rimosso.
+ */
+
+int elimina_nodo_storico_noleggio(ptr_lista_noleggi lista, char *targa_veicolo_eliminato,             
+                         int *ora_inizio, int *minuto_inizio, int *ora_fine, int *minuto_fine, int scelta) {
     if (!lista || !prendi_testa(lista)) {
-        printf("La lista è vuota.\n");
+       // printf("La lista è vuota.\n");
         return 0;
     }
 
-    int count = 0;
-    int scelta = 0;
-
-    if (prendi_coda(lista) == NULL) {
-        // coda == NULL -> eliminiamo da testa in poi
-        count = stampa_lista_noleggi(lista);
-    } else {
-        // coda != NULL -> eliminiamo solo nodi dopo la coda
-        count = stampa_dopo_coda(lista);
-        if (count == 0) {
-            //printf("Non ci sono prenotazioni eliminabili dopo la coda.\n");
-            return 0;
-        }
-    }
-
-    if (count <= 0) {
-       // printf("Nessuna prenotazione da eliminare.\n");
+    int count = dimensione_lista(lista);
+    if(scelta > count || scelta <= 0){
         return 0;
     }
-
-    printf("Inserisci il numero della prenotazione da eliminare (0 per annullare): ");
-    if (scanf("%d", &scelta) != 1) {
-        printf("Input non valido.\n");
-        while (getchar() != '\n'); // pulizia buffer
-        return 0;
-    }
-
-    if (scelta <= 0 || scelta > count) {
-        printf("Eliminazione annullata.\n");
-        return 0;
-    }
-
+    
     ptr_lista nodo_precedente = NULL;
     ptr_lista curr = NULL;
     int i = 1;
@@ -281,7 +300,7 @@ int elimina_nodo_storico_noleggio(ptr_lista_noleggi lista, char *targa_veicolo_e
     }
 
     if (!curr) {
-        printf("Errore: nodo da eliminare non trovato.\n");
+        // printf("Errore: nodo da eliminare non trovato.\n");
         return 0;
     }
 
@@ -313,7 +332,7 @@ int elimina_nodo_storico_noleggio(ptr_lista_noleggi lista, char *targa_veicolo_e
 
     distruggi_nodo(curr, (void (*)(void *))distruggi_storico_noleggio);
 
-    printf("Prenotazione eliminata con successo.\n");
+    //printf("Prenotazione eliminata con successo.\n");
     return 1;
 }
 
@@ -602,7 +621,7 @@ int aggiungi_prenotazione_storico_su_file(
 int conta_fino_a_coda(ptr_lista_noleggi l) 
 {
     if (!l || !prendi_testa(l) || !prendi_coda(l)) {
-        // Precondizione violata
+        
         return 0;
     }
 
@@ -623,3 +642,6 @@ int conta_fino_a_coda(ptr_lista_noleggi l)
 
     return count;
 }
+
+
+

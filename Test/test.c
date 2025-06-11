@@ -39,9 +39,11 @@ Data: 10/06/2025
 int prendi_veicolo_da_file(FILE *fp, ptr_hash_veicoli utente);
 int prendi_utenti_da_file(FILE *fp, ptr_hash_utenti utente);
 int test_funzione1(void);
+
 int test_funzione2(ptr_hash_veicoli veicolo, ptr_hash_utenti ut);
 //int test_funzione3(ptr_hash_utenti,ptr_hash_veicoli);
 int confronta_file(FILE*, FILE*);
+
 
 
 int main(int argc, char **argv) {
@@ -55,10 +57,12 @@ int main(int argc, char **argv) {
     char *file_utente = argv[2];
     char *file_veicolo= argv[3];
 
+
     FILE *ts = fopen (test_suite, "r");
     FILE *file_utenti = fopen (file_utente, "r");
     FILE *file_veicoli = fopen (file_veicolo, "r");
     FILE *file_result = fopen("result.txt", "w");
+
 
     if(!(ts && file_utenti && file_veicoli && file_result)){
         printf("Errore apertura file utenti!\n");
@@ -401,11 +405,13 @@ int test_funzione3(ptr_hash_veicoli hash_veicoli, ptr_hash_utenti hash_utenti)
     return (test1 && test2) ? 0 : 1;
 }
 
+
 /*
 int test_funzione3(ptr_hash_utenti ut,ptr_hash_veicoli ve) {
     FILE *input = fopen("TC3/input.txt", "r");
     FILE *oracle = fopen("TC3/oracle.txt", "r");
     FILE *output = fopen("TC3/output.txt", "w");
+
     if (!input || !oracle || !output) {
         fprintf(stderr, "Errore apertura file per funzione 3\n");
         if (input) fclose(input);
@@ -472,6 +478,7 @@ int test_funzione3(ptr_hash_utenti ut,ptr_hash_veicoli ve) {
     fclose(oracle);
     fclose(output);
     return errori;
+
 }*/
 
 
@@ -514,6 +521,7 @@ int confronta_file(FILE *a, FILE *b) {
     }
 
     return 1; // Test superato
+
 }
 
 

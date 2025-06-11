@@ -12,6 +12,32 @@ Data: 07/06/2025
 #include "ADT_lista/lista_storico_noleggio.h"
 #include "ADT_lista/lista.h"
 
+
+/*
+ Funzione: dimensione_lista
+ --------------------------
+
+ Calcola il numero totale di nodi presenti nella lista dei noleggi.
+
+ Parametri:
+    l: puntatore alla lista dei noleggi
+
+ Pre-condizioni:
+    `l` deve essere un puntatore valido a una struttura lista.
+    Tuttavia, la funzione gestisce anche il caso in cui `l` sia NULL o vuota.
+
+ Post-condizioni:
+    Nessuna modifica alla lista.
+
+ Ritorna:
+    Un intero rappresentante il numero di nodi presenti nella lista.
+    Restituisce 0 se la lista è NULL o se non ha nodi.
+
+ Side-effect:
+    Nessuno.
+ */
+
+int dimensione_lista(ptr_lista_noleggi l);
 /*
  Funzione: inserisci_nodo_storico_noleggio
  -----------------------------------------
@@ -42,34 +68,35 @@ void inserisci_nodo_storico_noleggio(ptr_lista_noleggi lista, ptr_storico prenot
  Funzione: elimina_nodo_storico_noleggio
  ---------------------------------------
 
- Permette di eliminare un nodo dalla lista dei noleggi storici, scegliendo tra
- i nodi eliminabili (tutti se la coda è NULL, oppure solo quelli successivi alla coda).
+ Elimina un nodo specifico dalla lista dello storico noleggi, identificato
+ tramite una scelta numerica (1-based), e restituisce i dettagli del noleggio
+ eliminato attraverso parametri di output.
 
  Parametri:
-    lista                  : puntatore alla lista dei noleggi storici
-    targa_veicolo_eliminato: array di char dove verrà copiata la targa del veicolo eliminato (dimensione minima 8)
-    ora_inizio             : puntatore a int per memorizzare l’ora di inizio del noleggio eliminato
-    minuto_inizio          : puntatore a int per memorizzare il minuto di inizio
-    ora_fine               : puntatore a int per memorizzare l’ora di fine
-    minuto_fine            : puntatore a int per memorizzare il minuto di fine
+    lista: puntatore alla lista dei noleggi
+    targa_veicolo_eliminato: stringa dove viene salvata la targa del veicolo eliminato (lunghezza minima 8)
+    ora_inizio, minuto_inizio: puntatori per salvare l'orario di inizio del noleggio eliminato
+    ora_fine, minuto_fine: puntatori per salvare l'orario di fine del noleggio eliminato
+    scelta: posizione (1-based) del nodo da eliminare
 
  Pre-condizioni:
-    lista deve essere valida e non vuota
-    puntatori per copia dati devono essere validi
+    - `lista` deve essere un puntatore valido e inizializzato.
+    - `targa_veicolo_eliminato`, `ora_inizio`, `minuto_inizio`, `ora_fine`, `minuto_fine` devono essere puntatori validi.
+    - `scelta` deve essere maggiore di 0 e non superiore alla dimensione della lista nella parte eliminabile.
 
  Post-condizioni:
-    nodo scelto viene eliminato dalla lista e memoria liberata
-    dati della prenotazione eliminata copiati nei parametri passati
+    - Il nodo selezionato viene rimosso dalla lista.
+    - I dati della prenotazione eliminata vengono copiati nei parametri di output.
 
  Ritorna:
-    1 se l’eliminazione è avvenuta con successo
-    0 in caso di errore, input non valido o annullamento
+    1 se la rimozione è avvenuta con successo,
+    0 in caso di errore (lista vuota, indice non valido o nodo non trovato).
 
  Side-effect:
-    stampa messaggi su stdout
-    modifica la lista e libera la memoria del nodo eliminato
-*/
-int elimina_nodo_storico_noleggio(ptr_lista_noleggi lista, char *targa_veicolo_eliminato, int *ora_inizio, int *minuto_inizio, int *ora_fine, int *minuto_fine);
+    Modifica la lista dei noleggi, deallocando la memoria del nodo rimosso.
+ */
+
+int elimina_nodo_storico_noleggio(ptr_lista_noleggi lista, char *targa_veicolo_eliminato, int *ora_inizio, int *minuto_inizio, int *ora_fine, int *minuto_fine, int scelta);
 
 
 /*
@@ -246,6 +273,9 @@ int stampa_dopo_coda(ptr_lista_noleggi l);
 */
 
 int conta_fino_a_coda(ptr_lista_noleggi l);
+
+
+
 
 
 #endif
