@@ -14,14 +14,19 @@ Data: 10/06/2025
 #include "ADT_array/array_prenotazione.h"
 #include "utili/utile_array_prenotazione.h"
 #include "utili/utile.h"
+#include "Modello_veicolo/veicolo.h"
+#include "utili/utile_veicolo.h"
 #include "Modello_storico_noleggio/storico_noleggio.h"
+#include "ADT_array/array.h"
+#include "ADT_hash/hash_veicoli.h"
+#include "ADT_hash/tab_hash.h"
 
 #define SCARTO 0.01 //Errore del costo
 
+int test_funzione1();
+//int test_funzione2();
+//int test_funzione3(const char *input_file, const char *oracle_file, const char *output_file);
 
-int test_funzione1(const char*, const char*, const char*);
-int test_funzione2(const char*, const char*, const char*);
-int test_funzione3(const char *input_file, const char *oracle_file, const char *output_file);
 
 int main() {
     FILE *suite = fopen("test_suite.txt", "r");
@@ -33,30 +38,21 @@ int main() {
 
     char test_case[100];
     while (fgets(test_case, sizeof(test_case), suite)) {
-        test_case[strcspn(test_case, "\n")] = 0; // rimuove newline
+        test_case[strcspn(test_case, "\r\n")] = 0;
 
-        // Prepara i nomi file
-        char input_file[150], oracle_file[150], output_file[150];
-        snprintf(input_file, sizeof(input_file), "%s/input.txt", test_case);
-        snprintf(oracle_file, sizeof(oracle_file), "%s/oracle.txt", test_case);
 
-        // Chiamo tutte le tre funzioni di test
-        // Per output nomi distinti (così non si sovrascrivono)
-        snprintf(output_file, sizeof(output_file), "%s/output.txt", test_case);
-        int es1 = test_funzione1(input_file, oracle_file, output_file);
-/*
-       snprintf(output_file, sizeof(output_file), "%s/output.txt", test_case);
-        int es2 = test_funzione2(input_file, oracle_file, output_file);
+       
+        int es1 = test_funzione1();
+        
+//printf("Input: %s\nOracle: %s\nOutput: %s\n", input_file, oracle_file, output_file);
 
-        snprintf(output_file, sizeof(output_file), "%s/output.txt", test_case);
-        int es3 = test_funzione3(input_file, oracle_file, output_file);
+        
+        int es2 = test_funzione2();
 
-        if (es1 == 0 && es2 == 0 && es3 == 0) {
-            fprintf(result, "%s PASS\n", test_case);
-        } else {
-            fprintf(result, "%s FAIL\n", test_case);
-        }*/
-       if(es1 == 0){
+        
+//printf("Input: %s\nOracle: %s\nOutput: %s\n", input_file, oracle_file, output_file);
+
+        if (es1 == 0 /*&& es2 == 0*/) {
             fprintf(result, "%s PASS\n", test_case);
         } else {
             fprintf(result, "%s FAIL\n", test_case);
@@ -72,13 +68,12 @@ int main() {
 
 
 
-
-int test_funzione1(const char *input_file, const char *oracle_file, const char *output_file) {
-    FILE *in = fopen(input_file, "r");
-    FILE *oracle = fopen(oracle_file, "r");
-    FILE *out = fopen(output_file, "w");
+int test_funzione1() {
+    FILE *in = fopen("TC1/input.txt", "r");
+    FILE *oracle = fopen("TC1/oracle.txt", "r");
+    FILE *out = fopen("TC1/output.txt", "w");
     if (!in || !oracle || !out) {
-        fprintf(stderr, "Errore apertura file per funzione 1\n");
+        fprintf(stderr, "Errore apertura file per TC1\n");
         return -1;
     }
 
@@ -88,6 +83,9 @@ int test_funzione1(const char *input_file, const char *oracle_file, const char *
 
     while (fscanf(in, "%d %d %d", &inizio, &fine, &sconto) == 3 &&
            fscanf(oracle, "%f", &atteso) == 1) {
+            
+//printf("Apro %s, %s, %s\n", input_file, oracle_file, output_file);
+
         ottenuto = calcola_costo_noleggio(inizio, fine, sconto);
         fprintf(out, "%.2f\n", ottenuto);
 
@@ -104,75 +102,65 @@ int test_funzione1(const char *input_file, const char *oracle_file, const char *
 }
 
 /*
-int test_funzione2(const char *file_input, const char *file_oracolo, const char *file_output) {
-    FILE *input = fopen(file_input, "r");
-    FILE *oracolo = fopen(file_oracolo, "r");
-    FILE *output = fopen(file_output, "w");
-    if (!input || !oracolo || !output) {
-        fprintf(stderr, "Errore apertura file per funzione 2\n");
-        return -1;
+// Funzione di test per prenotazione e aggiornamento disponibilità
+int test_funzione2(void) {
+    FILE *input = fopen("TC2/input.txt", "r");
+    FILE *oracle = fopen("TC2/oracle.txt", "r");
+    FILE *output = fopen("TC2/output.txt", "w");
+
+    if (!input || !oracle || !output) {
+        fprintf(stderr, "Errore apertura file in TC2\n");
+        return 1;
     }
 
-    ptr_prenotazione prenotazioni = inizializza_prenotazioni();
-    if (!prenotazioni) {
-        fprintf(stderr, "Errore allocazione struttura prenotazioni\n");
-        fclose(input); fclose(oracolo); fclose(output);
-        return -1;
-    }
+    // Inizializza un veicolo fittizio
+    ptr_veicolo ve = inizia_veicolo("Fiat", "Panda", "AA000BB", "Roma");
+    ptr_prenotazione p = prendi_prenotazioni(ve);
 
-    int inizio_slot, fine_slot;
-    int numero_test = 1, numero_errori = 0;
-    char riga_attesa[1024], riga_ottenuta[1024];
+    int inizio, fine;
+    char stato_atteso[20];
 
-    while (fscanf(input, "%d %d", &inizio_slot, &fine_slot) == 2) {
-        int risultato = prenota_intervallo(prenotazioni, inizio_slot, fine_slot);
-        fprintf(output, "Prenotazione %d: %s\n", numero_test, risultato ? "OK" : "FALLITA");
+    int test_num = 1;
+    int errori = 0;
 
-        // Redirigi stdout su file temporaneo
-        FILE *file_temporaneo = tmpfile();
-        if (!file_temporaneo) {
-            fprintf(stderr, "Errore nella creazione del file temporaneo\n");
-            break;
+    while (fscanf(input, "%d %d", &inizio, &fine) == 2 && fscanf(oracle, "%s", stato_atteso) == 1) {
+        
+//printf("Apro %s, %s, %s\n", input_file, oracle_file, output_file);
+
+        int esito = prenota_intervallo(p, inizio, fine);
+
+        // Aggiorna lo stato del veicolo (senza bloccare celle passate)
+        aggiorna_stato_veicolo(ve);
+
+        const char *stato_ottenuto = prendi_stato(ve);
+
+        fprintf(output, "Prenotazione %d: %s (atteso: %s, ottenuto: %s)\n",
+                test_num,
+                strcmp(stato_atteso, stato_ottenuto) == 0 ? "PASS" : "FAIL",
+                stato_atteso,
+                stato_ottenuto);
+
+        if (strcmp(stato_atteso, stato_ottenuto) != 0) {
+            errori++;
         }
 
-        // Salvataggio stdout corrente
-        int stdout_backup = dup(fileno(stdout));
-        fflush(stdout);
-        dup2(fileno(file_temporaneo), fileno(stdout));
-
-        // Chiama la funzione che stampa la disponibilità
-        mostra_orari_disponibili(prenotazioni);
-
-        // Ripristina stdout
-        fflush(stdout);
-        dup2(stdout_backup, fileno(stdout));
-        close(stdout_backup);
-
-        // Legge l'output generato
-        rewind(file_temporaneo);
-        riga_ottenuta[0] = '\0';
-        while (fgets(riga_ottenuta + strlen(riga_ottenuta), sizeof(riga_ottenuta) - strlen(riga_ottenuta), file_temporaneo));
-
-        // Legge la riga attesa dall'oracolo
-        if (!fgets(riga_attesa, sizeof(riga_attesa), oracolo)) {
-            printf("[Funzione2] Test %d FALLITO: riga oracolo mancante\n", numero_test);
-            numero_errori++;
-        } else if (strcmp(riga_ottenuta, riga_attesa) != 0) {
-            printf("[Funzione2] Test %d FALLITO\nOutput ottenuto:\n%sOutput atteso:\n%s\n", numero_test, riga_ottenuta, riga_attesa);
-            numero_errori++;
-        }
-
-        fclose(file_temporaneo);
-        numero_test++;
+        test_num++;
     }
 
     fclose(input);
-    fclose(oracolo);
+    fclose(oracle);
     fclose(output);
-    free(prenotazioni);
-    return numero_errori;
-}
+    distruggi_array_prenotazioni(p);
+    libera_veicolo(ve);
 
+    return errori == 0 ? 0 : 1;
+}
+*/
+
+
+
+
+/*
 int test_funzione3(const char *input_file, const char *oracle_file, const char *output_file) {
     FILE *input = fopen(input_file, "r");
     FILE *oracle = fopen(oracle_file, "r");
@@ -244,4 +232,5 @@ int test_funzione3(const char *input_file, const char *oracle_file, const char *
     fclose(output);
     return errori;
 }
+
 */

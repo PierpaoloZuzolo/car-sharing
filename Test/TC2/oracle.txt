@@ -1,8 +1,5 @@
-Prenotazione 1: FALLITA
--Disponibile: dalle 00:00 alle 24:00
-
-Prenotazione 2: OK
--Disponibile: dalle 00:00 alle 24:00
+fallita
+disponibile
 
 Prenotazione 3: OK
 -Disponibile: dalle 00:00 alle 24:00

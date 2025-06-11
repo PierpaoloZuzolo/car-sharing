@@ -2,7 +2,7 @@
 TARGET = test.exe
 
 # File oggetto
-OBJS = test.o ../ADT_array/array_prenotazione.o ../utili/utile_array_prenotazione.o ../utili/utile.o ../Modello_storico_noleggio/storico_noleggio.o
+OBJS = test.o ../ADT_array/array_prenotazione.o ../utili/utile_array_prenotazione.o ../utili/utile.o ../Modello_storico_noleggio/storico_noleggio.o ../Modello_veicolo/veicolo.o ../utili/utile_veicolo.o ../ADT_array/array.o ../ADT_hash/hash_veicoli.o ../ADT_hash/tab_hash.o
 
 # Rileva sistema operativo
 UNAME_S := $(shell uname -s)
@@ -39,8 +39,23 @@ test.o: test.c
 ../utili/utile.o: ../utili/utile.c
 	gcc -I.. -c ../utili/utile.c -o ../utili/utile.o
 
+../utili/utile_veicolo.o: ../utili/utile_veicolo.c
+	gcc -I.. -c ../utili/utile_veicolo.c -o ../utili/utile_veicolo.o
+
 ../Modello_storico_noleggio/storico_noleggio.o: ../Modello_storico_noleggio/storico_noleggio.c
 	gcc -I.. -c ../Modello_storico_noleggio/storico_noleggio.c -o ../Modello_storico_noleggio/storico_noleggio.o
+
+../Modello_veicolo/veicolo.o: ../Modello_veicolo/veicolo.c
+	gcc -I.. -c ../Modello_veicolo/veicolo.c -o ../Modello_veicolo/veicolo.o
+
+../ADT_array/array.o: ../ADT_array/array.c
+	gcc -I.. -c ../ADT_array/array.c -o ../ADT_array/array.o
+
+../ADT_hash/hash_veicoli.o: ../ADT_hash/hash_veicoli.c
+	gcc -I.. -c ../ADT_hash/hash_veicoli.c -o ../ADT_hash/hash_veicoli.o
+
+../ADT_hash/tab_hash.o: ../ADT_hash/tab_hash.c
+	gcc -I.. -c ../ADT_hash/tab_hash.c -o ../ADT_hash/tab_hash.o
 
 # Pulizia multi-ambiente
 clean:
