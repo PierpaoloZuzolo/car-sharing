@@ -15,6 +15,38 @@
 #include "ADT_lista/lista_storico_noleggio.h"
 #include "utili/utile_lista_storico_noleggio.h"
 
+/*
+ Funzione: gestione_utente
+ --------------------------
+
+ Gestisce la logica di registrazione e login degli utenti.
+ Carica gli utenti esistenti da file e permette la selezione tra:
+    - Registrazione di un nuovo utente.
+    - Login di un utente esistente.
+
+ Implementazione:
+    - Carica i dati da file all'inizio.
+    - Cicla finché l’utente non effettua una registrazione/login valida oppure sceglie di uscire.
+    - In caso di registrazione, salva il nuovo utente anche su file.
+
+ Parametri:
+    h - puntatore alla tabella hash contenente gli utenti (ptr_hash_utenti)
+
+ Pre-condizioni:
+    - h deve essere una struttura hash valida e inizializzata.
+    - Deve esistere il file "txt/Utenti/utenti.txt" per la lettura/scrittura.
+
+ Post-condizioni:
+    - Restituisce un puntatore a un utente valido (registrato o loggato), oppure termina il programma in caso di uscita.
+
+ Ritorna:
+    - Puntatore a una struttura `ptr_utente` contenente l'utente loggato o registrato.
+
+ Side-effect:
+    - Input/output su console.
+    - Lettura e scrittura su file per la persistenza degli utenti.
+    - Possibile terminazione del programma con `exit()` in caso di uscita o errori gravi.
+*/
 ptr_utente gestione_utente(ptr_hash_utenti h) {
     char nome[50], email[100];
 
@@ -90,6 +122,40 @@ ptr_utente gestione_utente(ptr_hash_utenti h) {
     }
 }
 
+/*
+ Funzione: avvia_menu_principale
+ --------------------------------
+
+ Gestisce il menu principale dell'applicazione per un utente autenticato.
+ Permette:
+    - Prenotare veicoli.
+    - Consultare ed eventualmente modificare lo storico delle prenotazioni.
+    - Terminare il programma.
+
+ Implementazione:
+    - Cicla finché l’utente non decide di uscire.
+    - Invoca le funzioni `menu_prenotazione` e `gestione_storico_prenotazioni` per le relative operazioni.
+
+ Parametri:
+    utente       - puntatore all'utente attualmente loggato
+    hash_veicoli - puntatore alla tabella hash contenente tutti i veicoli
+
+ Pre-condizioni:
+    - utente deve essere un puntatore valido e non NULL.
+    - hash_veicoli deve essere una tabella hash valida e inizializzata.
+
+ Post-condizioni:
+    - Tutte le operazioni effettuate possono aggiornare file e strutture dati.
+    - Termina solo su esplicita richiesta dell’utente (scelta 0).
+
+ Ritorna:
+    Nessun valore di ritorno (void).
+
+ Side-effect:
+    - Input/output su console.
+    - Lettura e scrittura su file.
+    - Modifica delle strutture di prenotazione e storico noleggi.
+*/
 void avvia_menu_principale(ptr_utente utente, ptr_hash_veicoli hash_veicoli) {
     int scelta;
 
@@ -130,6 +196,42 @@ void avvia_menu_principale(ptr_utente utente, ptr_hash_veicoli hash_veicoli) {
     } while (scelta != 0);
 }
 
+/*
+ Funzione: menu_prenotazione
+ ---------------------------
+
+ Gestisce il menu interattivo di prenotazione veicolo per l'utente.
+
+ Implementazione:
+    - Visualizza i veicoli disponibili.
+    - Permette all'utente di selezionare un veicolo e prenotare un intervallo di tempo.
+    - Calcola il costo, applica eventuali sconti basati sullo storico dell'utente.
+    - Registra la prenotazione e aggiorna lo storico.
+
+ Parametri:
+    hash_veicoli - puntatore alla tabella hash contenente i veicoli disponibili
+    nome_utente  - stringa contenente il nome dell'utente che effettua la prenotazione
+
+ Pre-condizioni:
+    hash_veicoli valido e inizializzato
+    nome_utente valido (non NULL)
+
+ Post-condizioni:
+    Se l'utente conferma la prenotazione:
+        - aggiorna le prenotazioni del veicolo
+        - aggiorna i file relativi alle prenotazioni e allo storico
+    Se l'utente annulla:
+        - nessuna modifica persistente viene effettuata
+
+ Ritorna:
+    ptr_veicolo - puntatore al veicolo prenotato se la prenotazione ha successo,
+                  NULL se l'utente annulla o se la prenotazione fallisce
+
+ Side-effect:
+    - Modifica lo stato delle prenotazioni del veicolo selezionato
+    - Scrive su file per aggiornare prenotazioni e storico noleggi
+    - Input/output su console
+*/
 ptr_veicolo menu_prenotazione(ptr_hash_veicoli hash_veicoli, char *nome_utente){
     ptr_veicolo ve = NULL;
 
@@ -234,6 +336,43 @@ ptr_veicolo menu_prenotazione(ptr_hash_veicoli hash_veicoli, char *nome_utente){
     return NULL;
 }
 
+/*
+ Funzione: gestione_storico_prenotazioni
+ ---------------------------------------
+
+ Permette all'utente di visualizzare e gestire lo storico delle prenotazioni effettuate.
+ Consente anche di eliminare una prenotazione precedente, aggiornando sia lo storico che
+ lo stato di prenotazione del veicolo corrispondente.
+
+ Implementazione:
+    - Carica dallo storico le prenotazioni dell'utente.
+    - Stampa l'intero storico delle prenotazioni.
+    - Permette all'utente, se desidera, di eliminare una prenotazione.
+    - In caso di eliminazione:
+        - Aggiorna la struttura di prenotazione del veicolo.
+        - Aggiorna i file di storico e di prenotazione.
+
+ Parametri:
+    nome_utente   - puntatore a stringa contenente il nome utente (identifica il file dello storico)
+    hash_veicoli  - puntatore alla tabella hash contenente tutti i veicoli
+
+ Pre-condizioni:
+    - nome_utente deve essere un puntatore valido e non NULL
+    - hash_veicoli deve essere una struttura hash valida e inizializzata
+
+ Post-condizioni:
+    - Se effettuata l’eliminazione, i dati vengono aggiornati su file e in memoria
+    - Se nessuna eliminazione, nessuna modifica persistente avviene
+
+ Ritorna:
+    Nessun valore di ritorno (void)
+
+ Side-effect:
+    - Input/output su console
+    - Modifica file su disco per storico noleggi e prenotazioni veicoli
+    - Modifica la struttura di prenotazioni in memoria per i veicoli
+
+*/
 void gestione_storico_prenotazioni(char *nome_utente, ptr_hash_veicoli hash_veicoli) {
     ptr_lista_noleggi lista_noleggi = crea_lista_storico();
     carica_lista_storico_noleggio_da_file(lista_noleggi, nome_utente);

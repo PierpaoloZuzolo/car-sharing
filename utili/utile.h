@@ -202,6 +202,27 @@ float calcola_costo_noleggio(int inizio_cella, int fine_cella, int sconto);
 */
 int inserisci_scelta();
 
+/*
+ Funzione: errore_allocazione
+ -----------------------------
+
+ Gestisce l'errore di allocazione delle risorse di sistema.
+
+ Parametri:
+    Nessuno.
+
+ Pre-condizioni:
+    Nessuna.
+
+ Post-condizioni:
+    Nessuna.
+
+ Ritorna:
+    Nessun valore (void).
+
+ Side-effect:
+    - Stampa un messaggio su standard output.
+*/
 void errore_allocazione();
 
 #endif

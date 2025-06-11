@@ -331,7 +331,31 @@ int inserisci_scelta()
     }
 }
 
+/*
+ Funzione: errore_allocazione
+ -----------------------------
 
+ Gestisce l'errore di allocazione delle risorse di sistema.
+
+ Implementazione:
+    - Stampa un messaggio di errore generico sull'impossibilità di allocare risorse.
+    - Non termina il programma, lascia la gestione all'esterno.
+
+ Parametri:
+    Nessuno.
+
+ Pre-condizioni:
+    Nessuna.
+
+ Post-condizioni:
+    Nessuna.
+
+ Ritorna:
+    Nessun valore (void).
+
+ Side-effect:
+    - Stampa un messaggio su standard output.
+*/
 void errore_allocazione()
 {
    printf("\nErrore risorse sistema.");
