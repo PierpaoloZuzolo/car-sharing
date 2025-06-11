@@ -71,88 +71,103 @@ void inserisci_nodo_storico_noleggio(ptr_lista_noleggi lista, ptr_storico prenot
 */
 int elimina_nodo_storico_noleggio(ptr_lista_noleggi lista, char *targa_veicolo_eliminato, int *ora_inizio, int *minuto_inizio, int *ora_fine, int *minuto_fine);
 
-/*
- Funzione: salva_lista_storico_noleggio_su_file
- ----------------------------------------------
-
- Salva su file il contenuto della lista dei noleggi storici di un utente.
-
- Parametri:
-    lista       : puntatore alla lista dei noleggi storici
-    nome_utente : stringa con il nome utente usato per il nome del file
-
- Pre-condizioni:
-    lista e nome_utente devono essere validi e non NULL
-
- Post-condizioni:
-    Su file "%s.txt" (dove %s è nome_utente) viene scritto lo storico dei noleggi
-
- Ritorna:
-    void
-
- Side-effect:
-    Scrive su file e produce output su stdout in caso di errore
-*/
-void salva_lista_storico_noleggio_su_file(ptr_lista_noleggi lista, char *nome_utente);
 
 /*
- Funzione: carica_lista_storico_noleggio_da_file
- ----------------------------------------------
+  Funzione: salva_lista_storico_noleggio_su_file
+  ----------------------------------------------
 
- Carica da file lo storico dei noleggi di un utente, inserendo le prenotazioni nella lista.
+  Salva su file lo storico dei noleggi associato a un determinato utente.
 
- Parametri:
-    lista       : puntatore alla lista dei noleggi storici in cui inserire i dati
-    nome_utente : stringa contenente il nome utente usato per costruire il nome del file
+  Parametri:
+     lista: puntatore alla lista contenente i record dello storico noleggi
+     nome_utente: stringa identificativa dell'utente
+     percorso_cartella: stringa opzionale contenente il percorso in cui salvare il file
 
- Pre-condizioni:
-    lista e nome_utente devono essere puntatori validi e non NULL
-    il file "%s.txt" (dove %s è nome_utente) deve esistere ed essere leggibile
-    il file deve rispettare il formato previsto con 13 campi separati da ';'
+  Pre-condizioni:
+     lista != NULL
+     nome_utente != NULL e non vuota (strlen(nome_utente) > 0)
 
- Post-condizioni:
-    La lista viene popolata con i nodi storico noleggio corrispondenti alle righe lette dal file
+  Post-condizioni:
+     se il file può essere aperto, il contenuto della lista viene salvato nel file specificato;
+     ogni elemento della lista viene scritto su una riga in formato CSV;
+     se il file non può essere aperto, viene stampato un messaggio di errore e non viene scritto nulla.
 
- Ritorna:
-    void
+  Ritorna:
+     Nessun valore di ritorno (funzione `void`)
 
- Side-effect:
-    Effettua stampe su stdout in caso di errore apertura file
-    Modifica la lista inserendo nuovi nodi
-*/
-void carica_lista_storico_noleggio_da_file(ptr_lista_noleggi lista, char *nome_utente);
+  Side-effect:
+     crea o sovrascrive un file con nome basato sull’utente;
+     scrive su file i dati della lista di noleggi;
+     stampa messaggi di errore in caso di parametri invalidi o problemi di apertura file.
+ */
+void salva_lista_storico_noleggio_su_file(ptr_lista_noleggi lista, const char *nome_utente, const char *percorso_cartella);
 
 /*
- Funzione: aggiungi_prenotazione_storico_su_file
- ----------------------------------------------
+  Funzione: carica_lista_storico_noleggio_da_file
+  -----------------------------------------------
 
- Aggiunge una nuova prenotazione allo storico dell'utente salvandola su file.
+  Carica da file lo storico dei noleggi relativi a un determinato utente e li inserisce nella lista fornita.
 
- Parametri:
-    targa           : stringa con la targa del veicolo prenotato
-    tipo_veicolo    : stringa con il tipo del veicolo
-    nome_utente     : stringa con il nome utente proprietario dello storico
-    ora_inizio      : ora di inizio noleggio
-    minuto_inizio   : minuto di inizio noleggio
-    ora_fine        : ora di fine noleggio
-    minuto_fine     : minuto di fine noleggio
-    costo           : costo totale del noleggio
+  Parametri:
+     lista: puntatore alla lista in cui caricare gli elementi dello storico
+     nome_utente: stringa che identifica l'utente
+     percorso_file: stringa opzionale che specifica il percorso della cartella dei file
 
- Pre-condizioni:
-    targa, tipo_veicolo e nome_utente devono essere puntatori validi e non NULL
-    Le funzioni data_attuale e ottieni_orario_corrente devono essere definite e funzionanti
+  Pre-condizioni:
+     lista != NULL
+     nome_utente != NULL
 
- Post-condizioni:
-    La prenotazione viene aggiunta in fondo al file storico dell'utente
+  Post-condizioni:
+     se il file esiste ed è valido, gli elementi vengono letti e inseriti nella lista;
+     se il file non esiste, la lista rimane invariata;
+     eventuali righe non leggibili o incomplete vengono ignorate.
 
- Ritorna:
-    void
+  Ritorna:
+     1 se la lettura ha avuto successo e almeno una riga è stata gestita correttamente;
+     2 se il file non esiste (non è considerato un errore critico);
+     0 in caso di parametri non validi (lista o nome utente NULL)
 
- Side-effect:
-    Effettua stampe su stdout in caso di errore apertura file
-    Modifica il file di testo con l'aggiunta della nuova prenotazione
-*/
-void aggiungi_prenotazione_storico_su_file(const char *targa, const char *tipo_veicolo, const char *nome_utente, int ora_inizio, int minuto_inizio, int ora_fine, int minuto_fine, float costo);
+  Side-effect:
+     apre e legge da un file su disco;
+     può modificare il contenuto della lista passata come parametro;
+     alloca memoria dinamica per ogni record storico inserito nella lista.
+ */
+int carica_lista_storico_noleggio_da_file(ptr_lista_noleggi lista, char *nome_utente, const char *percorso_file);
+
+
+/*
+  Funzione: aggiungi_prenotazione_storico_su_file
+  -----------------------------------------------
+
+  Aggiunge una nuova voce di prenotazione allo storico dei noleggi dell’utente, salvandola su file in formato CSV.
+
+  Parametri:
+     targa: stringa contenente la targa del veicolo noleggiato
+     tipo_veicolo: stringa che identifica la tipologia del veicolo
+     nome_utente: stringa che rappresenta l'utente che ha effettuato il noleggio
+     ora_inizio: ora di inizio del noleggio
+     minuto_inizio: minuti di inizio del noleggio
+     ora_fine: ora di fine del noleggio
+     minuto_fine: minuti di fine del noleggio
+     costo: costo del noleggio (valore float con 2 decimali)
+     percorso_file: percorso opzionale della cartella dove salvare il file
+
+  Pre-condizioni:
+     targa, tipo_veicolo e nome_utente devono essere stringhe non NULL
+
+  Post-condizioni:
+     se il file è accessibile, una nuova riga con i dati della prenotazione viene aggiunta al file;
+     altrimenti, nessun dato viene scritto e viene restituito 0.
+
+  Ritorna:
+     1 se l’operazione è andata a buon fine;
+     0 se si è verificato un errore (es. parametri non validi o apertura file fallita)
+
+  Side-effect:
+     apre e scrive su un file su disco in modalità append;
+     ottiene la data e ora correnti tramite funzioni di sistema.
+ */
+void aggiungi_prenotazione_storico_su_file(const char *targa, const char *tipo_veicolo, const char *nome_utente, int ora_inizio, int minuto_inizio, int ora_fine, int minuto_fine, float costo, const char *percorso_file);
 
 /*
  Funzione: stampa_lista_noleggi

@@ -15,6 +15,10 @@
 #include "ADT_lista/lista_storico_noleggio.h"
 #include "utili/utile_lista_storico_noleggio.h"
 
+#define PERCORSO_STORICO_NOLEGGI "txt/Storico_noleggi"
+#define PERCORSO_PRENOTAZIONI_VEICOLI "txt/Prenotazioni_veicoli"
+#define PERCORSO_FILE_UTENTI "txt/Utenti"
+
 /*
  Funzione: gestione_utente
  --------------------------
@@ -50,7 +54,7 @@
 ptr_utente gestione_utente(ptr_hash_utenti h) {
     char nome[50], email[100];
 
-    carica_utente_da_file("txt/Utenti/utenti.txt", h);
+    carica_utenti_da_file("utenti.txt", h, PERCORSO_FILE_UTENTI);
 
     int scelta;
 
@@ -89,7 +93,7 @@ ptr_utente gestione_utente(ptr_hash_utenti h) {
                 }
 
                 if(inserisci_utente_in_hash(h, nuovo)){
-                    salva_utente_su_file("txt/Utenti/utenti.txt", nuovo);
+                    salva_utente_su_file("utenti.txt", nuovo, PERCORSO_FILE_UTENTI);
                     printf("\nRegistrazione completata!");
                     printf("\nBenvenut* in Luxury Sharing, %s!\n\n", nome);
                     return nuovo;
@@ -237,7 +241,7 @@ ptr_veicolo menu_prenotazione(ptr_hash_veicoli hash_veicoli, char *nome_utente){
 
     printf("\n\n===== VEICOLI DISPONIBILI =====\n\n");
     aggiorna_prenotazioni_veicoli(hash_veicoli);
-    aggiorna_file_prenotazione_veicoli(hash_veicoli);
+    aggiorna_file_prenotazione_veicoli(hash_veicoli, PERCORSO_PRENOTAZIONI_VEICOLI);
     stampa_veicoli_disponibili(hash_veicoli);
 
     printf("\n1. Prenota un veicolo\n");
@@ -272,7 +276,10 @@ ptr_veicolo menu_prenotazione(ptr_hash_veicoli hash_veicoli, char *nome_utente){
             }
 
             ptr_lista_noleggi lista_noleggi = crea_lista_storico();
-            carica_lista_storico_noleggio_da_file(lista_noleggi, nome_utente);
+            if(carica_lista_storico_noleggio_da_file(lista_noleggi, nome_utente, PERCORSO_STORICO_NOLEGGI) == 0){
+                printf("\n[ERRORE] caricamenti lista storico noleggio ha fallito.");
+                exit(1);
+            }
             int sconto = conta_fino_a_coda(lista_noleggi);
             distruggi_lista_storico_noleggio(lista_noleggi);
 
@@ -296,7 +303,8 @@ ptr_veicolo menu_prenotazione(ptr_hash_veicoli hash_veicoli, char *nome_utente){
             if (scelta == 0) return NULL;
 
             if (prenota_intervallo(prendi_prenotazioni(ve), inizio, fine)) {
-                aggiorna_prenotazione_veicolo(ve);
+                aggiorna_stato_veicolo(ve);
+                aggiorna_file_prenotazione_veicoli(hash_veicoli, PERCORSO_PRENOTAZIONI_VEICOLI);
 
                 printf("Prenotazione per veicolo [%s] completata!\n", prendi_targa(ve));
 
@@ -304,7 +312,7 @@ ptr_veicolo menu_prenotazione(ptr_hash_veicoli hash_veicoli, char *nome_utente){
                 converti_celle_in_orario(inizio, fine, &ora_inizio, &minuto_inizio, &ora_fine, &minuto_fine);
 
                 aggiungi_prenotazione_storico_su_file(prendi_targa(ve), prendi_marca(ve), nome_utente,
-                                                     ora_inizio, minuto_inizio, ora_fine, minuto_fine, costo);
+                                                     ora_inizio, minuto_inizio, ora_fine, minuto_fine, costo, PERCORSO_STORICO_NOLEGGI);
 
                 return ve;
             } else {
@@ -375,7 +383,11 @@ ptr_veicolo menu_prenotazione(ptr_hash_veicoli hash_veicoli, char *nome_utente){
 */
 void gestione_storico_prenotazioni(char *nome_utente, ptr_hash_veicoli hash_veicoli) {
     ptr_lista_noleggi lista_noleggi = crea_lista_storico();
-    carica_lista_storico_noleggio_da_file(lista_noleggi, nome_utente);
+    if( carica_lista_storico_noleggio_da_file(lista_noleggi, nome_utente, PERCORSO_STORICO_NOLEGGI) == 0){
+        printf("\n[ERRORE] caricamento dello storico noleggi ha fallito.");
+        distruggi_lista_storico_noleggio(lista_noleggi);
+        return;
+    }
 
     printf("\n===== STORICO NOLEGGI =====\n\n");
     int lunghezza_lista = stampa_lista_noleggi(lista_noleggi);
@@ -404,8 +416,10 @@ void gestione_storico_prenotazioni(char *nome_utente, ptr_hash_veicoli hash_veic
             if (ve != NULL) {
                 converti_orario_in_celle(ora_inizio, minuto_inizio, ora_fine, minuto_fine, &cella_inizio, &cella_fine);
                 libera_intervallo(prendi_prenotazioni(ve), cella_inizio, cella_fine);
-                salva_prenotazioni_su_file(prendi_prenotazioni(ve), targa_veicolo_eliminato);
-                salva_lista_storico_noleggio_su_file(lista_noleggi, nome_utente);
+                salva_prenotazione_su_file(prendi_prenotazioni(ve), prendi_targa(ve), PERCORSO_PRENOTAZIONI_VEICOLI);
+                
+                
+                salva_lista_storico_noleggio_su_file(lista_noleggi, nome_utente, PERCORSO_STORICO_NOLEGGI);
                 printf("Prenotazione eliminata con successo.\n");
             } else {
                 printf("Errore: veicolo non trovato nell'hash.\n");

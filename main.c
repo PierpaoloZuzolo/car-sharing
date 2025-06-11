@@ -16,6 +16,9 @@
 #include "utili/utile_lista_storico_noleggio.h"
 #include "Interfaccia_utente/interfaccia_utente.h"
 
+#define PERCORSO_FILE_VEICOLI "txt/Veicoli"
+#define PERCORSO_PRENOTAZIONI_VEICOLI "txt/Prenotazioni_veicoli"
+
 
 #define DIM_HASH_UTENTI 200
 #define DIM_HASH_VEICOLI 150
@@ -34,7 +37,32 @@ int main() {
         return 1;
     }
 
-    carica_veicoli_da_file("txt/Veicoli/veicoli.txt", hash_veicoli);
+    if(carica_veicoli_da_file("veicoli.txt", hash_veicoli, PERCORSO_FILE_VEICOLI) == 0){
+        fprintf(stderr, "[ERRORE] Impossibile aprire il file \"%s\"\n", PERCORSO_FILE_VEICOLI);
+         distruggi_hash_utenti(hash_ut);
+         distruggi_hash_veicoli(hash_veicoli);
+        return 1;
+    }
+
+    if(carica_prenotazioni_veicoli_da_file(hash_veicoli, PERCORSO_PRENOTAZIONI_VEICOLI) == 0){
+        printf("\n[ERRORE], caricamenti prenotazioni veicoli ha fallito.");
+         distruggi_hash_utenti(hash_ut);
+         distruggi_hash_veicoli(hash_veicoli);
+        return 1;
+    }
+    if(aggiorna_prenotazioni_veicoli(hash_veicoli) == 0){
+        printf("\n[ERRORE], aggiornamento prenotazioni veicoli ha fallito.");
+         distruggi_hash_utenti(hash_ut);
+         distruggi_hash_veicoli(hash_veicoli);
+        return 1;
+    }
+
+    if(aggiorna_file_prenotazione_veicoli(hash_veicoli, PERCORSO_PRENOTAZIONI_VEICOLI) == 0){
+        printf("\n[ERRORE], aggiornamento file prenotazioni veicoli ha fallito.");
+         distruggi_hash_utenti(hash_ut);
+         distruggi_hash_veicoli(hash_veicoli);
+        return 1;
+    }
 
     if (vedi_se_giorno_nuovo()) {
         int giorno, mese, anno;

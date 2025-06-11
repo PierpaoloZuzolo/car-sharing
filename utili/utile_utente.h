@@ -34,58 +34,68 @@ Data: 20/05/2025
  */
 void stampa_utente(ptr_utente ut);
 
-/*
- Funzione: salva_utente_su_file
- ------------------------------
-
- Salva i dati dell'utente su due file:
- 1) un file generale di elenco utenti (append),
- 2) un file dedicato con nome "<nome_utente>.txt" contenente dati specifici.
-
- Parametri:
-    nome_file: stringa contenente il nome del file per l'elenco generale utenti
-    ut: puntatore alla struttura utente da salvare
-
- Pre-condizioni:
-    `nome_file` deve essere una stringa valida.
-    `ut` deve essere un puntatore valido non NULL.
-
- Post-condizioni:
-    I dati dell'utente sono salvati su disco su due file (append + dedicato).
-
- Ritorna:
-    void
-
- Side-effect:
-    Scrive su file su disco.
-    Può stampare messaggi di errore su stdout in caso di problemi.
- */
-void salva_utente_su_file(char *nome_file, ptr_utente ut);
 
 /*
- Funzione: carica_utente_da_file
- -------------------------------
+  Funzione: salva_utente_su_file
+  ------------------------------
 
- Carica gli utenti da un file e li inserisce nella tabella hash degli utenti.
+  Salva le informazioni di un utente su un file di testo, in modalità append.
 
- Parametri:
-    nome_file: stringa contenente il nome del file da cui caricare gli utenti
-    h: puntatore alla tabella hash utenti in cui inserire gli utenti caricati
+  Parametri:
+     nome_file: nome base del file (senza estensione)
+     ut: puntatore alla struttura utente da salvare
+     percorso_file: percorso opzionale della cartella in cui salvare il file
 
- Pre-condizioni:
-    `nome_file` deve essere una stringa valida e puntatore non NULL.
-    `h` deve essere un puntatore valido alla tabella hash.
+  Pre-condizioni:
+     ut != NULL
+     nome_file != NULL e non vuoto
 
- Post-condizioni:
-    La tabella hash `h` conterrà i nuovi utenti caricati dal file.
+  Post-condizioni:
+     se il file viene aperto correttamente, i dati dell'utente sono scritti in append;
+     altrimenti, non viene scritto nulla.
 
- Ritorna:
-    void
+  Ritorna:
+     1 se il salvataggio ha avuto successo;
+     0 in caso di errore (es. parametri non validi o apertura file fallita)
 
- Side-effect:
-    Può allocare memoria per nuovi utenti e modificarne la tabella hash.
+  Side-effect:
+     apre (o crea) e scrive su un file di testo;
+     aggiunge una nuova riga contenente i dati dell'utente.
  */
-void carica_utente_da_file(const char *nome_file, ptr_hash_utenti h);
+
+int salva_utente_su_file(char *nome_file, ptr_utente ut, const char *percorso_file);
+
+/*
+  Funzione: carica_utenti_da_file
+  -------------------------------
+
+  Carica da un file di testo gli utenti registrati e li inserisce in una tabella hash.
+
+  Parametri:
+     nome_file: nome del file contenente gli utenti (con o senza estensione)
+     h: puntatore alla tabella hash degli utenti
+     percorso_file: percorso opzionale della cartella in cui si trova il file
+
+  Pre-condizioni:
+     nome_file != NULL
+     h != NULL
+
+  Post-condizioni:
+     se il file è valido e contiene righe ben formattate (nome email),
+     gli utenti vengono inseriti nella tabella hash;
+     le righe mal formattate vengono ignorate.
+
+  Ritorna:
+     1 se il file è stato aperto correttamente e almeno un'operazione di lettura è stata tentata;
+     0 se il file non può essere aperto o i parametri sono invalidi.
+
+  Side-effect:
+     apre e legge da un file su disco;
+     può allocare memoria dinamicamente per ogni utente letto e inserirlo nella tabella hash.
+ */
+
+int carica_utenti_da_file(const char *nome_file, ptr_hash_utenti h, const char *percorso_file);
+
 
 
 /*
