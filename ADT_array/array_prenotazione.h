@@ -53,57 +53,7 @@ ptr_prenotazione inizializza_prenotazioni();
 */
 int prendi_grandezza_array_prenotazioni();
 
-/*
- Funzione: prenota_intervallo
- ----------------------------
 
- Prenota un intervallo di celle nell'array prenotazioni.
-
- Parametri:
-    p           - puntatore alla struttura prenotazioni
-    inizio_cella- indice di inizio intervallo (inclusivo)
-    fine_cella  - indice di fine intervallo (esclusivo)
-
- Pre-condizioni:
-    p valido
-    inizio_cella e fine_cella validi e inizio_cella < fine_cella
-
- Post-condizioni:
-    Celle nell'intervallo prenotate
-
- Ritorna:
-    1 se prenotazione riuscita, 0 altrimenti
-
- Side-effect:
-    Modifica celle nell'array prenotazioni
-*/
-//int prenota_intervallo(ptr_prenotazione p, int inizio_cella, int fine_cella);
-
-/*
- Funzione: libera_intervallo
- ---------------------------
-
- Libera un intervallo di celle nell'array prenotazioni.
-
- Parametri:
-    p           - puntatore alla struttura prenotazioni
-    inizio_cella- indice di inizio intervallo (inclusivo)
-    fine_cella  - indice di fine intervallo (esclusivo)
-
- Pre-condizioni:
-    p valido
-    inizio_cella e fine_cella validi e inizio_cella < fine_cella
-
- Post-condizioni:
-    Celle nell'intervallo liberate (impostate a NULL)
-
- Ritorna:
-    1 se liberazione riuscita, 0 altrimenti
-
- Side-effect:
-    Modifica celle nell'array prenotazioni
-*/
-//int libera_intervallo(ptr_prenotazione p, int inizio_cella, int fine_cella);
 
 /*
  Funzione: ottiene_cella

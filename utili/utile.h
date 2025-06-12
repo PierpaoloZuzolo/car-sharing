@@ -225,4 +225,106 @@ int inserisci_scelta();
 */
 void errore_allocazione();
 
+/*
+ Funzione: leggi_input
+ ---------------------
+
+ Legge una stringa da input standard in modo sicuro, evitando
+ buffer overflow e rimuovendo il carattere newline finale.
+
+ Parametri:
+    char *dest       - puntatore al buffer di destinazione dove salvare la stringa
+    size_t dimensione - dimensione massima del buffer (incluso il terminatore)
+
+ Pre-condizioni:
+    Il puntatore dest deve essere valido e puntare a un buffer di almeno 'dimensione' byte.
+
+ Post-condizioni:
+    La stringa letta da stdin è salvata in dest senza il carattere newline finale.
+    Il buffer di input è svuotato se la stringa letta supera la dimensione del buffer.
+
+ Ritorna:
+    void
+
+ Side-effect:
+    Legge da input standard e svuota eventualmente il buffer di input.
+*/
+void leggi_input(char *dest, size_t dimensione);
+
+/*
+ Funzione: valida_nome
+ ---------------------
+
+ Controlla se la stringa 'nome' è un nome valido secondo i criteri:
+    - lunghezza tra 1 e 49 caratteri
+    - contiene solo lettere, numeri o underscore
+
+ Parametri:
+    const char *nome - stringa da validare
+
+ Pre-condizioni:
+    nome deve essere una stringa terminata da '\0'.
+
+ Post-condizioni:
+    Nessuna modifica a 'nome'.
+
+ Ritorna:
+    true se il nome è valido, false altrimenti.
+
+ Side-effect:
+    Nessuno.
+*/
+bool valida_nome(const char *nome);
+
+/*
+ Funzione: valida_email
+ ----------------------
+
+ Controlla se la stringa 'email' è una email valida secondo i criteri minimi:
+    - lunghezza tra 1 e 99 caratteri
+    - contiene almeno un carattere '@'
+    - contiene almeno un '.' dopo '@'
+    - tutti i caratteri sono stampabili
+
+ Parametri:
+    const char *email - stringa da validare
+
+ Pre-condizioni:
+    email deve essere una stringa terminata da '\0'.
+
+ Post-condizioni:
+    Nessuna modifica a 'email'.
+
+ Ritorna:
+    true se l’email è valida secondo i criteri, false altrimenti.
+
+ Side-effect:
+    Nessuno.
+*/
+bool valida_email(const char *email);
+
+/*
+ Funzione: pulisci_input_buffer
+ ------------------------------
+
+ Svuota il buffer di input fino a incontrare un newline o EOF.
+
+ Parametri:
+    Nessuno.
+
+ Pre-condizioni:
+    Nessuna.
+
+ Post-condizioni:
+    Il buffer di input è svuotato fino a newline o EOF.
+
+ Ritorna:
+    void
+
+ Side-effect:
+    Consuma caratteri da input standard.
+*/
+void pulisci_input_buffer();
+
+
 #endif

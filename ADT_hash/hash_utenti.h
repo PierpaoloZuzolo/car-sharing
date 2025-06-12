@@ -42,30 +42,6 @@ typedef struct tabella_hash *ptr_hash_utenti;
 ptr_hash_utenti crea_hash_utenti(int dimensione);
 
 /*
- Funzione: libera_utente_hash
- ----------------------------
-
- Funzione ausiliaria per liberare correttamente la memoria associata a un utente,
- da usare come callback nei processi di distruzione della tabella hash.
-
- Parametri:
-    utente: puntatore generico a un utente da liberare
-
- Pre-condizioni:
-    utente deve essere non NULL e puntare a una struttura `utente` valida
-
- Post-condizioni:
-    la memoria associata all'utente viene deallocata
-
- Ritorna:
-    niente (void)
-
- Side-effect:
-    dealloca memoria dinamicamente associata all'utente
- */
-static void libera_utente_hash(void *utente);
-
-/*
  Funzione: distruggi_hash_utenti
  -------------------------------
 

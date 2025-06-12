@@ -39,31 +39,6 @@ typedef struct tabella_hash *ptr_hash_veicoli;
 ptr_hash_veicoli crea_hash_veicoli(int dimensione);
 
 /*
- Funzione: libera_veicolo_hash
- -----------------------------
-
- Funzione ausiliaria per liberare correttamente la memoria associata a un veicolo,
- da usare come callback nei processi di distruzione della tabella hash.
-
-
- Parametri:
-    veicolo: puntatore generico a un veicolo da liberare
-
- Pre-condizioni:
-    veicolo deve essere non NULL e puntare a una struttura `veicolo` valida
-
- Post-condizioni:
-    la memoria associata al veicolo viene deallocata
-
- Ritorna:
-    niente (void)
-
- Side-effect:
-    dealloca memoria dinamicamente associata al veicolo
- */
-static void libera_veicolo_hash(void *veicolo);
-
-/*
  Funzione: distruggi_hash_veicoli
  --------------------------------
 

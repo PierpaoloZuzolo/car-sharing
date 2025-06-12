@@ -8,6 +8,8 @@ Data: 16/05/2025
 #include <string.h>
 #include <time.h>
 #include <stdbool.h>
+#include <ctype.h>
+
 #include "utile.h"
 
 
@@ -359,4 +361,161 @@ int inserisci_scelta()
 void errore_allocazione()
 {
    printf("\nErrore risorse sistema.");
+}
+
+/*
+ Funzione: leggi_input
+ ---------------------
+
+ Legge una stringa da input standard in modo sicuro, evitando
+ buffer overflow e rimuovendo il carattere newline finale.
+
+ Implementazione:
+    Usa fgets per leggere una stringa da stdin con lunghezza massima 
+    definita da 'dimensione'.
+    Se presente, rimuove il carattere '\n' finale.
+    Se la stringa è più lunga del buffer, svuota il buffer di input 
+    per evitare che il resto dell’input rimanga nel buffer.
+
+ Parametri:
+    char *dest       - puntatore al buffer di destinazione dove salvare la stringa
+    size_t dimensione - dimensione massima del buffer (incluso il terminatore)
+
+ Pre-condizioni:
+    Il puntatore dest deve essere valido e puntare a un buffer di almeno 'dimensione' byte.
+
+ Post-condizioni:
+    La stringa letta da stdin è salvata in dest senza il carattere newline finale.
+    Il buffer di input è svuotato se la stringa letta supera la dimensione del buffer.
+
+ Ritorna:
+    void
+
+ Side-effect:
+    Legge da input standard e svuota eventualmente il buffer di input.
+*/
+void leggi_input(char *dest, size_t dimensione) 
+{
+    if (fgets(dest, dimensione, stdin)) {
+        size_t len = strlen(dest);
+        if (len > 0 && dest[len - 1] == '\n')
+            dest[len - 1] = '\0'; 
+        else
+            while (getchar() != '\n'); 
+    }
+}
+
+/*
+ Funzione: valida_nome
+ ---------------------
+
+ Controlla se la stringa 'nome' è un nome valido secondo i criteri:
+    - lunghezza tra 1 e 49 caratteri
+    - contiene solo lettere, numeri o underscore
+
+ Implementazione:
+    Conta la lunghezza della stringa.
+    Controlla ogni carattere: deve essere alfanumerico o underscore.
+    Ritorna false se non soddisfa i requisiti.
+
+ Parametri:
+    const char *nome - stringa da validare
+
+ Pre-condizioni:
+    nome deve essere una stringa terminata da '\0'.
+
+ Post-condizioni:
+    Nessuna modifica a 'nome'.
+
+ Ritorna:
+    true se il nome è valido, false altrimenti.
+
+ Side-effect:
+    Nessuno.
+*/
+bool valida_nome(const char *nome) 
+{
+    size_t len = strlen(nome);
+    if (len == 0 || len >= 50) return false;
+
+    for (size_t i = 0; i < len; i++) {
+        if (!isalnum(nome[i]) && nome[i] != '_') return false;
+    }
+    return true;
+}
+
+/*
+ Funzione: valida_email
+ ----------------------
+
+ Controlla se la stringa 'email' è una email valida secondo i criteri minimi:
+    - lunghezza tra 1 e 99 caratteri
+    - contiene almeno un carattere '@'
+    - contiene almeno un '.' dopo '@'
+    - tutti i caratteri sono stampabili
+
+ Implementazione:
+    Scorre la stringa controllando i caratteri.
+    Tiene traccia se '@' è stato trovato e, dopo '@', se '.' è stato trovato.
+    Ritorna true solo se entrambi sono presenti e tutti i caratteri sono stampabili.
+
+ Parametri:
+    const char *email - stringa da validare
+
+ Pre-condizioni:
+    email deve essere una stringa terminata da '\0'.
+
+ Post-condizioni:
+    Nessuna modifica a 'email'.
+
+ Ritorna:
+    true se l’email è valida secondo i criteri, false altrimenti.
+
+ Side-effect:
+    Nessuno.
+*/
+bool valida_email(const char *email) 
+{
+    size_t len = strlen(email);
+    if (len == 0 || len >= 100) return false;
+
+    bool chiocciola_trovata = false, punto_trovato = false;
+
+    for (size_t i = 0; i < len; i++) {
+        if (!isprint(email[i])) return false;
+        if (email[i] == '@') chiocciola_trovata = true;
+        if (chiocciola_trovata && email[i] == '.') punto_trovato = true;
+    }
+
+    return chiocciola_trovata && punto_trovato;
+}
+
+/*
+ Funzione: pulisci_input_buffer
+ ------------------------------
+
+ Svuota il buffer di input fino a incontrare un newline o EOF.
+
+ Implementazione:
+    Legge caratteri da stdin uno ad uno finché non trova '\n' o EOF.
+
+ Parametri:
+    Nessuno.
+
+ Pre-condizioni:
+    Nessuna.
+
+ Post-condizioni:
+    Il buffer di input è svuotato fino a newline o EOF.
+
+ Ritorna:
+    void
+
+ Side-effect:
+    Consuma caratteri da input standard.
+*/
+void pulisci_input_buffer() 
+{
+    int c;
+    while ((c = getchar()) != '\n' && c != EOF);
 }

@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+
 #include "interfaccia_utente.h"
 #include "Modello_utente/utente.h"
 #include "ADT_hash/hash_utenti.h"
@@ -19,6 +20,7 @@
 #define PERCORSO_PRENOTAZIONI_VEICOLI "txt/Prenotazioni_veicoli"
 #define PERCORSO_FILE_UTENTI "txt/Utenti"
 
+#define MAX_TENTATIVI 5
 
 
 /*
@@ -60,7 +62,7 @@ int leggi_cella_da_orario(const char *messaggio)
 
         // Pulizia del buffer in caso di input errato
         if (result != 2) {
-            printf("Input non valido. Inserisci due numeri interi.\n");   // DA SPOSTARE IN UTILI !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            printf("Input non valido. Inserisci due numeri interi.\n");   
             while (getchar() != '\n'); // scarta input residuo
             continue;
         }
@@ -109,12 +111,11 @@ int leggi_cella_da_orario(const char *messaggio)
 */
 ptr_utente gestione_utente(ptr_hash_utenti h) {
     char nome[50], email[100];
+    int scelta;
 
     carica_utenti_da_file("utenti.txt", h, PERCORSO_FILE_UTENTI);
 
-    int scelta;
-
-    while(1){
+    while (1) {
         printf("\n==============================\n");
         printf("       Luxury Sharing     \n");
         printf("==============================\n");
@@ -124,50 +125,88 @@ ptr_utente gestione_utente(ptr_hash_utenti h) {
         printf("------------------------------\n");
         printf(" Scelta: ");
 
-        if(scanf("%d", &scelta) != 1) {
+        if (scanf("%d", &scelta) != 1) {
             printf("\nInput non valido. Per favore inserisci un numero.\n");
-            while(getchar() != '\n');
+            pulisci_input_buffer();
             continue;
         }
+        pulisci_input_buffer();
 
         switch (scelta) {
             case 0:
                 printf("\nHai scelto di uscire. Alla prossima!\n");
-                exit(0);
+                return NULL;
 
             case 1: {
-                printf("\nRegistrazione utente");
-                printf("\nInserisci nome: ");
-                scanf("%49s", nome);
-                printf("Inserisci email: ");
-                scanf("%99s", email);
+                printf("\nRegistrazione utente\n");
 
-                ptr_utente nuovo = inizia_utente(nome, email);
-                if (!nuovo){
-                    printf("\nErrore risorse sistema insufficienti.\n");
-                    exit(1);
+                int tentativi_nome = 0;
+                while (tentativi_nome < MAX_TENTATIVI) {
+                    printf("Inserisci nome (solo lettere, numeri, underscore): ");
+                    leggi_input(nome, sizeof(nome));
+
+                    if (!valida_nome(nome)) {
+                        printf("Nome non valido. Tentativi rimanenti: %d\n", MAX_TENTATIVI - tentativi_nome - 1);
+                        tentativi_nome++;
+                        continue;
+                    }
+
+                    if (cerca_utente_in_hash(h, nome)) {
+                        printf("Nome già esistente. Scegli un altro nome.\n");
+                        tentativi_nome++;
+                        continue;
+                    }
+
+                    break;
+                }
+                if (tentativi_nome == MAX_TENTATIVI) {
+                    printf("\nTroppe tentativi falliti. Operazione annullata.\n");
+                    return NULL;
                 }
 
-                if(inserisci_utente_in_hash(h, nuovo)){
+                int tentativi_email = 0;
+                while (tentativi_email < MAX_TENTATIVI) {
+                    printf("Inserisci email (deve contenere '@' e '.'): ");
+                    leggi_input(email, sizeof(email));
+
+                    if (!valida_email(email)) {
+                        printf("Email non valida. Tentativi rimanenti: %d\n", MAX_TENTATIVI - tentativi_email - 1);
+                        tentativi_email++;
+                        continue;
+                    }
+                    break;
+                }
+                if (tentativi_email == MAX_TENTATIVI) {
+                    printf("\nTroppe tentativi falliti. Operazione annullata.\n");
+                    return NULL;
+                }
+
+                ptr_utente nuovo = inizia_utente(nome, email);
+                if (!nuovo) {
+                    printf("\nErrore: risorse di sistema insufficienti.\n");
+                    return NULL;
+                }
+
+                if (inserisci_utente_in_hash(h, nuovo)) {
                     salva_utente_su_file("utenti.txt", nuovo, PERCORSO_FILE_UTENTI);
                     printf("\nRegistrazione completata!");
                     printf("\nBenvenut* in Luxury Sharing, %s!\n\n", nome);
                     return nuovo;
                 } else {
-                    printf("\nNome utente non valido. Riprova con un altro nome.\n");
+                    printf("\nErrore: nome utente non valido o duplicato.\n");
                     libera_utente(nuovo);
                 }
+
                 break;
             }
 
             case 2: {
-                printf("\nLogin utente");
-                printf("\nInserisci nome: ");
-                scanf("%49s", nome);
+                printf("\nLogin utente\n");
+                printf("Inserisci nome: ");
+                leggi_input(nome, sizeof(nome));
 
                 ptr_utente trovato = cerca_utente_in_hash(h, nome);
-
-                if(trovato){
+                if (trovato) {
                     printf("\nLogin effettuato!");
                     printf("\nBentornat* ");
                     stampa_utente(trovato);
@@ -178,10 +217,13 @@ ptr_utente gestione_utente(ptr_hash_utenti h) {
                 }
                 break;
             }
+
+            default:
+                printf("\nScelta non valida. Riprova.\n");
+                break;
         }
     }
 }
-
 
 
 /*
