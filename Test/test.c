@@ -107,62 +107,70 @@ int main(int argc, char **argv) {
 
 
     char test_case[LUNGHEZZA_RIGA];
-    while (fgets(test_case, sizeof(test_case), ts)) {
-        test_case[strcspn(test_case, "\n")] = 0; // rimuove newline
+   while (fgets(test_case, sizeof(test_case), ts)) {
+    test_case[strcspn(test_case, "\n")] = 0;
 
-        char *tc_generale = strtok(test_case, " ");
-        if(strcmp(tc_generale, "TC1") == 0){
-            if(test_funzione1() < 0){
-                printf("Errore TC1\n");
-                continue;
-            }
-        }
+    char *tc_generale = strtok(test_case, " ");
+    int risultato = 0; // di default
 
-        if(strcmp(tc_generale, "TC2") == 0){
-            if(test_funzione2(hash_veicoli, hash_utenti) < 0){
-                printf("Errore TC2\n");
-                continue;
-            }
+    if(strcmp(tc_generale, "TC1") == 0){
+        int esito = test_funzione1();
+        if(esito < 0){
+            printf("Errore TC1\n");
+            risultato = 0;  // FAIL
+        } else {
+            risultato = 1;  // PASS (temporaneo, ora vediamo il confronto file)
         }
-        if(strcmp(tc_generale, "TC3") == 0){
-            if(test_funzione3() < 0){
-                printf("Errore TC3\n");
-                continue;
-            }
+    }
+    else if(strcmp(tc_generale, "TC2") == 0){
+        int esito = test_funzione2(hash_veicoli, hash_utenti);
+        if(esito < 0){
+            printf("Errore TC2\n");
+            risultato = 0;
+        } else {
+            risultato = 1;
         }
+    }
+    else if(strcmp(tc_generale, "TC3") == 0){
+        int esito = test_funzione3();
+        if(esito < 0){
+            printf("Errore TC3\n");
+            risultato = 0;
+        } else {
+            risultato = 1;
+        }
+    } else {
+        printf("Test case non riconosciuto: \"%s\"\n", tc_generale);
+        risultato = 0;
+    }
 
+    // Solo se il test è andato in esecuzione confronto i file
+    if (risultato == 1) {
         char file_oracle[CONTENITORE] = {0};
         snprintf(file_oracle, CONTENITORE, "%s/oracle.txt", tc_generale);
 
         char file_output[CONTENITORE] = {0};
         snprintf(file_output, CONTENITORE, "%s/output.txt", tc_generale);
 
-        //Apertura file
         FILE *oracle_file = fopen(file_oracle, "r");
         FILE *output_file = fopen(file_output, "r");
 
-        if (!oracle_file) {
-            printf("Errore apertura file %s\n", file_oracle);
-            fflush(stdout);
-        }
-        if (!output_file) {
-            printf("Errore apertura file %s\n", file_output);
-            fflush(stdout);
-        }
-    
         if (!oracle_file || !output_file) {
+            printf("Errore apertura file oracle/output per %s\n", tc_generale);
             if (oracle_file) fclose(oracle_file);
             if (output_file) fclose(output_file);
-            continue;
+            risultato = 0;  // Consideriamo il test fallito
+        } else {
+            risultato = confronta_file(oracle_file, output_file);
+            fclose(oracle_file);
+            fclose(output_file);
         }
-
-        int risultato = confronta_file(oracle_file, output_file);
-        //Scrittura PASS/FAIL in 'result.txt' es. TC1:PASS
-        fprintf(file_result, "%s: %s\n", tc_generale, risultato ? "PASS" : "FAIL");
-
-        fclose(oracle_file);
-        fclose(output_file);
     }
+
+    // Ora in ogni caso scriviamo il risultato
+    fprintf(file_result, "%s: %s\n", tc_generale, risultato ? "PASS" : "FAIL");
+}
+
     
     distruggi_hash_utenti(hash_utenti);
     distruggi_hash_veicoli(hash_veicoli);
@@ -172,7 +180,7 @@ int main(int argc, char **argv) {
     fclose(file_result);
 
 
-    printf("\n\nFino a qui arrivo--------------------");
+    
     return 0;
 }
 
@@ -464,7 +472,3 @@ int confronta_file(FILE *a, FILE *b) {
 
     return 1; // Test superato
 }
-
-
-
-    
