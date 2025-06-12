@@ -58,41 +58,12 @@ int dimensione_lista(ptr_lista_noleggi l)
     return count;
 }
 
-/*
- Funzione: inserisci_nodo_storico_noleggio
- -----------------------------------------
 
- Inserisce un nuovo nodo nella lista dello storico noleggi rispettando la
- distinzione tra nodi eliminabili e non eliminabili.
-
- Implementazione:
-    Se la lista è vuota, inserisce il nodo in testa.
-    Se esiste una coda (primo nodo non eliminabile), inserisce il nuovo nodo
-    subito dopo la coda e aggiorna la coda solo se il nuovo nodo non è eliminabile.
-    Se la coda non esiste, inserisce il nodo in testa e, se non eliminabile, lo imposta come coda.
-
- Parametri:
-    lista: puntatore alla lista dei noleggi
-    prenotazione: puntatore allo storico noleggio da inserire nella lista
-
- Pre-condizioni:
-    `lista` e `prenotazione` devono essere puntatori validi e non NULL.
-
- Post-condizioni:
-    Il nodo viene inserito nella lista in posizione corretta,
-    la coda viene aggiornata se necessario.
-
- Ritorna:
-    void
-
- Side-effect:
-    Modifica la lista collegata e può aggiornare la coda.
- */
-void inserisci_nodo_storico_noleggio(ptr_lista_noleggi lista, ptr_storico prenotazione) 
+void inserisci_nodo_storico_noleggio(ptr_lista_noleggi lista, ptr_storico prenotazione, int eliminabile) 
 {
     if (!lista || !prenotazione) return;
 
-    bool eliminabile = vedi_se_noleggio_eliminabile(prenotazione);
+    //bool eliminabile = vedi_se_noleggio_eliminabile(prenotazione);
 
     if (lista_storico_vuota(lista)) {
         // Lista vuota
@@ -490,7 +461,8 @@ int carica_lista_storico_noleggio_da_file(ptr_lista_noleggi lista, char *nome_ut
         // Alloca e inserisci la prenotazione
         ptr_storico pren = inizia_storico_noleggio(giorno, mese, anno, ora, minuto, tipo_veicolo, targa_veicolo, nome_file_utente, costo, ora_inizio, minuto_inizio, ora_fine, minuto_fine);
         if(pren){
-            inserisci_nodo_storico_noleggio(lista, pren);
+            int eliminabile = vedi_se_noleggio_eliminabile(pren);
+            inserisci_nodo_storico_noleggio(lista, pren, eliminabile);
         }
     }
 

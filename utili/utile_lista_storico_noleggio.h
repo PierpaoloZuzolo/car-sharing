@@ -38,31 +38,8 @@ Data: 07/06/2025
  */
 
 int dimensione_lista(ptr_lista_noleggi l);
-/*
- Funzione: inserisci_nodo_storico_noleggio
- -----------------------------------------
 
- Inserisce un nuovo nodo nella lista dello storico noleggi rispettando la
- distinzione tra nodi eliminabili e non eliminabili.
-
- Parametri:
-    lista: puntatore alla lista dei noleggi
-    prenotazione: puntatore allo storico noleggio da inserire nella lista
-
- Pre-condizioni:
-    `lista` e `prenotazione` devono essere puntatori validi e non NULL.
-
- Post-condizioni:
-    Il nodo viene inserito nella lista in posizione corretta,
-    la coda viene aggiornata se necessario.
-
- Ritorna:
-    void
-
- Side-effect:
-    Modifica la lista collegata e può aggiornare la coda.
- */
-void inserisci_nodo_storico_noleggio(ptr_lista_noleggi lista, ptr_storico prenotazione);
+void inserisci_nodo_storico_noleggio(ptr_lista_noleggi lista, ptr_storico prenotazione, int eliminabile);
 
 /*
  Funzione: elimina_nodo_storico_noleggio

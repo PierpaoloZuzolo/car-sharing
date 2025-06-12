@@ -39,11 +39,9 @@ Data: 10/06/2025
 int prendi_veicolo_da_file(FILE *fp, ptr_hash_veicoli utente);
 int prendi_utenti_da_file(FILE *fp, ptr_hash_utenti utente);
 int test_funzione1(void);
-
 int test_funzione2(ptr_hash_veicoli veicolo, ptr_hash_utenti ut);
-//int test_funzione3(ptr_hash_utenti,ptr_hash_veicoli);
+int test_funzione3();
 int confronta_file(FILE*, FILE*);
-
 
 
 int main(int argc, char **argv) {
@@ -57,12 +55,10 @@ int main(int argc, char **argv) {
     char *file_utente = argv[2];
     char *file_veicolo= argv[3];
 
-
     FILE *ts = fopen (test_suite, "r");
     FILE *file_utenti = fopen (file_utente, "r");
     FILE *file_veicoli = fopen (file_veicolo, "r");
     FILE *file_result = fopen("result.txt", "w");
-
 
     if(!(ts && file_utenti && file_veicoli && file_result)){
         printf("Errore apertura file utenti!\n");
@@ -128,12 +124,12 @@ int main(int argc, char **argv) {
                 continue;
             }
         }
-       /* if(strcmp(tc_generale, "TC3") == 0){
-            if(test_funzione3(hash_utenti, hash_veicoli) < 0){
+        if(strcmp(tc_generale, "TC3") == 0){
+            if(test_funzione3() < 0){
                 printf("Errore TC3\n");
                 continue;
             }
-        }*/
+        }
 
         char file_oracle[CONTENITORE] = {0};
         snprintf(file_oracle, CONTENITORE, "%s/oracle.txt", tc_generale);
@@ -344,142 +340,68 @@ int test_funzione2(ptr_hash_veicoli hash_veicoli, ptr_hash_utenti hash_utenti) {
 }
 
 
-int test_funzione3()
+int test_funzione3() // test dello storico del noleggio
 {
-
-}
-
-
-int test_funzione3(ptr_hash_veicoli hash_veicoli, ptr_hash_utenti hash_utenti) 
-{
-    int test1 = 0, test2 = 0;
-    FILE *fout = fopen("TC3/output.txt", "w");
-    if (!fout) {
-        printf("\nErrore apertura file output TC3");
-        return 1;
-    }
-
-    int stdout_backup = dup(fileno(stdout)); // Backup stdout
-    dup2(fileno(fout), fileno(stdout));      // Redirect stdout -> file
-    fclose(fout);
-
-    // === Test 1: Stampa veicoli disponibili ===
-    stampa_veicoli_disponibili(hash_veicoli);
-
-    fflush(stdout);                          // Flush e restore
-    dup2(stdout_backup, fileno(stdout));
-    close(stdout_backup);
-
-    if (confronta_file("TC3/output.txt", "TC3/oracle.txt")) {
-        printf("Test 1 (stampa veicoli disponibili): SUPERATO\n");
-        test1 = 1;
-    } else {
-        printf("Test 1 (stampa veicoli disponibili): FALLITO\n");
-    }
-
-    // === Test 2: Gestione degli storici di prenotazione ===
-    fout = fopen("TC3/output2.txt", "w");
-    if (!fout) {
-        printf("\nErrore apertura file output2 TC3");
-        return 1;
-    }
-
-    stdout_backup = dup(fileno(stdout));     // Backup stdout di nuovo
-    dup2(fileno(fout), fileno(stdout));      // Redirect su nuovo file
-    fclose(fout);
-
-    // Chiama funzione che stampa o gestisce lo storico delle prenotazioni
-    stampa_storico_prenotazioni_utenti(hash_utenti); // <-- Sostituisci con nome corretto
-
-    fflush(stdout);
-    dup2(stdout_backup, fileno(stdout));
-    close(stdout_backup);
-
-    if (confronta_file("TC3/output2.txt", "TC3/oracle2.txt")) {
-        printf("Test 2 (storico prenotazioni): SUPERATO\n");
-        test2 = 1;
-    } else {
-        printf("Test 2 (storico prenotazioni): FALLITO\n");
-    }
-
-    return (test1 && test2) ? 0 : 1;
-}
-
-
-/*
-int test_funzione3(ptr_hash_utenti ut,ptr_hash_veicoli ve) {
-    FILE *input = fopen("TC3/input.txt", "r");
-    FILE *oracle = fopen("TC3/oracle.txt", "r");
-    FILE *output = fopen("TC3/output.txt", "w");
-
-    if (!input || !oracle || !output) {
-        fprintf(stderr, "Errore apertura file per funzione 3\n");
-        if (input) fclose(input);
-        if (oracle) fclose(oracle);
-        if (output) fclose(output);
+      FILE *in = fopen("TC3/input.txt", "r");
+      FILE *oracle = fopen("TC3/oracle.txt", "r");
+      FILE *out = fopen("TC3/output.txt", "w");
+      if (!in || !oracle || !out) {
+        fprintf(stderr, "Errore apertura file per TC2\n");
         return -1;
     }
 
-    int giorno, mese, anno, ora_inizio, minuto_inizio;
-    int test_num = 1;
-    int errori = 0;
+    ptr_lista_noleggi lista_noleggi = crea_lista_storico();
+    
+    int giorno, mese, anno, ora, minuto, ora_inizio, minuto_inizio, ora_fine, minuto_fine;
+    float costo;
+    char tipo_veicolo[50], targa_veicolo[8], nome_file_utente[50];
+    int eliminabile;
+     while (fscanf(in, "%d;%d;%d;%d;%d;%49[^;];%7[^;];%49[^;];%f;%d;%d;%d;%d;%d\n",
+                  &giorno, &mese, &anno, &ora, &minuto,
+                  tipo_veicolo, targa_veicolo, nome_file_utente,
+                  &costo, &ora_inizio, &minuto_inizio, &ora_fine, &minuto_fine, &eliminabile) == 14){
 
-    while (fscanf(input, "%d %d %d %d %d", &giorno, &mese, &anno, &ora_inizio, &minuto_inizio) == 5) {
-        int expected;
-        if (fscanf(oracle, "%d", &expected) != 1) {
-            fprintf(stderr, "Riga oracolo mancante per test %d\n", test_num);
-            errori++;
-            break;
-        }
+                ptr_storico pren = inizia_storico_noleggio(giorno, mese, anno, ora, minuto, tipo_veicolo, targa_veicolo, nome_file_utente, costo, ora_inizio, minuto_inizio, ora_fine, minuto_fine);
+                if(pren){
+                inserisci_nodo_storico_noleggio(lista_noleggi, pren, eliminabile);
 
-        // Creo la struttura storico_noleggio con valori fittizi per campi mancanti,
-        // ad esempio tipo_veicolo, targa, nome utente, costo e orari di inizio/fine.
-        // Puoi adattare i valori secondo i tuoi dati di test.
+                  }
+                }
+    salva_lista_storico_noleggio_su_file(lista_noleggi, "output", "TC3");
 
-        ptr_storico s = inizia_storico_noleggio(
-            giorno, mese, anno, ora_inizio, minuto_inizio,
-            "TipoVeicolo",   // esempio stringa fittizia tipo veicolo
-            "AB123CD",       // esempio targa
-            "UtenteTest",    // esempio nome utente
-            100.0f,          // costo fittizio
-            ora_inizio, minuto_inizio,  // ora e minuto inizio
-            ora_inizio + 1, 0            // ora e minuto fine (esempio)
-        );
+    fclose(in);
+    fclose(out);
 
-        if (!s) {
-            fprintf(stderr, "Errore allocazione storico noleggio per test %d\n", test_num);
-            errori++;
-            break;
-        }
-
-        // Chiamo la funzione da testare
-        bool risultato = vedi_se_noleggio_eliminabile(s);
-
-        // Scrivo l'output su file
-        fprintf(output, "Test %d: %s\n", test_num, risultato ? "true" : "false");
-
-        // Confronto con l'oracolo
-        if ((risultato ? 1 : 0) != expected) {
-            printf("[Funzione3] Test %d FALLITO: atteso %s, ottenuto %s\n",
-                   test_num,
-                   expected ? "true" : "false",
-                   risultato ? "true" : "false");
-            errori++;
-        }
-
-        // Libero la memoria allocata per lo storico
-        // (assumendo che esista una funzione per liberare ptr_storico, esempio: distruggi_storico_noleggio)
-        distruggi_storico_noleggio(s);
-
-        test_num++;
+    // Ora confronto output.txt con oracle.txt
+    out = fopen("TC3/output.txt", "r");
+    if (!out) {
+        fclose(oracle);
+        return -1;
     }
 
-    fclose(input);
-    fclose(oracle);
-    fclose(output);
-    return errori;
+    char linea_oracle[500], linea_output[500];
+    while (fgets(linea_oracle, sizeof(linea_oracle), oracle) &&
+           fgets(linea_output, sizeof(linea_output), out)) {
+        // Rimuovi newline per confronto robusto
+        linea_oracle[strcspn(linea_oracle, "\n")] = 0;
+        linea_output[strcspn(linea_output, "\n")] = 0;
 
-}*/
+        if (strcmp(linea_oracle, linea_output) != 0) {
+            fclose(oracle);
+            fclose(out);
+            return 0; // Test fallito
+        }
+    }
+
+    fclose(oracle);
+    fclose(out);
+    return 1; // Test superato
+
+    
+}
+
+
+
 
 
 
@@ -521,7 +443,6 @@ int confronta_file(FILE *a, FILE *b) {
     }
 
     return 1; // Test superato
-
 }
 
 
