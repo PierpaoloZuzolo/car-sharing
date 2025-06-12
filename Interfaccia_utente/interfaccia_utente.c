@@ -19,6 +19,62 @@
 #define PERCORSO_PRENOTAZIONI_VEICOLI "txt/Prenotazioni_veicoli"
 #define PERCORSO_FILE_UTENTI "txt/Utenti"
 
+
+
+/*
+ Funzione: leggi_cella_da_orario
+ -------------------------------
+
+ Legge da input un orario nel formato "HH MM" (ore minuti) e lo converte nell'indice
+ di una cella oraria, considerando che ogni ora è divisa in due celle (00 e 30 minuti).
+
+ Implementazione:
+    - Richiede all'utente di inserire un orario nel formato HH MM.
+    - Controlla che l'input sia valido (due numeri interi).
+    - Verifica che l'ora sia tra 0 e 24 e che i minuti siano solo 0 o 30.
+    - In caso di errore, mostra un messaggio e ripete la richiesta.
+    - Se valido, calcola e restituisce l'indice della cella corrispondente:
+      ogni ora corrisponde a 2 celle, 0 minuti → cella pari, 30 minuti → cella dispari.
+
+ Parametri:
+    messaggio : stringa da mostrare come prompt all'utente per la lettura dell'orario
+
+ Pre-condizioni:
+    messaggio deve essere una stringa valida non nulla
+
+ Post-condizioni:
+    Nessuna modifica a variabili esterne
+
+ Ritorna:
+    L'indice intero della cella oraria corrispondente all'orario inserito (da 0 a 48)
+
+ Side-effect:
+    Stampa messaggi su stdout e legge da stdin
+*/
+int leggi_cella_da_orario(const char *messaggio)
+{
+    int ora, minuto;
+    while (1) {
+        printf("%s formato HH MM (ore - minuti): ", messaggio);
+        int result = scanf("%d %d", &ora, &minuto);
+
+        // Pulizia del buffer in caso di input errato
+        if (result != 2) {
+            printf("Input non valido. Inserisci due numeri interi.\n");   // DA SPOSTARE IN UTILI !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            while (getchar() != '\n'); // scarta input residuo
+            continue;
+        }
+
+        if (ora < 0 || ora > 24 || (minuto != 0 && minuto != 30)) {
+            printf("Orario non valido. Usa solo minuti :00 o :30 e ore tra 0 e 24.\n");
+            continue;
+        }
+
+        // Valido → restituisci indice della cella
+        return ora * 2 + (minuto == 30 ? 1 : 0);
+    }
+}
+
 /*
  Funzione: gestione_utente
  --------------------------
@@ -126,79 +182,7 @@ ptr_utente gestione_utente(ptr_hash_utenti h) {
     }
 }
 
-/*
- Funzione: avvia_menu_principale
- --------------------------------
 
- Gestisce il menu principale dell'applicazione per un utente autenticato.
- Permette:
-    - Prenotare veicoli.
-    - Consultare ed eventualmente modificare lo storico delle prenotazioni.
-    - Terminare il programma.
-
- Implementazione:
-    - Cicla finché l’utente non decide di uscire.
-    - Invoca le funzioni `menu_prenotazione` e `gestione_storico_prenotazioni` per le relative operazioni.
-
- Parametri:
-    utente       - puntatore all'utente attualmente loggato
-    hash_veicoli - puntatore alla tabella hash contenente tutti i veicoli
-
- Pre-condizioni:
-    - utente deve essere un puntatore valido e non NULL.
-    - hash_veicoli deve essere una tabella hash valida e inizializzata.
-
- Post-condizioni:
-    - Tutte le operazioni effettuate possono aggiornare file e strutture dati.
-    - Termina solo su esplicita richiesta dell’utente (scelta 0).
-
- Ritorna:
-    Nessun valore di ritorno (void).
-
- Side-effect:
-    - Input/output su console.
-    - Lettura e scrittura su file.
-    - Modifica delle strutture di prenotazione e storico noleggi.
-*/
-void avvia_menu_principale(ptr_utente utente, ptr_hash_veicoli hash_veicoli) {
-    int scelta;
-
-    do {
-        printf("\n====== MENU PRINCIPALE ======\n");
-        printf("1. Visualizza veicoli disponibili\n");
-        printf("2. Visualizza storico prenotazioni\n");
-        printf("0. Esci\n");
-        printf("Scelta: ");
-
-        if (scanf("%d", &scelta) != 1) {
-            printf("Input non valido.\n");
-            while (getchar() != '\n');
-            scelta = -1;
-            continue;
-        }
-
-        switch (scelta) {
-            case 1: {
-                ptr_veicolo veicolo_prenotato = menu_prenotazione(hash_veicoli, prendi_nome(utente));
-                if (veicolo_prenotato)
-                    printf("Prenotazione completata con successo!\n");
-                else
-                    printf("Nessuna prenotazione effettuata.\n");
-                break;
-            }
-            case 2:
-                gestione_storico_prenotazioni(prendi_nome(utente), hash_veicoli);
-                break;
-
-            case 0:
-                printf("Uscita...\n");
-                break;
-
-            default:
-                printf("Scelta non valida.\n");
-        }
-    } while (scelta != 0);
-}
 
 /*
  Funzione: menu_prenotazione

@@ -401,6 +401,7 @@ int test_funzione3() // test dello storico del noleggio
 
     // Salvataggio della lista su file
     salva_lista_storico_noleggio_su_file(lista_noleggi, "output", "TC3");
+    distruggi_lista_storico_noleggio(lista_noleggi);
 
     fclose(in);
     fclose(out);

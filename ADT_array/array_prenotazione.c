@@ -88,7 +88,7 @@ int prendi_grandezza_array_prenotazioni()
 
  Side-effect:
     Modifica celle nell'array prenotazioni
-*/
+
 int prenota_intervallo(ptr_prenotazione p, int inizio_cella, int fine_cella) 
 {
     if (!p) return 0;
@@ -115,6 +115,7 @@ int prenota_intervallo(ptr_prenotazione p, int inizio_cella, int fine_cella)
 
     return 1;
 }
+*/
 
 /*
  Funzione: libera_intervallo
@@ -142,7 +143,7 @@ int prenota_intervallo(ptr_prenotazione p, int inizio_cella, int fine_cella)
 
  Side-effect:
     Modifica celle nell'array prenotazioni
-*/
+
 int libera_intervallo(ptr_prenotazione p, int inizio_cella, int fine_cella) 
 {
     if (!p) return 0;
@@ -161,6 +162,7 @@ int libera_intervallo(ptr_prenotazione p, int inizio_cella, int fine_cella)
 
     return 1;
 }
+*/
 
 /*
  Funzione: ottiene_cella

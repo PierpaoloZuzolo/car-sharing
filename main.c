@@ -23,6 +23,47 @@
 #define DIM_HASH_UTENTI 200
 #define DIM_HASH_VEICOLI 150
 
+
+
+
+
+/*
+ Funzione: avvia_menu_principale
+ --------------------------------
+
+ Gestisce il menu principale dell'applicazione per un utente autenticato.
+ Permette:
+    - Prenotare veicoli.
+    - Consultare ed eventualmente modificare lo storico delle prenotazioni.
+    - Terminare il programma.
+
+ Implementazione:
+    - Cicla finché l’utente non decide di uscire.
+    - Invoca le funzioni `menu_prenotazione` e `gestione_storico_prenotazioni` per le relative operazioni.
+
+ Parametri:
+    utente       - puntatore all'utente attualmente loggato
+    hash_veicoli - puntatore alla tabella hash contenente tutti i veicoli
+
+ Pre-condizioni:
+    - utente deve essere un puntatore valido e non NULL.
+    - hash_veicoli deve essere una tabella hash valida e inizializzata.
+
+ Post-condizioni:
+    - Tutte le operazioni effettuate possono aggiornare file e strutture dati.
+    - Termina solo su esplicita richiesta dell’utente (scelta 0).
+
+ Ritorna:
+    Nessun valore di ritorno (void).
+
+ Side-effect:
+    - Input/output su console.
+    - Lettura e scrittura su file.
+    - Modifica delle strutture di prenotazione e storico noleggi.
+*/
+void avvia_menu_principale(ptr_utente utente, ptr_hash_veicoli hash_veicoli);
+
+
 int main() {
     ptr_hash_utenti hash_ut = crea_hash_utenti(DIM_HASH_UTENTI);
     if (!hash_ut) {
@@ -88,4 +129,46 @@ int main() {
     distruggi_hash_veicoli(hash_veicoli);
 
     return 0;
+}
+
+
+void avvia_menu_principale(ptr_utente utente, ptr_hash_veicoli hash_veicoli)
+{
+    int scelta;
+
+    do {
+        printf("\n====== MENU PRINCIPALE ======\n");
+        printf("1. Visualizza veicoli disponibili\n");
+        printf("2. Visualizza storico prenotazioni\n");
+        printf("0. Esci\n");
+        printf("Scelta: ");
+
+        if (scanf("%d", &scelta) != 1) {
+            printf("Input non valido.\n");
+            while (getchar() != '\n');
+            scelta = -1;
+            continue;
+        }
+
+        switch (scelta) {
+            case 1: {
+                ptr_veicolo veicolo_prenotato = menu_prenotazione(hash_veicoli, prendi_nome(utente));
+                if (veicolo_prenotato)
+                    printf("Prenotazione completata con successo!\n");
+                else
+                    printf("Nessuna prenotazione effettuata.\n");
+                break;
+            }
+            case 2:
+                gestione_storico_prenotazioni(prendi_nome(utente), hash_veicoli);
+                break;
+
+            case 0:
+                printf("Uscita...\n");
+                break;
+
+            default:
+                printf("Scelta non valida.\n");
+        }
+    } while (scelta != 0);
 }

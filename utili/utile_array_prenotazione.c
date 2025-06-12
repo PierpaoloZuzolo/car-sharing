@@ -7,6 +7,7 @@ Data: 13/05/2025
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+
 #include <stdbool.h>
 #include "ADT_array/array_prenotazione.h"
 #include "utile.h"
@@ -140,62 +141,6 @@ void salva_prenotazione_su_file(ptr_prenotazione p, const char *targa, const cha
 }
 
 
-
-
-
-/*
- Funzione: leggi_cella_da_orario
- -------------------------------
-
- Legge da input un orario nel formato "HH MM" (ore minuti) e lo converte nell'indice
- di una cella oraria, considerando che ogni ora è divisa in due celle (00 e 30 minuti).
-
- Implementazione:
-    - Richiede all'utente di inserire un orario nel formato HH MM.
-    - Controlla che l'input sia valido (due numeri interi).
-    - Verifica che l'ora sia tra 0 e 24 e che i minuti siano solo 0 o 30.
-    - In caso di errore, mostra un messaggio e ripete la richiesta.
-    - Se valido, calcola e restituisce l'indice della cella corrispondente:
-      ogni ora corrisponde a 2 celle, 0 minuti → cella pari, 30 minuti → cella dispari.
-
- Parametri:
-    messaggio : stringa da mostrare come prompt all'utente per la lettura dell'orario
-
- Pre-condizioni:
-    messaggio deve essere una stringa valida non nulla
-
- Post-condizioni:
-    Nessuna modifica a variabili esterne
-
- Ritorna:
-    L'indice intero della cella oraria corrispondente all'orario inserito (da 0 a 48)
-
- Side-effect:
-    Stampa messaggi su stdout e legge da stdin
-*/
-int leggi_cella_da_orario(const char *messaggio)
-{
-    int ora, minuto;
-    while (1) {
-        printf("%s formato HH MM (ore - minuti): ", messaggio);
-        int result = scanf("%d %d", &ora, &minuto);
-
-        // Pulizia del buffer in caso di input errato
-        if (result != 2) {
-            printf("Input non valido. Inserisci due numeri interi.\n");   // DA SPOSTARE IN UTILI !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-            while (getchar() != '\n'); // scarta input residuo
-            continue;
-        }
-
-        if (ora < 0 || ora > 24 || (minuto != 0 && minuto != 30)) {
-            printf("Orario non valido. Usa solo minuti :00 o :30 e ore tra 0 e 24.\n");
-            continue;
-        }
-
-        // Valido → restituisci indice della cella
-        return ora * 2 + (minuto == 30 ? 1 : 0);
-    }
-}
 
 
 /*
@@ -350,4 +295,109 @@ void blocca_celle_passate(ptr_prenotazione p)
     for (int i = 0; i < prossima_cella; i++) {
         imposta_cella(p, i, 1);
     }
+}
+
+
+
+
+/*
+ Funzione: prenota_intervallo
+ ----------------------------
+
+ Prenota un intervallo di celle nell'array prenotazioni.
+
+ Implementazione:
+    Verifica validità intervallo e disponibilità,
+    quindi inserisce il valore prenotato (void*)1 in ogni cella.
+
+ Parametri:
+    p           - puntatore alla struttura prenotazioni
+    inizio_cella- indice di inizio intervallo (inclusivo)
+    fine_cella  - indice di fine intervallo (esclusivo)
+
+ Pre-condizioni:
+    p valido
+    inizio_cella e fine_cella validi e inizio_cella < fine_cella
+
+ Post-condizioni:
+    Celle nell'intervallo prenotate
+
+ Ritorna:
+    1 se prenotazione riuscita, 0 altrimenti
+
+ Side-effect:
+    Modifica celle nell'array prenotazioni
+*/
+int prenota_intervallo(ptr_prenotazione p, int inizio_cella, int fine_cella) 
+{
+    if (!p) return 0;
+
+    // Verifica validità intervallo usando la funzione dell'ADT
+    if (!in_intervallo(inizio_cella, 0, prendi_grandezza_array_prenotazioni()) || 
+        !in_intervallo(fine_cella-1, 0, prendi_grandezza_array_prenotazioni()) || 
+        inizio_cella >= fine_cella) {
+        return 0;
+    }
+
+    // Verifica disponibilità
+    for (int i = inizio_cella; i < fine_cella; i++) {
+        if (ottiene_cella(p, i) != 0) {
+            return 0;
+        }
+    }
+
+    // Prenota l'intervallo
+    for (int i = inizio_cella; i < fine_cella; i++) {
+        // Usiamo (void*)1 per rappresentare "prenotato"
+        imposta_cella(p, i, 1);
+    }
+
+    return 1;
+}
+
+
+/*
+ Funzione: libera_intervallo
+ ---------------------------
+
+ Libera un intervallo di celle nell'array prenotazioni.
+
+ Implementazione:
+    Imposta NULL in tutte le celle nell'intervallo indicato.
+
+ Parametri:
+    p           - puntatore alla struttura prenotazioni
+    inizio_cella- indice di inizio intervallo (inclusivo)
+    fine_cella  - indice di fine intervallo (esclusivo)
+
+ Pre-condizioni:
+    p valido
+    inizio_cella e fine_cella validi e inizio_cella < fine_cella
+
+ Post-condizioni:
+    Celle nell'intervallo liberate (impostate a NULL)
+
+ Ritorna:
+    1 se liberazione riuscita, 0 altrimenti
+
+ Side-effect:
+    Modifica celle nell'array prenotazioni
+*/
+int libera_intervallo(ptr_prenotazione p, int inizio_cella, int fine_cella) 
+{
+    if (!p) return 0;
+
+    // Verifica validità intervallo
+    if (!in_intervallo(inizio_cella, 0, prendi_grandezza_array_prenotazioni()) || 
+        !in_intervallo(fine_cella-1, 0, prendi_grandezza_array_prenotazioni()) || 
+        inizio_cella >= fine_cella) {
+        return 0;
+    }
+
+    // Libera l'intervallo
+    for (int i = inizio_cella; i < fine_cella; i++) {
+        imposta_cella(p, i, 0);                       
+    }
+
+    return 1;
 }

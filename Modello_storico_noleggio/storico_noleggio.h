@@ -369,7 +369,6 @@ char *prendi_utente_veicolo_noleggiato(ptr_storico pr);
 void stampa_storico_noleggio(ptr_storico s);
 
 
-int vedi_se_noleggio_eliminabile(ptr_storico s);
 
 /*
  Funzione: distruggi_storico_noleggio

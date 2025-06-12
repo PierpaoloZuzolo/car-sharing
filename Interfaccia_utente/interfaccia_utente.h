@@ -6,6 +6,31 @@
 #include "ADT_hash/hash_veicoli.h"
 #include "Modello_veicolo/veicolo.h"
 
+
+/*
+ Funzione: leggi_cella_da_orario
+ -------------------------------
+
+ Legge da input un orario nel formato "HH MM" (ore minuti) e lo converte nell'indice
+ di una cella oraria, considerando che ogni ora è divisa in due celle (00 e 30 minuti).
+
+ Parametri:
+    messaggio : stringa da mostrare come prompt all'utente per la lettura dell'orario
+
+ Pre-condizioni:
+    messaggio deve essere una stringa valida non nulla
+
+ Post-condizioni:
+    Nessuna modifica a variabili esterne
+
+ Ritorna:
+    L'indice intero della cella oraria corrispondente all'orario inserito (da 0 a 48)
+
+ Side-effect:
+    Stampa messaggi su stdout e legge da stdin
+*/
+int leggi_cella_da_orario(const char *messaggio);
+
 /*
  Funzione: gestione_utente
  --------------------------
@@ -35,37 +60,6 @@
 */
 ptr_utente gestione_utente(ptr_hash_utenti h);
 
-/*
- Funzione: avvia_menu_principale
- --------------------------------
-
- Gestisce il menu principale dell'applicazione per un utente autenticato.
- Permette:
-    - Prenotare veicoli.
-    - Consultare ed eventualmente modificare lo storico delle prenotazioni.
-    - Terminare il programma.
-
- Parametri:
-    utente       - puntatore all'utente attualmente loggato
-    hash_veicoli - puntatore alla tabella hash contenente tutti i veicoli
-
- Pre-condizioni:
-    - utente deve essere un puntatore valido e non NULL.
-    - hash_veicoli deve essere una tabella hash valida e inizializzata.
-
- Post-condizioni:
-    - Tutte le operazioni effettuate possono aggiornare file e strutture dati.
-    - Termina solo su esplicita richiesta dell’utente (scelta 0).
-
- Ritorna:
-    Nessun valore di ritorno (void).
-
- Side-effect:
-    - Input/output su console.
-    - Lettura e scrittura su file.
-    - Modifica delle strutture di prenotazione e storico noleggi.
-*/
-void avvia_menu_principale(ptr_utente utente, ptr_hash_veicoli hash_veicoli);
 
 
 /*

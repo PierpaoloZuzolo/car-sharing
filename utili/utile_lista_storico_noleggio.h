@@ -14,6 +14,32 @@ Data: 07/06/2025
 
 
 /*
+  Funzione: vedi_se_noleggio_eliminabile
+  --------------------------------------
+
+  Verifica se una prenotazione (noleggio) è eliminabile in base alla data e all'orario attuale.
+
+  Parametri:
+     s: puntatore a una struttura ptr_storico contenente i dati della prenotazione
+
+  Pre-condizioni:
+     s può essere NULL
+
+  Post-condizioni:
+     Se s è NULL o la prenotazione inizia tra meno di 60 minuti, viene restituito 0;
+     altrimenti viene restituito 1.
+
+  Ritorna:
+     1 se la prenotazione è eliminabile (è oggi e mancano almeno 60 minuti all'inizio)
+     0 se la prenotazione non è eliminabile (non è oggi o mancano meno di 60 minuti)
+
+  Side-effect:
+     Nessuno
+ */
+int vedi_se_noleggio_eliminabile(ptr_storico s);
+
+
+/*
  Funzione: dimensione_lista
  --------------------------
 
@@ -39,6 +65,36 @@ Data: 07/06/2025
 
 int dimensione_lista(ptr_lista_noleggi l);
 
+/*
+  Funzione: inserisci_nodo_storico_noleggio
+  -----------------------------------------
+
+  Inserisce una nuova prenotazione nella lista dei noleggi storici, tenendo conto 
+  del flag `eliminabile` per gestire correttamente la posizione del nodo e il 
+  puntatore alla "coda" (ultimo nodo non eliminabile).
+
+  Parametri:
+     lista: puntatore alla lista dei noleggi storici
+     prenotazione: puntatore alla struttura ptr_storico che rappresenta la prenotazione da inserire
+     eliminabile: intero (booleano) che indica se la prenotazione può essere eliminata (1 = sì, 0 = no)
+
+  Pre-condizioni:
+     - `lista` deve essere un puntatore valido a una lista inizializzata (non NULL)
+     - `prenotazione` deve essere un puntatore valido a una struttura `ptr_storico`
+     - `eliminabile` deve essere 0 o 1
+
+  Post-condizioni:
+     - La prenotazione viene inserita nella lista secondo le regole di priorità dei nodi non eliminabili
+     - Se la prenotazione non è eliminabile, viene mantenuta una traccia (aggiornando il puntatore alla coda)
+
+  Ritorna:
+     Nessun valore (funzione `void`)
+
+  Side-effect:
+     - Modifica la struttura della lista dei noleggi storici
+     - Può aggiornare il puntatore alla "coda" della lista
+     - Alloca memoria dinamica per un nuovo nodo
+ */
 void inserisci_nodo_storico_noleggio(ptr_lista_noleggi lista, ptr_storico prenotazione, int eliminabile);
 
 /*

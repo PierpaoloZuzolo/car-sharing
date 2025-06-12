@@ -71,34 +71,6 @@ void salva_prenotazione_su_file(ptr_prenotazione p, const char *targa, const cha
 
 
 
-
-
-/*
- Funzione: leggi_cella_da_orario
- -------------------------------
-
- Legge da input un orario nel formato "HH MM" (ore minuti) e lo converte nell'indice
- di una cella oraria, considerando che ogni ora è divisa in due celle (00 e 30 minuti).
-
- Parametri:
-    messaggio : stringa da mostrare come prompt all'utente per la lettura dell'orario
-
- Pre-condizioni:
-    messaggio deve essere una stringa valida non nulla
-
- Post-condizioni:
-    Nessuna modifica a variabili esterne
-
- Ritorna:
-    L'indice intero della cella oraria corrispondente all'orario inserito (da 0 a 48)
-
- Side-effect:
-    Stampa messaggi su stdout e legge da stdin
-*/
-int leggi_cella_da_orario(const char *messaggio);
-
-
-
 /*
  Funzione: veicolo_disponibile_oggi
  ----------------------------------
@@ -176,5 +148,56 @@ void mostra_orari_disponibili(ptr_prenotazione p);
 void blocca_celle_passate(ptr_prenotazione p);
 
 
+/*
+ Funzione: prenota_intervallo
+ ----------------------------
+
+ Prenota un intervallo di celle nell'array prenotazioni.
+
+ Parametri:
+    p           - puntatore alla struttura prenotazioni
+    inizio_cella- indice di inizio intervallo (inclusivo)
+    fine_cella  - indice di fine intervallo (esclusivo)
+
+ Pre-condizioni:
+    p valido
+    inizio_cella e fine_cella validi e inizio_cella < fine_cella
+
+ Post-condizioni:
+    Celle nell'intervallo prenotate
+
+ Ritorna:
+    1 se prenotazione riuscita, 0 altrimenti
+
+ Side-effect:
+    Modifica celle nell'array prenotazioni
+*/
+int prenota_intervallo(ptr_prenotazione p, int inizio_cella, int fine_cella);
+
+/*
+ Funzione: libera_intervallo
+ ---------------------------
+
+ Libera un intervallo di celle nell'array prenotazioni.
+
+ Parametri:
+    p           - puntatore alla struttura prenotazioni
+    inizio_cella- indice di inizio intervallo (inclusivo)
+    fine_cella  - indice di fine intervallo (esclusivo)
+
+ Pre-condizioni:
+    p valido
+    inizio_cella e fine_cella validi e inizio_cella < fine_cella
+
+ Post-condizioni:
+    Celle nell'intervallo liberate (impostate a NULL)
+
+ Ritorna:
+    1 se liberazione riuscita, 0 altrimenti
+
+ Side-effect:
+    Modifica celle nell'array prenotazioni
+*/
+int libera_intervallo(ptr_prenotazione p, int inizio_cella, int fine_cella);
 
 #endif

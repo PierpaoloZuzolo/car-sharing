@@ -14,6 +14,73 @@ Data: 07/06/2025
 #include "utile.h"
 
 
+
+
+
+
+
+/*
+  Funzione: vedi_se_noleggio_eliminabile
+  --------------------------------------
+
+  Verifica se una prenotazione (noleggio) è eliminabile in base alla data e all'orario attuale.
+
+  Implementazione:
+     Controlla se la prenotazione è prevista per il giorno corrente.
+     Se non è oggi, la prenotazione non è eliminabile.
+     Se è per oggi, confronta l'orario di inizio della prenotazione con l'orario corrente:
+     se mancano meno di 60 minuti all'orario di inizio, la prenotazione non è eliminabile.
+     Altrimenti, è considerata eliminabile.
+
+  Parametri:
+     s: puntatore a una struttura ptr_storico contenente i dati della prenotazione
+
+  Pre-condizioni:
+     s può essere NULL
+
+  Post-condizioni:
+     Se s è NULL o la prenotazione inizia tra meno di 60 minuti, viene restituito 0;
+     altrimenti viene restituito 1.
+
+  Ritorna:
+     1 se la prenotazione è eliminabile (è oggi e mancano almeno 60 minuti all'inizio)
+     0 se la prenotazione non è eliminabile (non è oggi o mancano meno di 60 minuti)
+
+  Side-effect:
+     Nessuno
+ */
+int vedi_se_noleggio_eliminabile(ptr_storico s) 
+{
+    if (!s) return 0;  // errore, no storico
+
+    int giorno_oggi, mese_oggi, anno_oggi;
+    data_attuale(&giorno_oggi, &mese_oggi, &anno_oggi);
+
+    // Controllo se la prenotazione è per oggi
+    if (prendi_giorno_noleggiato(s) != giorno_oggi ||
+        prendi_mese_noleggiato(s) != mese_oggi ||
+        prendi_anno_noleggiato(s) != anno_oggi) {
+        return 0;  // non è oggi → non eliminabile
+    }
+
+    int ora_corrente, minuto_corrente;
+    ottieni_orario_corrente(&ora_corrente, &minuto_corrente);
+
+    int ora_inizio = prendi_ora_inizio_noleggiato(s);
+    int minuto_inizio = prendi_minuto_inizio_noleggiato(s);
+
+    // Calcolo il tempo in minuti dall'inizio giornata
+    int minuti_correnti = ora_corrente * 60 + minuto_corrente;
+    int minuti_inizio = ora_inizio * 60 + minuto_inizio;
+
+    // Se mancano meno di 60 minuti → non eliminabile
+    if ((minuti_inizio - minuti_correnti) < 60) {
+        return 0;
+    }
+
+    // Altrimenti è eliminabile
+    return 1;
+}
 /*
  Funzione: dimensione_lista
  --------------------------
@@ -58,7 +125,44 @@ int dimensione_lista(ptr_lista_noleggi l)
     return count;
 }
 
+/*
+  Funzione: inserisci_nodo_storico_noleggio
+  -----------------------------------------
 
+  Inserisce una nuova prenotazione nella lista dei noleggi storici, tenendo conto 
+  del flag `eliminabile` per gestire correttamente la posizione del nodo e il 
+  puntatore alla "coda" (ultimo nodo non eliminabile).
+
+  Implementazione:
+     - Se la lista è vuota, inserisce la prenotazione in testa e, se non è eliminabile,
+       aggiorna il puntatore alla coda.
+     - Se la coda è NULL (tutti i nodi sono eliminabili), inserisce comunque in testa,
+       e aggiorna la coda se necessario.
+     - Se esistono già nodi non eliminabili, inserisce il nuovo nodo subito dopo la coda.
+       Se il nuovo nodo è non eliminabile, aggiorna il puntatore alla coda.
+
+  Parametri:
+     lista: puntatore alla lista dei noleggi storici
+     prenotazione: puntatore alla struttura ptr_storico che rappresenta la prenotazione da inserire
+     eliminabile: intero (booleano) che indica se la prenotazione può essere eliminata (1 = sì, 0 = no)
+
+  Pre-condizioni:
+     - `lista` deve essere un puntatore valido a una lista inizializzata (non NULL)
+     - `prenotazione` deve essere un puntatore valido a una struttura `ptr_storico`
+     - `eliminabile` deve essere 0 o 1
+
+  Post-condizioni:
+     - La prenotazione viene inserita nella lista secondo le regole di priorità dei nodi non eliminabili
+     - Se la prenotazione non è eliminabile, viene mantenuta una traccia (aggiornando il puntatore alla coda)
+
+  Ritorna:
+     Nessun valore (funzione `void`)
+
+  Side-effect:
+     - Modifica la struttura della lista dei noleggi storici
+     - Può aggiornare il puntatore alla "coda" della lista
+     - Alloca memoria dinamica per un nuovo nodo
+ */
 void inserisci_nodo_storico_noleggio(ptr_lista_noleggi lista, ptr_storico prenotazione, int eliminabile) 
 {
     if (!lista || !prenotazione) return;
@@ -608,7 +712,7 @@ int conta_fino_a_coda(ptr_lista_noleggi l)
     }
 
     
-    if (corrente != coda) {// Se non abbiamo trovato la coda, restituiamo 0
+    if (corrente != coda) {
         return 0;
     }
 

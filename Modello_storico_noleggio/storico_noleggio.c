@@ -528,35 +528,6 @@ void stampa_storico_noleggio(ptr_storico s)
 }
 
 
-//da rivedere!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-int vedi_se_noleggio_eliminabile(ptr_storico s) 
-{
-    if (!s) return false;
-
-    int giorno_oggi, mese_oggi, anno_oggi;
-    data_attuale(&giorno_oggi, &mese_oggi, &anno_oggi);
-
-    if (prendi_giorno_noleggiato(s) != giorno_oggi ||
-        prendi_mese_noleggiato(s) != mese_oggi ||
-        prendi_anno_noleggiato(s) != anno_oggi) {
-        return 0;  // prenotazione non è di oggi
-    }
-
-    int ora_corrente, minuto_corrente;
-    ottieni_orario_corrente(&ora_corrente, &minuto_corrente);
-
-    int inizio = prendi_ora_inizio_noleggiato(s);
-    int minuti_correnti = ora_corrente * 60 + minuto_corrente;
-    int minuti_inizio = inizio * 60;
-
-    if ((minuti_inizio - minuti_correnti) < 60) {
-        return 0;  // meno di un'ora alla prenotazione
-    }
-
-    return 1;  // è oggi e c'è più di un'ora
-}
-
 
 /*
  Funzione: distruggi_storico_noleggio
