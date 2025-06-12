@@ -342,31 +342,56 @@ int test_funzione2(ptr_hash_veicoli hash_veicoli, ptr_hash_utenti hash_utenti) {
 
 int test_funzione3() // test dello storico del noleggio
 {
-      FILE *in = fopen("TC3/input.txt", "r");
-      FILE *oracle = fopen("TC3/oracle.txt", "r");
-      FILE *out = fopen("TC3/output.txt", "w");
-      if (!in || !oracle || !out) {
-        fprintf(stderr, "Errore apertura file per TC2\n");
+    FILE *in = fopen("TC3/input.txt", "r");
+    FILE *oracle = fopen("TC3/oracle.txt", "r");
+    FILE *out = fopen("TC3/output.txt", "w");
+    if (!in || !oracle || !out) {
+        fprintf(stderr, "Errore apertura file per TC3\n");
+        if(in) fclose(in);
+        if(oracle) fclose(oracle);
+        if(out) fclose(out);
         return -1;
     }
 
     ptr_lista_noleggi lista_noleggi = crea_lista_storico();
-    
-    int giorno, mese, anno, ora, minuto, ora_inizio, minuto_inizio, ora_fine, minuto_fine;
-    float costo;
-    char tipo_veicolo[50], targa_veicolo[8], nome_file_utente[50];
-    int eliminabile;
-     while (fscanf(in, "%d;%d;%d;%d;%d;%49[^;];%7[^;];%49[^;];%f;%d;%d;%d;%d;%d\n",
-                  &giorno, &mese, &anno, &ora, &minuto,
-                  tipo_veicolo, targa_veicolo, nome_file_utente,
-                  &costo, &ora_inizio, &minuto_inizio, &ora_fine, &minuto_fine, &eliminabile) == 14){
 
-                ptr_storico pren = inizia_storico_noleggio(giorno, mese, anno, ora, minuto, tipo_veicolo, targa_veicolo, nome_file_utente, costo, ora_inizio, minuto_inizio, ora_fine, minuto_fine);
-                if(pren){
-                inserisci_nodo_storico_noleggio(lista_noleggi, pren, eliminabile);
+    char riga[LUNGHEZZA_RIGA];
+    while (fgets(riga, sizeof(riga), in)) {
+        riga[strcspn(riga, "\n")] = 0;  // rimuove il newline
 
-                  }
-                }
+        // Parsing con strtok
+        char *token = strtok(riga, ";");
+        if (!token) continue;  // riga vuota o malformata
+
+        int giorno = atoi(token);
+        int mese = atoi(strtok(NULL, ";"));
+        int anno = atoi(strtok(NULL, ";"));
+        int ora = atoi(strtok(NULL, ";"));
+        int minuto = atoi(strtok(NULL, ";"));
+        char tipo_veicolo[50];
+        strcpy(tipo_veicolo, strtok(NULL, ";"));
+        char targa_veicolo[8];
+        strcpy(targa_veicolo, strtok(NULL, ";"));
+        char nome_file_utente[50];
+        strcpy(nome_file_utente, strtok(NULL, ";"));
+        float costo = atof(strtok(NULL, ";"));
+        int ora_inizio = atoi(strtok(NULL, ";"));
+        int minuto_inizio = atoi(strtok(NULL, ";"));
+        int ora_fine = atoi(strtok(NULL, ";"));
+        int minuto_fine = atoi(strtok(NULL, ";"));
+        int eliminabile = atoi(strtok(NULL, ";"));
+
+        // Creazione nodo
+        ptr_storico pren = inizia_storico_noleggio(
+            giorno, mese, anno, ora, minuto, tipo_veicolo, targa_veicolo,
+            nome_file_utente, costo, ora_inizio, minuto_inizio, ora_fine, minuto_fine
+        );
+        if (pren) {
+            inserisci_nodo_storico_noleggio(lista_noleggi, pren, eliminabile);
+        }
+    }
+
+    // Salvataggio della lista su file
     salva_lista_storico_noleggio_su_file(lista_noleggi, "output", "TC3");
 
     fclose(in);
@@ -382,7 +407,6 @@ int test_funzione3() // test dello storico del noleggio
     char linea_oracle[500], linea_output[500];
     while (fgets(linea_oracle, sizeof(linea_oracle), oracle) &&
            fgets(linea_output, sizeof(linea_output), out)) {
-        // Rimuovi newline per confronto robusto
         linea_oracle[strcspn(linea_oracle, "\n")] = 0;
         linea_output[strcspn(linea_output, "\n")] = 0;
 
@@ -396,11 +420,7 @@ int test_funzione3() // test dello storico del noleggio
     fclose(oracle);
     fclose(out);
     return 1; // Test superato
-
-    
 }
-
-
 
 
 
