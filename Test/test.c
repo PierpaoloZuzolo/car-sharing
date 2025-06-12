@@ -39,7 +39,7 @@ Data: 10/06/2025
 int prendi_veicolo_da_file(FILE *fp, ptr_hash_veicoli utente);
 int prendi_utenti_da_file(FILE *fp, ptr_hash_utenti utente);
 int test_funzione1(void);
-int test_funzione2(ptr_hash_veicoli veicolo, ptr_hash_utenti ut);
+int test_funzione2(ptr_hash_veicoli veicolo);
 int test_funzione3();
 int test_funzione4(ptr_hash_veicoli hash_veicoli);
 int confronta_file(FILE*, FILE*);
@@ -84,61 +84,38 @@ int confronta_file(FILE*, FILE*);
     - Scrive su file result.txt.
  */
 int main(int argc, char **argv) {
-    if(argc < 4){
+    if(argc < 3){
         printf("Assicurati di mettere tutti i parametri!\n");
-        printf("Per runnare scrivere: ./test.exe test_suite.txt utenti.txt veicoli.txt\n");
+        printf("Per runnare scrivere: ./test.exe test_suite.txt veicoli.txt\n");
         return -1;
     }
 
     char *test_suite = argv[1];
-    char *file_utente = argv[2];
-    char *file_veicolo= argv[3];
+    char *file_veicolo= argv[2];
 
     FILE *ts = fopen (test_suite, "r");
-    FILE *file_utenti = fopen (file_utente, "r");
     FILE *file_veicoli = fopen (file_veicolo, "r");
     FILE *file_result = fopen("result.txt", "w");
 
-    if(!(ts && file_utenti && file_veicoli && file_result)){
+    if(!(ts && file_veicoli && file_result)){
         printf("Errore apertura file utenti!\n");
         fclose(ts);
-        fclose(file_utenti);
         fclose(file_veicoli);
         fclose(file_result);
         return -1;
     }
 
-    ptr_hash_utenti hash_utenti = crea_hash_utenti(NUMERO_UTENTI);
-    if (!hash_utenti) {
-        fclose(ts);
-        fclose(file_utenti);
-        fclose(file_veicoli);
-        fclose(file_result);
-        return -1;
-    }
-    if(carica_utenti_da_file(file_utente, hash_utenti, NULL) < 0){
-        printf("Errore caricamento utenti!\n(Controlla il formato nome email)");
-        distruggi_hash_utenti(hash_utenti);
-        fclose(ts);
-        fclose(file_utenti);
-        fclose(file_veicoli);
-        return -1;
-    }
 
     ptr_hash_veicoli hash_veicoli = crea_hash_veicoli(NUMERO_VEICOLI);
     if (!hash_veicoli) {
-        distruggi_hash_utenti(hash_utenti);
         fclose(ts);
-        fclose(file_utenti);
         fclose(file_veicoli);
         fclose(file_result);
         return -1;
     }
     if(carica_veicoli_da_file(file_veicolo, hash_veicoli, NULL) == 0){
         printf("Errore caricamento veicoli!\n(Controlla il formato marca modello targa posizione)");
-        distruggi_hash_utenti(hash_utenti);
         distruggi_hash_veicoli(hash_veicoli);
-        fclose(file_utenti);
         fclose(ts);
         fclose(file_veicoli);
         return -1;
@@ -158,7 +135,7 @@ int main(int argc, char **argv) {
         }
 
         if(strcmp(tc_generale, "TC2") == 0){
-            if(test_funzione2(hash_veicoli, hash_utenti) < 0){
+            if(test_funzione2(hash_veicoli) < 0){
                 printf("Errore TC2\n");
                 continue;
             }
@@ -210,11 +187,9 @@ int main(int argc, char **argv) {
         fclose(output_file);
     }
     
-    distruggi_hash_utenti(hash_utenti);
     distruggi_hash_veicoli(hash_veicoli);
     fclose(ts);
     fclose(file_veicoli);
-    fclose(file_utenti);
     fclose(file_result);
 
 
@@ -440,7 +415,7 @@ e confronta l'output ottenuto con l'oracle.
     - Scrive su "TC2/output.txt" i risultati ottenuti.
     - Eventuali messaggi di errore vengono stampati su stderr.
  */
-int test_funzione2(ptr_hash_veicoli hash_veicoli, ptr_hash_utenti hash_utenti) {
+int test_funzione2(ptr_hash_veicoli hash_veicoli) {
     //Apre gli opportuni file nella cartella TC2
     FILE *in = fopen("TC2/input.txt", "r");
     FILE *oracle = fopen("TC2/oracle.txt", "r");
