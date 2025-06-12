@@ -1,2 +1,1 @@
-Verifica della visualizzazione corretta dei veicoli disponibili e della gestione
-degli storici di prenotazione
+Verifica della gestione degli storici di prenotazione

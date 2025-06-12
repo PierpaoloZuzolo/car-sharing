@@ -1,0 +1,2 @@
+12;6;2025;17;0;ferrari;CC000NN;pierpaolo_zuzolo;131.60;17;0;18;0
+12;6;2025;18;43;Porshe;BB001AA;pierpaolo_zuzolo;658.00;19;0;24;0
