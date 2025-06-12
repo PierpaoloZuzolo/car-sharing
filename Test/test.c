@@ -114,31 +114,43 @@ int main(int argc, char **argv) {
 
     char test_case[LUNGHEZZA_RIGA];
     while (fgets(test_case, sizeof(test_case), ts)) {
-    // Rimuove newline (\n), carriage return (\r), e spazi finali
+    // Debug: stampa riga grezza letta
+    printf("DEBUG (grezza): '%s'\n", test_case);
+
+    // Pulizia della riga
     test_case[strcspn(test_case, "\r\n")] = 0;
     while (strlen(test_case) > 0 && isspace((unsigned char)test_case[strlen(test_case) - 1])) {
         test_case[strlen(test_case) - 1] = 0;
     }
 
+    // Debug: stampa riga pulita
+    printf("DEBUG (pulita): '%s'\n", test_case);
+
     // Estrae il nome del test case in modo sicuro
     char tc_nome[CONTENITORE] = {0};
-    sscanf(test_case, "%s", tc_nome); // estrae la prima parola ignorando spazi
+    sscanf(test_case, "%s", tc_nome);
+
+    // Debug: stampa nome del test case estratto
+    printf("DEBUG (tc_nome): '%s'\n", tc_nome);
 
     int risultato = -1;
 
     if (strcmp(tc_nome, "TC1") == 0) {
+        printf("==> Eseguo test_funzione1()\n");
         risultato = test_funzione1();
         if (risultato < 0) {
             printf("Errore TC1\n");
             continue;
         }
     } else if (strcmp(tc_nome, "TC2") == 0) {
+        printf("==> Eseguo test_funzione2()\n");
         risultato = test_funzione2(hash_veicoli, hash_utenti);
         if (risultato < 0) {
             printf("Errore TC2\n");
             continue;
         }
     } else if (strcmp(tc_nome, "TC3") == 0) {
+        printf("==> Eseguo test_funzione3()\n");
         risultato = test_funzione3();
         if (risultato < 0) {
             printf("Errore TC3\n");
@@ -180,6 +192,7 @@ int main(int argc, char **argv) {
     fclose(oracle_file);
     fclose(output_file);
 }
+
 
 
     
@@ -248,7 +261,7 @@ int prendi_veicolo_da_file(FILE *fp, ptr_hash_veicoli veicolo) {
 
 
 int test_funzione1(void) {
-    printf("\nFunzione 3 chiamata");
+   // printf("\nFunzione 3 chiamata");
     FILE *in = fopen("TC1/input.txt", "r");
     FILE *oracle = fopen("TC1/oracle.txt", "r");
     FILE *out = fopen("TC1/output.txt", "w");
@@ -282,7 +295,7 @@ int test_funzione1(void) {
 
 
 int test_funzione2(ptr_hash_veicoli hash_veicoli, ptr_hash_utenti hash_utenti) {
-    printf("\nFunzione 2 chiamata");
+    //printf("\nFunzione 2 chiamata");
     //Apre gli opportuni file nella cartella TC2
     FILE *in = fopen("TC2/input.txt", "r");
     FILE *oracle = fopen("TC2/oracle.txt", "r");
@@ -363,7 +376,7 @@ int test_funzione2(ptr_hash_veicoli hash_veicoli, ptr_hash_utenti hash_utenti) {
 
 int test_funzione3() // test dello storico del noleggio
 {
-      printf("\nFunzione 3 chiamata");
+     // printf("\nFunzione 3 chiamata");
       FILE *in = fopen("TC3/input.txt", "r");
       FILE *oracle = fopen("TC3/oracle.txt", "r");
       FILE *out = fopen("TC3/output.txt", "w");
@@ -414,7 +427,7 @@ int test_funzione3() // test dello storico del noleggio
             return 0; // Test fallito
         }
     }
-    printf("\nFunzione 3 test superato");
+   // printf("\nFunzione 3 test superato");
     fclose(oracle);
     fclose(out);
     return 1; // Test superato
