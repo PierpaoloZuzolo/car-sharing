@@ -1,0 +1,17 @@
+====================================
+ Porshe  911 [BB001AA] 
+	posizione: Avellino
+
+	Orari disponibili:
+-Disponibile: dalle 00:00 alle 02:30
+-Disponibile: dalle 04:30 alle 24:00
+
+====================================
+====================================
+ ferrari  roma [CC000NN] 
+	posizione: Roma
+
+	Orari disponibili:
+-Disponibile: dalle 00:00 alle 24:00
+
+====================================

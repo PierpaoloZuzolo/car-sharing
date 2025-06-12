@@ -41,6 +41,7 @@ int prendi_utenti_da_file(FILE *fp, ptr_hash_utenti utente);
 int test_funzione1(void);
 int test_funzione2(ptr_hash_veicoli veicolo, ptr_hash_utenti ut);
 int test_funzione3();
+int test_funzione4(ptr_hash_veicoli hash_veicoli);
 int confronta_file(FILE*, FILE*);
 
 
@@ -165,6 +166,12 @@ int main(int argc, char **argv) {
         if(strcmp(tc_generale, "TC3") == 0){
             if(test_funzione3() < 0){
                 printf("Errore TC3\n");
+                continue;
+            }
+        }
+         if(strcmp(tc_generale, "TC4") == 0){
+            if(test_funzione4(hash_veicoli) < 0){
+                printf("Errore TC4\n");
                 continue;
             }
         }
@@ -473,6 +480,7 @@ int test_funzione2(ptr_hash_veicoli hash_veicoli, ptr_hash_utenti hash_utenti) {
         //Prenota le celle di un veicolo e vede e se è disponibile o no nella giornata di oggi
         int risultato_prenotazione = prenota_intervallo(pren, inizio, fine);
         bool disponibile = veicolo_disponibile_oggi(pren);
+        aggiorna_stato_veicolo(ve);
        
 
 
@@ -481,6 +489,9 @@ int test_funzione2(ptr_hash_veicoli hash_veicoli, ptr_hash_utenti hash_utenti) {
         fprintf(out, "%s %s\n", risultato_prenotazione ? "TRUE" : "FALSE", disponibile ? "TRUE" : "FALSE");
 
     }
+
+  
+
 
     fclose(in);
     fclose(out);
@@ -632,6 +643,91 @@ int test_funzione3() // test dello storico del noleggio
     fclose(oracle);
     fclose(out);
     return 1; // Test superato
+}
+
+
+/*
+ Funzione: test_funzione4
+ -------------------------
+
+ Esegue il test per la funzione `stampa_veicoli_disponibili`, verificando che l'output prodotto
+ corrisponda esattamente a quanto atteso (oracolo).
+
+ Implementazione:
+    - Reindirizza lo standard output (`stdout`) su un file ("TC4/output.txt").
+    - Chiama la funzione `stampa_veicoli_disponibili` con l'hash table inizializzata in precedenza.
+    - Ripristina lo standard output originale.
+    - Apre i file "TC4/output.txt" (output prodotto) e "TC4/oracle.txt" (output atteso).
+    - Confronta i due file riga per riga tramite la funzione `confronta_file`.
+    - Chiude i file aperti.
+
+ Parametri:
+    - `hash_veicoli`: puntatore alla tabella hash contenente i veicoli da stampare.
+
+ Pre-condizioni:
+    - `hash_veicoli` deve essere stato inizializzato e contenere dati validi.
+    - I file "TC4/oracle.txt" devono esistere e contenere l'output atteso nel formato corretto.
+
+ Post-condizioni:
+    - Viene generato il file "TC4/output.txt" contenente l’output effettivo della funzione.
+
+ Ritorna:
+    1 se il test è superato (file uguali);
+    0 se il test fallisce (file diversi) o in caso di errore nell'apertura dei file.
+
+ Side-effect:
+    - Scrive il file "TC4/output.txt".
+    - Stampa su standard error eventuali messaggi di errore in caso di differenze o problemi di I/O.
+ */
+int test_funzione4(ptr_hash_veicoli hash_veicoli)
+{
+    FILE *fout = fopen("TC4/output.txt", "w");
+    if (!fout) {
+        perror("Errore apertura file");
+        return 0;
+    }
+
+    // Salva fd stdout originale
+    int stdout_backup = dup(fileno(stdout));
+    if (stdout_backup == -1) {
+        perror("Errore dup stdout");
+        fclose(fout);
+        return 0;
+    }
+
+    // Reindirizza stdout su fout
+    if (dup2(fileno(fout), fileno(stdout)) == -1) {
+        perror("Errore dup2");
+        fclose(fout);
+        close(stdout_backup);
+        return 0;
+    }
+
+    fclose(fout); 
+
+    // Chiamata alla funzione da testare
+    stampa_veicoli_disponibili(hash_veicoli);
+
+    // Ripristina stdout
+    fflush(stdout);
+    dup2(stdout_backup, fileno(stdout));
+    close(stdout_backup);
+
+    //confronto output con oracolo
+    FILE *f1 = fopen("TC4/output.txt", "r");
+    FILE *f2 = fopen("TC4/oracle.txt", "r");
+    if (!f1 || !f2) {
+        perror("Errore apertura file per confronto");
+        return 0;
+    }
+
+    int risultato = confronta_file(f1, f2);
+
+    fclose(f1);
+    fclose(f2);
+
+    return risultato;
+
 }
 
 
