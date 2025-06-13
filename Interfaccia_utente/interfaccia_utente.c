@@ -312,7 +312,7 @@ ptr_veicolo menu_prenotazione(ptr_hash_veicoli hash_veicoli, char *nome_utente){
             float costo = calcola_costo_noleggio(inizio, fine, sconto);
 
             if(sconto >= 10){
-                printf("\nIl costo per il noleggio del veicolo è di %.2f euro,\nsul quale è stato applicato lo sconto per frequenza d'uso.\n\n", costo);
+                printf("\nIl costo per il noleggio del veicolo e' di %.2f euro,\nsul quale e' stato applicato lo sconto per frequenza d'uso.\n\n", costo);
             } else {
                 printf("\nIl costo del veicolo e' di %.2f euro.\n\n", costo);
             }
@@ -346,7 +346,7 @@ ptr_veicolo menu_prenotazione(ptr_hash_veicoli hash_veicoli, char *nome_utente){
 
                 printf("\nVuoi:\n");
                 printf("1. Riprovare la prenotazione per questo veicolo\n");
-                printf("2. Tornare alla lista veicoli\n");
+                printf("2. Selezionare un altro veicolo\n");
                 printf("0. Annullare e tornare al menu principale\n");
                 printf("Scelta: ");
 
@@ -423,16 +423,18 @@ void gestione_storico_prenotazioni(char *nome_utente, ptr_hash_veicoli hash_veic
         return;
     }
 
-    printf("\n\n1. Elimina prenotazione\n0. Indietro\n\n");
+    printf("\n\n1. Disdici prenotazione\n0. Indietro\n\n");
+    printf("\nNOTA: è consentita la disdetta esclusivamente per prenotazioni il cui inizio\n");
+    printf("sia previsto ad almeno 60 minuti dal momento della richiesta di cancellazione.\n");
     int scelta;
     while (1) {
         scelta = inserisci_scelta();
         if (scelta == 0 || scelta == 1) break;
-        printf("\nInserire 1 per eliminare o 0 per tornare indietro.\n");
+        printf("\nInserire 1 per disdire o 0 per tornare indietro.\n");
     }
 
     if (scelta == 1) {
-        printf("\n=== PRENOTAZIONI CHE PUOI ELIMINARE ===\n\n");
+        printf("\n=== PRENOTAZIONI CHE PUOI DISDIRE ===\n\n");
         char targa_veicolo_eliminato[8];
         int ora_inizio, minuto_inizio, ora_fine, minuto_fine;
         int cella_inizio, cella_fine;
@@ -448,19 +450,19 @@ void gestione_storico_prenotazioni(char *nome_utente, ptr_hash_veicoli hash_veic
     }
 
         if (count <= 0){
-            printf("\nNon ci sono prenotazioni eliminabili.\n");
+            printf("\nNon ci sono prenotazioni da disdire.\n");
             distruggi_lista_storico_noleggio(lista_noleggi);
             return;
         }
 
-        printf("Inserisci il numero della prenotazione da eliminare (0 per annullare): ");
+        printf("Inserisci il numero della prenotazione da disdire (0 per annullare): ");
         while(1){
             scelta = inserisci_scelta();
             if(scelta < 0 || scelta > count){
-                printf("\nInserire un numero valido (tra 1 e %d)", count);
+                printf("\nInserire un numero valido (tra 0 e %d)", count);
                 continue;
             }else if (scelta == 0){
-                     printf("\nOperazione annulata\nRitorno al menu,");
+                     printf("\nOperazione annullata\nRitorno al menu");
                     distruggi_lista_storico_noleggio(lista_noleggi);
                     return;
             } else break;
@@ -477,12 +479,12 @@ void gestione_storico_prenotazioni(char *nome_utente, ptr_hash_veicoli hash_veic
                 
                 
                 salva_lista_storico_noleggio_su_file(lista_noleggi, nome_utente, PERCORSO_STORICO_NOLEGGI);
-                printf("Prenotazione eliminata con successo.\n");
+                printf("Prenotazione disdetta con successo.\n");
             } else {
                 printf("Errore: veicolo non trovato nell'hash.\n");
             }
         } else {
-            printf("Nessuna prenotazione eliminata.\n");
+            printf("Nessuna prenotazione disdetta.\n");
         }
     }
 
