@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 
 #include "interfaccia_utente.h"
@@ -284,8 +285,13 @@ ptr_veicolo menu_prenotazione(ptr_hash_veicoli hash_veicoli, char *nome_utente){
     while (1) {
         printf("\nDigitare la targa del veicolo da prenotare: ");
         char targa[8];
-        scanf("%7s", targa);
-
+        if (fgets(targa, sizeof(targa), stdin)) {
+            if (strchr(targa, '\n') == NULL){
+                pulisci_input_buffer();
+            }
+        // Rimuove il newline se presente
+            targa[strcspn(targa, "\n")] = '\0';
+        }
         ve = cerca_veicolo_in_hash(hash_veicoli, targa);
         if(!ve){
             printf("\nVeicolo non trovato.\n");
