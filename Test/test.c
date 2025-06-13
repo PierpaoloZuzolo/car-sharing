@@ -30,14 +30,11 @@ Data: 10/06/2025
 
 #define LUNGHEZZA_RIGA 600
 #define CONTENITORE 1024
-#define NUMERO_UTENTI 5
 #define NUMERO_VEICOLI 5
 #define SCARTO 0.01 //Errore del costo
 #define MAX_LINE 1024 //da eliminare
 
 
-int prendi_veicolo_da_file(FILE *fp, ptr_hash_veicoli utente);
-int prendi_utenti_da_file(FILE *fp, ptr_hash_utenti utente);
 int test_funzione1(void);
 int test_funzione2(ptr_hash_veicoli veicolo);
 int test_funzione3();
